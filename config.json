@@ -1,0 +1,36 @@
+{   "SERVER_URL"   : "http://localhost:82"
+,   "TEXT_LEN_MAX" :  96
+, "PORT_HTTP"          :  82
+, "PORT_HTTPS"         : 444
+,  "KEY_PEM"           :    "../KEYSTORE/server/privkey.pem"
+, "CERT_PEM"           :    "../KEYSTORE/server/fullchain.pem"
+
+, "HOST"               : "localhost"
+, "PORT"               : 5432
+, "USER"               : "postgres"
+, "PASSWORD"           : "ivan"
+, "DATABASE"           : "cxu-feedback"
+
+,   "TOPICS_TABLE"     : "topics"
+,     "I18N_TABLE"     : "i18n"
+, "FEEDBACK_TABLE"     : "feedbacks"
+
+, "SELECT_feedbacks"   : "with args as(select uuid('?') as user_id from dual), comments as (select args.user_id, question_id, subject_id, commentaire from responses_libres inner join args on responses_libres.user_id=args.user_id inner join questions on responses_libres.question_id=questions.id), qcm as (select args.user_id, question_id, subject_id, rank from responses_qcm inner join args on responses_qcm.user_id=args.user_id inner join questions on responses_qcm.question_id=questions.id), tmp as (select case when comments.user_id is not null then comments.user_id else qcm.user_id end as user_id, case when comments.question_id is not null then comments.question_id else qcm.question_id end as q_id, case when comments.subject_id is not null then comments.subject_id else qcm.subject_id end as s_id,commentaire, rank from comments full outer join qcm on comments.question_id=qcm.question_id), responses as (select user_id, 's_' || s_id as subject, 'q_' || q_id as question, 'q_' || q_id || '_r_' || rank as feedback, case when commentaire is null then '' else commentaire end as comment from tmp) select * from responses ORDER BY subject,question;"
+, "SELECT_i18n"        : "with args as(select ? as lang from dual), subjects as (select args.lang, 's_'|| subject_id as key, libelle as val from subjects_translation inner join args on subjects_translation.lang=args.lang), questions as (select args.lang, 'q_'|| question_id as key, libelle as val from questions_translation inner join args on questions_translation.lang=args.lang), qcm as (select args.lang, 'q_' || question_id || '_r_' || rank as key, libelle as val from qcm_translation inner join args on qcm_translation.lang=args.lang)select * from qcm union select * from questions union select * from subjects"
+, "SELECT_topics"      : "select 's_' || subject_id as subject, 'q_' || id as question from questions ORDER BY subject,question"
+
+,    "XPATH_TABLE"     : "site_XPATH"
+,"SITE_TREE_TABLE"     : "site_TREE"
+
+
+  , "LOG_MORE"              : true
+  , "I18N_SELECT_feedbacks" : "SELECT * FROM feedbacks WHERE user_id='?' ORDER BY subject,question"
+  , "I18N_SELECT_i18n"      : "SELECT * FROM i18n      ORDER BY key"
+  , "I18N_SELECT_topics"    : "SELECT * FROM topics    ORDER BY subject,question"
+
+
+, "SELECT_site_TREE"    : "SELECT * FROM site_TREE WHERE site_url LIKE '?' ORDER BY site_url"
+
+, "URI_DIR"             :    "Files"
+, "URI_DIR_TARGET"      : "C:/Files"
+}

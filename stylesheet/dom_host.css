@@ -1,0 +1,157 @@
+/* ┌────────────────────────────────────────────────────────────────────────┐ */
+/* │ XPH stylesheet dom_host.css .. loaded by manifest _TAG (210611:23h:00) │ */
+/* └────────────────────────────────────────────────────────────────────────┘ */
+/* log_popup_div {{{*/
+
+#log_popup_div       > pre::before {
+    position         :       absolute;
+    content          :        "\25C0";
+    font-size        :           24px;
+    background-color :    transparent;
+    line-height      :            1em;
+    transform-origin :       80%  20%;
+    transform        : rotate( 45deg);
+    left             :            0px;
+    top              :            0px;
+    bottom           :          unset;
+}
+
+#log_popup_div.above> pre::before {
+    transform-origin :       80%  80%;
+    transform        : rotate(-45deg);
+    top              :          unset;
+    bottom           :            0px;
+}
+
+#log_popup_div.center> pre::before {
+    display          : none;
+}
+
+#log_popup_div         { line-height   : 1.2em;           }
+
+#log_popup_div em      { margin-left   : 1px;             }
+#log_popup_div em      { padding       : 0px 0.5em;       }
+
+#log_popup_div em      { border        : 1px solid white; }
+#log_popup_div em      { box-shadow    : 1px 1px 1px #888; }
+
+#log_popup_div .tag    { border-radius : 0.25em 0.25em 0.25em 0.25em; }
+#log_popup_div .left   { border-radius : 0.25em 0   0   0.25em; }
+#log_popup_div .center { border-radius : 0   0   0   0  ; }
+#log_popup_div .right  { border-radius : 0   0.25em 0.25em 0  ; }
+
+#log_popup_div .tag    { background    : linear-gradient(to right, rgba(255,255,255,0.4), rgba(136,136,255,0.4)); }
+#log_popup_div .id     { background    : linear-gradient(to right, rgba(255,000,000,0.4), rgba(255,136,136,0.4)); }
+#log_popup_div .class  { background    : linear-gradient(to left , rgba(000,255,000,0.4), rgba(136,255,136,0.4)); }
+
+/*}}}*/
+/* XPH_TARGET_CSS {{{*/
+
+.xpath_target {
+    transition       : transform 150ms ease-in;
+    transform        : rotate(1deg) scale(0.9);
+    opacity          : 0.8;
+    outline          : 5px #000 dashed;
+    box-shadow       : 3px 3px 12px 6px rgba(0,0,0,0.5);
+    border           : 5px #000 dashed;
+    background-color : #DFD;
+}
+
+/*}}}*/
+/* ECC {{{ */
+
+/* ECC #964B00 #FF0000 #FFA500 #FFFF00 #9ACD32 #6495ED #EE82EE #A0A0A0 #FFFFFF #CFB53B #C0C0C0 */
+/*      111111  222222  333333  444444  555555  666666  777777  888888  999999  000000  111111 */
+.cc1 { color: #FFF; background-color:#964B00 !important; }
+.cc2 { color: #FFF; background-color:#FF0000 !important; }
+.cc3 { color: #000; background-color:#FFA500 !important; }
+.cc4 { color: #000; background-color:#FFFF00 !important; }
+.cc5 { color: #000; background-color:#9ACD32 !important; }
+.cc6 { color: #000; background-color:#6495ED !important; }
+.cc7 { color: #000; background-color:#EE82EE !important; }
+.cc8 { color: #000; background-color:#A0A0A0 !important; }
+.cc9 { color: #000; background-color:#FFFFFF !important; }
+.cc0 { color: #FFF; background-color:#202020 !important; }
+
+.bg1 { background-color : rgba(150,  75,   0, .9); color : black; }
+.bg2 { background-color : rgba(255,   0,   0, .9); color : black; }
+.bg3 { background-color : rgba(255, 165,   0, .9); color : black; }
+.bg4 { background-color : rgba(255, 255,   0, .9); color : black; }
+.bg5 { background-color : rgba(154, 205,  50, .9); color : black; }
+.bg6 { background-color : rgba(100, 149, 237, .9); color : black; }
+.bg7 { background-color : rgba(238, 130, 238, .9); color : black; }
+.bg8 { background-color : rgba(160, 160, 160, .9); color : black; }
+.bg9 { background-color : rgba(255, 255, 255, .9); color : black; }
+.bg0 { background-color : rgba(128, 128, 128, .9); color : black; }
+
+.fg1 {            color : rgba(200,  99,   0, 1) !important; } /* overrides [ccX] color */
+.fg2 {            color : rgba(255,   0,   0, 1) !important; }
+.fg3 {            color : rgba(255, 165,   0, 1) !important; }
+.fg4 {            color : rgba(255, 255,   0, 1) !important; }
+.fg5 {            color : rgba(154, 205,  50, 1) !important; }
+.fg6 {            color : rgba(100, 149, 237, 1) !important; }
+.fg7 {            color : rgba(238, 130, 238, 1) !important; }
+.fg8 {            color : rgba(160, 160, 160, 1) !important; }
+.fg9 {            color : rgba(255, 255, 255, 1) !important; }
+.fg0 {            color : rgba(  0,   0,   0, 1) !important; text-shadow : 0px -1px #FFFFFF; }
+
+/* }}} */
+/* outline_frame outline_dot {{{*/
+
+    .outline_frame {
+        pointer-events   : none                 !important;
+        position         : absolute             !important;
+        margin           : 0                    !important;
+
+        outline-style    : dashed               !important;
+        outline-width    : 7px                  !important;
+
+        padding          : 0                    !important;
+        background-color : transparent          !important;
+    }
+
+    .outline_dot {
+        pointer-events   : none                 !important;
+        position         : absolute             !important;
+        margin           : 0                    !important;
+        transform        : translate(-50%,-50%) !important;
+
+        border-radius    : 0.5em                !important;
+        box-shadow       : 2px 2px 2px rgba(255,255,255,0.5) !important;
+        box-shadow       : 2px 2px 2px rgba(255,255,255,0.5) !important;
+
+        padding          : 0.2em                !important;
+        opacity          : 80%                  !important;
+
+        font-size        : 80%                  !important;
+        text-align       : center               !important;
+        text-shadow      : white    1px 1px 1px !important;
+    }
+
+/*}}}*/
+/* lit {{{*/
+
+.lit { outline : 7px dashed rgba(000,000,000,0.5); outline-offset: 7px; }
+
+/*}}}*/
+/* div_mask {{{*/
+/*
+
+#div_mask.displayed { top:  0 ; left:  0 ; }
+#div_mask           { width  :    0  ; height :    0  ; }
+#div_mask.displayed { width  :   100%; height :   100%; }
+
+#div_mask           { transition : opacity 250ms, top 100ms, left 100ms, width 100ms, height 100ms; }
+*/
+#div_mask           { display    :  none; }
+#div_mask.displayed { display    : block; }
+
+#div_mask           { top    :  0  ; left   :   0 ; }
+#div_mask           { width  : 100%; height : 100%; }
+
+#div_mask           { opacity    : 0.2; }
+#div_mask.displayed { opacity    : 1.0; }
+
+#div_mask           { transition : opacity 100ms ease-in; }
+
+/*}}}*/

@@ -1,0 +1,41 @@
+{
+    "name"             :   "XPath GitHub",
+    "version"          :   "2",
+    "manifest_version" :    2 ,
+    "description"      :   "DOM Nodes XPath selection",
+    "icons"            : { "48" : "images/xpath_48_unloaded.png"
+        ,                  "16" : "images/xpath_48.png"
+    },
+    "permissions"      : [ "tabs"
+        ,                  "file://*/*"
+        ,                  "http://*/*"
+        ,                  "https://*/*"
+        ,                  "webRequest"
+    ],
+    "content_scripts"  : [
+        {
+            "matches"  : [ "file://*/*", "http://*/*", "https://*/*" ],
+            "js"       : [ "lib/lib_log.js"
+                ,          "lib/lib_popup.js"
+                ,          "lib/lib_util.js"
+            ,              "javascript/config.js"
+                ,          "javascript/outline.js"
+                ,          "javascript/div_tools_html.js"
+                ,          "javascript/xpath.js"
+                ,          "javascript/xpath_content.js"
+            ],
+            "css"      : [ "stylesheet/dom_host.css" ]
+        }
+    ],
+    "browser_action"   : {
+        "default_icon" :   "images/xpath_48_unloaded.png"
+    },
+    "background"       : {
+        "scripts"      : [ "lib/lib_log.js"
+            ,              "lib/lib_util.js"
+            ,              "javascript/config.js"
+            ,              "javascript/xpath_background.js"
+        ],
+        "persistent"   : true
+    }
+}
