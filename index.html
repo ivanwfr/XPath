@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<!-- ┌─────────────────────────────────────────────────────────────────────┐ -->
+<!-- │ [index.html]                                   _TAG (211019:19h:39) │ -->
+<!-- └─────────────────────────────────────────────────────────────────────┘ -->
+<html>
+ <head>
+ <!--{{{-->
+  <meta charset="utf-8"/>
+  <title>index</title>
+  <!-- style {{{-->
+  <style>
+   /* LAYOUT {{{*/
+   html        { height        : 100%; }
+   body        { background    : linear-gradient(to bottom right, rgba(255,255,255,1), rgba(0,0,0,0.5)); }
+
+   h1          { text-align    :  right; }
+   h1          { align-self    : center; }
+
+   div         { box-shadow    : 2px 2px 2px #888; }
+   div         { border        : 1px solid   #DDD; }
+   div         { border-radius : 1em;              }
+   div         { padding       : 1em;              }
+   div         { margin        : 1em;              }
+
+            #div_online  { display: grid; grid-template-columns: 1fr 1fr; }
+            #div_offline { display: grid; grid-template-columns: 1fr 1fr; }
+
+
+   .offline #div_offline { visibility            : visible !important;         }
+            #div_offline { visibility            : hidden            ;         }
+            #div_offline { position              : fixed; top: 1em; left: 1em; }
+
+   .offline #div_online  { visibility            : hidden;  }
+   .offline #div_online  { pointer-events        : none;    }
+            #div_online  { box-shadow            : none;    }
+            #div_online  { border                : none;    }
+
+   /*}}}*/
+   /* COLOR {{{*/
+   a:visited             {            color  : unset !important;      }
+
+   .div_http             { background-color  : rgba(000,136,000,0.1);                 }
+   .div_https            { background-color  : rgba(000,000,136,0.1);                 }
+
+   .hosname              {            color  : black !important;      }
+   .network              {            color  : black !important;      }
+   .localhost            {            color  : gray  !important;      }
+
+   /*}}}*/
+   /* PORT {{{*/
+   .scheme               { font-size         :  120%; font-weight: bolder;            }
+   .scheme.https         { background-color  : rgba(000,000,136,0.5); color: white; padding: 0 0.2em; }
+   .scheme.http          { background-color  : rgba(000,136,000,0.5); color: black; padding: 0 0.2em; }
+
+   /*}}}*/
+  </style>
+  <!--}}}-->
+  <!-- script {{{-->
+   <script>
+    /*_ set_body_style_f_location {{{*/
+    let set_body_style_f_location = function()
+    {
+     let className
+     = (location.protocol == "file:")
+      ?  "offline"
+      :  "online"
+      ;
+     document.body.className = className;
+
+console.log("set_body_style_f_location:\n PROTOCOL=["+location.protocol+"] ➔ "+className);
+    };
+    /*}}}*/
+   /*_ replace_localhost_with_location_hostname {{{*/
+   let replace_localhost_with_location_hostname = function()
+   {
+console.log("%c replace_localhost_with_location_hostname ["+location.hostname+"]", "background:#00B;");
+    if(!location.hostname || (location.hostname == "localhost"))
+    {
+        console.log("...have no substitute for [localhost] yet...");
+        return;
+    }
+
+    let a_array = document.querySelectorAll("A");
+
+     for(let i=0; i<a_array.length; ++i)
+     {
+      //let a_innerText = a_array[i].innerText;
+      a_array[i].href      = a_array[i].href     .replace(/localhost/gm, location.hostname);
+      a_array[i].innerHTML = a_array[i].innerHTML.replace(/localhost/gm, location.hostname);
+
+console.log("┌──────────────────────────────────────┐");
+console.log(  a_array[i].innerText                    );
+console.log(  a_array[i] );
+console.log("└──────────────────────────────────────┘");
+
+     }
+   };
+   /*}}}*/
+  </script>
+  <!--}}}-->
+ <!--}}}-->
+ </head>
+ <body onload='set_body_style_f_location(); replace_localhost_with_location_hostname();'>
+  <h1>index</h1>
+  <div id="div_offline">
+   <!-- HTTPS URL {{{-->
+   <div>
+    <b>&#x25B6; Select an <em class="scheme https">HTTPS URL</em> to this file :</b>
+    <ul>
+    <li><a href="https://localhost:443/index.html">http://localhost:<em class="scheme https">443</em>/index.html …</a></li>
+    <li><a href="https://localhost:444/index.html">http://localhost:<em class="scheme https">444</em>/index.html …</a></li>
+    <li><a href="https://localhost:446/index.html">http://localhost:<em class="scheme https">446</em>/index.html …</a></li>
+    </ul>
+  </div>
+<!--}}}-->
+  <!-- HTTP  URL {{{-->
+   <div>
+    <b>&#x25B6; Select an <em class="scheme http" >HTTP URL</em> to this file :</b>
+    <ul>
+    <li><a href="http://localhost:80/index.html">http://localhost:<em class="scheme http" >80</em>/index.html …</a></li>
+    <li><a href="http://localhost:81/index.html">http://localhost:<em class="scheme http" >81</em>/index.html …</a></li>
+    <li><a href="http://localhost:83/index.html">http://localhost:<em class="scheme http" >83</em>/index.html …</a></li>
+    </ul>
+   </div>
+   <!--}}}-->
+  </div>
+  <div id="div_online">
+    <!-- HTTPS SERVER DASHBOARD {{{-->
+   <div class="div_https">
+    <b><em class="scheme https">HTTPS</em> SERVER DASHBOARD</b>
+    <ul>
+    <li><a href="https://localhost:443/server_index.html">https://localhost<em class="scheme https">:443</em>/server_index.html &#x25B6;</a></li>
+    <li><a href="https://localhost:444/server_index.html">https://localhost<em class="scheme https">:444</em>/server_index.html &#x25B6;</a></li>
+    <li><a href="https://localhost:446/server_index.html">https://localhost<em class="scheme https">:446</em>/server_index.html &#x25B6;</a></li>
+    </ul>
+   </div>
+   <!--}}}-->
+    <!-- HTTP  SERVER DASHBOARD {{{-->
+   <div class="div_http">
+    <b><em class="scheme http" >HTTP</em>  SERVER DASHBOARD</b>
+    <ul>
+    <li><a href= "http://localhost:80/server_index.html" > http://localhost<em class="scheme http" >:80</em>/server_index.html &#x25B6;</a></li>
+    <li><a href= "http://localhost:81/server_index.html" > http://localhost<em class="scheme http" >:81</em>/server_index.html &#x25B6;</a></li>
+    <li><a href= "http://localhost:83/server_index.html" > http://localhost<em class="scheme http" >:83</em>/server_index.html &#x25B6;</a></li>
+    </ul>
+   </div>
+   <!--}}}-->
+  </div>
+ </body>
+</html>
+
