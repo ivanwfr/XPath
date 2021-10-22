@@ -6,5 +6,5 @@
 # X=0   ;Y=0;  W=165;H=65
 # X=1364;Y=0;  W=165;H=111
 set -x
-mintty -t "USR" -p $X,$Y -s $W,$H --exec sh -c "cd `pwd`; ./server.sh"
+mintty -t `basename $PWD` -p $X,$Y -s $W,$H --exec sh -c "cd `pwd`; ./server.sh"
 
