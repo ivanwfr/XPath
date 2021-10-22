@@ -1,15 +1,15 @@
-{   "SERVER_URL"   : "http://localhost:82"
-,   "TEXT_LEN_MAX" :  96
-, "PORT_HTTP"          :  82
-, "PORT_HTTPS"         : 444
+{ "SERVER_URL"         : "http://localhost:83"
+, "TEXT_LEN_MAX"       :  96
+, "PORT_HTTP"          :  83
+, "PORT_HTTPS"         : 446
 ,  "KEY_PEM"           :    "../KEYSTORE/server/privkey.pem"
 , "CERT_PEM"           :    "../KEYSTORE/server/fullchain.pem"
 
 , "HOST"               : "localhost"
 , "PORT"               : 5432
 , "USER"               : "postgres"
-, "PASSWORD"           : "ivan"
-, "DATABASE"           : "cxu-feedback"
+, "PASSWORD"           : "postgres"
+, "DATABASE"           : "postgres"
 
 ,   "TOPICS_TABLE"     : "topics"
 ,     "I18N_TABLE"     : "i18n"
