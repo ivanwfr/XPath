@@ -257,440 +257,46 @@ if( log_this) lib_log.log_key_val_group(_caller+" ➔ "+caller+(message_object.c
 
 <!--}}}-->
 
-<H1>Base de connaissance<br>et alimentation</H1>
-<details id="introduction"><summary><H2>Introduction</H2></summary> <!--{{{-->
+<H1>XXX</H1>
+<details id="XXX"><summary><H2></H2></summary> <!--{{{-->
 <div>
-<P>L’alimentation
-de la base de connaissance se fait site (nom de domaine) par site,
-sur la base d’une url quelconque de celui-ci.</p>
-
-<P>Elle se décline en 3 phases de:
-</p>
-
-<UL>
-        <LI>collecte</li>
-        <LI>clustering</li>
-        <LI>labellisation
-        (tâche manuelle)</li>
-</UL>
-
-<P>Les
-phases de collecte et clustering sont séquentielles et automatiques,
-elles font l’objet du job de collecte/clustering en NodeJS décrit.</p>
-<P>L’extension
-spécifiée ici permettra de labelliser les clusters, et d’extraire
-certaines caractéristiques et alimenter la base de connaissance de
-celles-ci.</p>
-
 </div>
-</details>
-<!--}}}-->
-<details id="modele"><summary><H2>Modèle de données</H2></summary> <!--{{{-->
-<div>
-<P STYLE="margin-bottom: 0in; line-height: 100%">Le modèle de
-données décrit ici est la base de connaissance des sites internet.
+</details> <!--}}}-->
 
-    <details id="arbre"><summary><H3>Table ARBRE</H3></summary>
-    <!--{{{-->
-    <div>
-    <P>Un échantillon d’url pour chacun des noms de domaine avec la
-    structure décrivant l’arbre DOM stockée dans la colonne 
-    tree_structure, sous la forme
-    d’un fichier json. Voir paragraphe sur la modélisation de l’arbre
-    DOM.
-    <P>ARBRES(id,
-    nomdomaine, url, tree_structure), id est un identifiant
-    auto-incrémenté
-    </div>
-    <!--}}}-->
-    </details>
-
-    <details id="clustering_work"><summary><H3>Table CLUSTERING_WORK</H3></summary>
-    <!--{{{-->
-    <div>
-
-    <P>C’est
-    la table de travail pour la partie clustering. Voir la section sur le
-    clustering pour les détails.
-    <P>Brièvement,
-    l’algorithme de clustering est joué pour différentes valeurs du
-    paramètre cluster_nb (=Nc). Pour chaque valeur de l’hyperparamètre
-    Nc, on affecte l’url à l’un des clusters.
-
-    <P>CLUSTERING_WORK(tree_id, cluster_nb , cluster_id),
-     avec:
-
-     <UL>
-      <LI>cluster_nb: c’est la valeur de l’hyper-paramètre de clustering, le nombre de clusters</LI>
-      <LI>(tree_id, cluster_nb) est la clé primaire</LI>
-      <LI>tree_id est une clé étrangère pointant vers ARBRES.id</LI>
-      <LI>cluster_id: index (identifiant) du cluster auquel appartient l’url courante</LI>
-     </UL>
-
-
-    </div>
-    <!--}}}-->
-    </details>
-
-    <details id="table_labellisation"><summary><H3>Table LABELLISATION _XPATH</H3></summary>
-    <!--{{{-->
-    <div>
-
-    <P STYLE="margin-bottom: 0in; line-height: 100%">C’est la table
-    remplie par l’opération de labellisation via l’extension. Voir
-    la section Labellisation pour plus de détails.
-
-    <P STYLE="margin-bottom: 0in; line-height: 100%">LABELLISATION_PATH(tree_id,
-    xpathes, xpath_reduct) avec:
-    <UL>
-            <LI>tree_id: clé
-            étrangère pointant vers la référence ARBRE.id
-            <LI>xpathes:
-            tableau JSON de chemins XPath, sous la forme d’un blob.
-            <LI>xpath_reduct:
-            formule réduite du XPath
-    </UL>
-    </div>
-    <!--}}}-->
-    </details>
-
-</div>
-</details>
-<!--}}}-->
-<details id="service"><summary><H2>Service de collecte/clustering</H2></summary> <!--{{{-->
-<div>
-    <!--{{{-->
-    <div>
-    <P>Présenté
-    comme une API Rest, il est embarqué dans une application serveur
-    NodeJS et appelé par un client http (appel serveur à serveur) et
-    prend une url en paramètre. Il lance les deux phases de
-    collecte-clustering en asynchrone, Le service lance la
-    collecte/clustering en asynchrone et notifie immédiatement le client
-    la bonne prise en compte.
-
-    </div>
-    <!--}}}-->
-        <details id="dom"><summary><H3>Arbre DOM</H3></summary>
-    <!--{{{-->
-    <div>
-    <P STYLE="margin-bottom: 0in; line-height: 100%">On représente
-    l’arbre DOM/HTML du contenu de la page avec deux tableaux:
-    <UL>
-     <LI>la suite des tagname dans l’ordre croissant de leur index</LI>
-     <LI>dans le même ordre, la liste des index fils pour chacun</LI>
-    </UL>
-
-    <P>C’est la
-    modélisation la plus communément répandue dans les algorithmes
-    basés sur la TED. On la représente comme suit (une structure JSON à
-    deux tableaux)
-
-<PRE>
-{
-   ‘tags’     : [ html, body, content, iframe, footer, note]
- , ‘children’ : [ [ 2,5], [3,4], [], [], [6], [] ]
-}
-    <img src="DOC/arbre.png" alt="DOC/arbre.png"/>
-</PRE>
-
-    <P>On note <I><B>structure</B></I>
-    la fonction qui prend un contenu html et qui renvoie sa structure.
-
-    <P>En base de données
-    SQL, la structure sera stockée sous la forme d’un json dans un
-    type de données blob (binary)
-
-    </div>
-    <!--}}}-->
-    </details>
-
-        <details id="collecte"><summary><H3>Collecte</H3></summary>
-    <!--{{{-->
-    <p>
-    Le traitement prend
-    en paramètre une url, on extrait le nom de domaine. L’objectif est
-    d’alimenter la base de données de travail, la table ARBRE.
-    </p>
-    <pre>
-
-    table SQL: ARBRES(id, nomdomaine, url, tree_structure)
-    // id est un identifiant auto-incrémenté
-
-    // version tail recursive:
-    Définition:
-
-    <B>collecte</B>(liste(url), tot=0):
-                     si tot &gt;= max: return
-                     urls           = []  // liste vide
-                     Pour chaque url de liste(url):
-
-    contenu        = getHTTPContent(url)
-
-    tree_structure = structure (contenu)
-                     ajoute entrée SQL  dans la table
-                     ARBRES(id, nomdomaine, url, tree_structure)
-                     // id: auto-incrémenté
-
-    liens          = récupère toutes les urls (pointant vers le même nom de domaine)
-                     depuis le contenu HTML
-                     empile chacun des liens dans la liste urls
-
-    collecte(urls, tot + sizeof(urls))
-                         // tail recursive, permet l’optimisation de la pile
-    </pre>
-    <!--}}}-->
-    </details>
-
-        <details id="distances"><summary><H3>Calcul matrice des distances</H3></summary>
-    <!--{{{-->
-    <div>
-
-    <P>Tree Edit Distance (TED): Elle permet de calculer la distance
-    entre 2 arbres. C’est la longueur du plus court chemin pour passer
-    d’un abre1 en un arbre2. Le chemin est la suite d’opérations
-    d’insertion, suppression et modification du tagname de l’élément
-    DOM.
-
-    <P><A HREF="http://tree-edit-distance.dbresearch.uni-salzburg.at/">http://tree-edit-distance.dbresearch.uni-salzburg.at/</A>
-
-    <P>L’objectif est de calculer une matrice de dimension n x n  où n
-    est le nombre d’urls que l’on a analysé du nom de domaine. La
-    matrice est stockée en mémoire. Elle prend en argument le nom du
-    domaine et récupère l’ensemble des champs tree_structure de la
-    base SQL. Elle calcule, deux à deux,  les distances TED (Tree Edit
-    Distance) entre les structures d’arbre de chacun des 2. 
-
-
-
-    <P>Note: Pour le clustering, il est absolument nécessaire d’avoir
-    une distance (ou norme) au sens mathématiques du terme, notamment
-    l’inégalité triangulaire.
-
-    <A HREF="https://fr.wikipedia.org/wiki/Distance_(mathématiques)">https://fr.wikipedia.org/wiki/Distance_(mathématiques)</A>
-
-
-
-    <P>Un package NodeJS satisfaisant à ces conditions de norme
-    mathématiques:
-
-    <A HREF="https://www.npmjs.com/package/edit-distance" title="implémentation npm de la tree edit distance">https://www.npmjs.com/package/edit-distance</A>
-    <pre>
-
-    Définition <b>matrice_distance(nomdomaine)</b>:
-
-      liste(tree_structure) = récupération de toutes les lignes avec le nom de domaine
-
-      mat = init matrice de dimension n * n avec n: taille (liste(tree_structure))
-
-      Pour  idxI variant de      1 à len(tree_structure):
-       Pour idxJ variant de idxI+1 à len(tree_structure):
-        mat(idxI,idxJ) = TED(structure( idxI), structure( idxJ))
-
-      mat = mat + transpose(mat)
-
-      return mat
-    </pre>
-
-    </div>
-    <!--}}}-->
-    </details>
-
-        <details id="clustering"><summary><H3>Clustering</H3></summary>
-    <!--{{{-->
-    <div>
-    <P STYLE="margin-bottom: 0in; line-height: 100%">L’algorithme de
-    clustering «&nbsp;s’entraîne&nbsp;» sur la matrice de distance.
-    <P STYLE="margin-bottom: 0in; line-height: 100%">Son hyper-paramètre
-    est le nombre de clusters Nc. Pour déterminer le meilleur
-    hyper-paramètre Nc, on effectue le traitement pour les valeurs de Nc
-    suivantes: de 1 à 10. Ce sont les résultats des métriques
-    post-clustering qui détermineront le meilleur choix.
-
-    <P>table
-    SQL: CLUSTERING_WORK(tree_id, cluster_nb , cluster_id),
-    <br> avec:
-    <UL>
-            <LI>cluster_nb: c’est la valeur de l’hyper-paramètre de clustering, le nombre de clusters
-            <LI>(tree_id, cluster_nb) est la clé primaire
-            <LI>tree_id est une clé étrangère pointant vers ARBRES.id
-            <LI>cluster_id: index (identifiant) du cluster auquel appartient l’url courante
-    </UL>
-
-    <P>Utiliser
-    l’algorithme des k plus proches voisins/ KNN.
-    <A HREF="https://fr.wikipedia.org/wiki/Méthode_des_k_plus_proches_voisins">wikipedia knn</A>.
-
-    </div>
-    <!--}}}-->
-    </details>
-
-</div>
-</details>
-<!--}}}-->
-<details id="labellisation"><summary><H2>Extension de labellisation</H2></summary> <!--{{{-->
-<div>
-    <!--{{{-->
-    <div>
-
-    <P>L’extension communique avec un serveur NodeJS connecté à la
-    base PostgreSQL. L’extension récupère les urls devant être
-    labellisés par l’extension, l’extension est redirigée
-    séquentiellement sur chacune des urls, l’utilisateur effectue la
-    labellisation (cliques sur éléments de contenu pertinent). Les
-    chemins XPath sur chacun des éléments cliqués sont extraits et
-    inscrits en base de données dans la table  LABELLISATION
-    correspondant à l’url visitée.
-    </div>
-    <!--}}}-->
-        <details id="xpath"><summary><H3>XPath dans le DOM</H3></summary>
-    <!--{{{-->
-    <div>
-
-    <P>Chaque élément (ou tag) html peut être identifié par son
-    chemin XPath. Nous prenons une forme simplifiée de sélecteur XPath:
-    les «&nbsp;class&nbsp;» html et sélecteurs CSS ne sont pas pris en
-    compte.
-
-    <P>Exemple:
-    <PRE>&lt;html&gt;
-      &lt;head&gt;&lt;title&gt; Titre de la page&lt;/title&gt;&lt;/head&gt;
-      &lt;body&gt;
-              &lt;div&gt;&lt;h2&gt;Header&lt;/h2&gt;&lt;/div&gt;
-              &lt;div&gt;&lt;h2&gt;Data&lt;/h2&gt;&lt;/div&gt;
-              &lt;div&gt;&lt;h2&gt;Footer&lt;/h2&gt;&lt;/div&gt;
-      &lt;/body&gt;
-    &lt;/html&gt;</PRE><P>
-    Le texte «&nbsp;Data&nbsp;» peut être localisé par son expression
-    XPath: 
-
-
-    </div>
-    <!--}}}-->
-    </details>
-        <details id="calcul"><summary><H3>Calcul du XPath issu d’un clique</H3></summary>
-    <!--{{{-->
-    <div>
-
-    <P>Lorsque l’utilisateur est redirigé sur la page qu’il doit
-    labelliser, il doit ensuite cliquer sur quelques éléments texte
-    pertinents et dans le corps de la page. Les chemins XPath des
-    éléments cliqués sont ajoutés dans le tableau de la colonne
-    xpathes de la table LABELLISATION_PATH.
-
-    <P>Un menu contextuel permettant de valider ou de mettre de côté
-    est continuellement affiché.
-
-    <P>Note technique: je suppose que des gestionnaires d’évènements
-    clique devront être ajoutés dynamiquement par l’extension sur
-    tous les éléments de la page?
-
-    <P>Précisions dans les captures d’écran.
-    </div>
-    <!--}}}-->
-    </details>
-        <details id="sampling"><summary><H3>Sampling des urls à labelliser</H3></summary>
-    <!--{{{-->
-    <div>
-
-    <P>Pour un nom de domaine donné dont la collecte et le clustering
-    ont été effectués, le traitement de sampling consiste à récupérer
-    les urls des pages à labelliser.
-
-    <P>Reste à faire (Amaël): détailler l’algorithme de sampling.
-    </div>
-    <!--}}}-->
-    </details>
-        <details id="réduction"><summary><H3>Réduction des XPathes d’une url</H3></summary>
-    <!--{{{-->
-    <div>
-
-    <P>À l’issue de la la labellisation de l’url, on se retrouve
-    avec un tableau de chemins XPath, notamment dans la colonne 
-    LABELLISATION_PATH.xpathes
-
-    <P>L’algorithme réduit ce tableau à un unique chemin XPath en
-    prenant la racine commune aux différents pathes. Exemple:
-
-    <P>On considère 3 chemins XPath pour la même url:
-    <PRE>
-    /html[0]/body[0]/div[1]/div[7]/h1[1]
-    /html[0]/body[0]/div[1]/div[8]/div/a[0]
-    /html[0]/body[0]/div[1]/div[9]/div[1]/h2[0] </PRE>
-
-    <P>Alors le chemin parent commun à chacun est:
-    <PRE>
-    /html[0]/body[0]/div[1]
-    </PRE>
-
-    <P>C’est cette forme réduite qui est stockée dans la colonne
-    LABELLISATION_PATH.xpath_reduct
-
-
-    </div>
-    <!--}}}-->
-    </details>
-</div>
-</details>
-<!--}}}-->
-
-<!-- contrat_de_service -->
 <hr>
-<!--{{{-->
+<details id="XXX"><summary><H2></H2></summary> <!--{{{-->
+<div>
+ <details id="XXX"><summary><H3></H3></summary> <!--{{{-->
+  <div>
+  </div>
+ </details> <!--}}}-->
+ <details id="XXX"><summary><H3></H3></summary> <!--{{{-->
+  <pre>
+  </pre>
+ </details> <!--}}}-->
+ <details id="XXX"><summary><H3></H3></summary> <!--{{{-->
+  <div>
+  </div>
+ </details> <!--}}}-->
+ <details id="XXX"><summary><H3></H3></summary> <!--{{{-->
+  <div>
+  </div>
+ </details> <!--}}}-->
+</div>
+</details> <!--}}}-->
 
-<details id="contrat_de_service"><summary><H2>contrat_de_service</H2></summary>
+<hr>
+<details id="XXX"><summary><H2></H2></summary> <!--{{{-->
+ <details id="XXX"><summary><H3></H3></summary> <!--{{{-->
+ </details> <!--}}}-->
+</details> <!--}}}-->
 
-<p>
-L'extension sollicite les 3 services du serveur NodeJS pour les points suivants:
+<hr>
+<details id="XXX"><summary><H2>XXX</H2></summary> <!--{{{-->
+</details> <!--}}}-->
 
-<ul>
-<li>- récupération des noms de domaine à récupérer:
-<pre> <!--{{{-->
-GET https://clustering.iwintoo.io/domains
-- Params IN: aucun
-- Params OUT: JSON/tableau des noms de domaine
-ex: [ "https://www.lemonde.fr", "https://nomdomaine1", ... ]
-</pre> <!--}}}-->
-</li>
-
-
-<li>- récupération des urls d'un nom de domaine:
-<pre> <!--{{{-->
-POST https://clustering.iwintoo.io/urls
-- Params IN: nomdomaine: nom de domaine 1
-- Params OUT: JSON/tableau des urls du nom de domaine:
-ex: [ "https://www.lemonde.fr/gfhrz",  "https://www.lemonde.fr/mldsfsq",  ... ]
-</pre> <!--}}}-->
-</li>
-
-
-<li>- transmission d'une liste de XPath liés à l'url:
-<pre> <!--{{{-->
-POST https://clustering.iwintoo.io/xpaths
-- Params IN: JSON: { "url": "https://www.lemonde.fr/gfhrz", xpathes: [xpath1, xpath2]}
-- Params OUT: aucun
-</pre> <!--}}}-->
-</li>
-
-</ul>
-
-<p>
-Le job de collecte, pour un nom de domaine donnée est lancé par l'appel suivant:
-<ul>
-<li>
-<pre>
-POST https://clustering.iwintoo.io/collecte
-- Params IN: JSON: { "domain": "https://www.lemonde.fr/gfhrz"}
-- Params OUT: aucun
-</pre>
-</li>
-</ul>
-
-</details>
-<!--}}}-->
-
+<hr>
 <!-- nodejs_dev_server_logs -->
-<hr>
 <details class="nodejs_dev_server_logs"><summary><H2>nodejs_dev_server_logs</H2></summary> <!--{{{-->
 <pre class="comment"> <!--{{{-->
 Ces logs sont ceux du serveur NodeJS qui a servi à simuler
@@ -1364,6 +970,11 @@ let onload = function()
 /*}}}*/
  </script>
 <!--}}}-->
+
+
+
+
+
 
 </body>
 </html>
