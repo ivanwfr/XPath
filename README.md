@@ -37,8 +37,8 @@
 ## `USAGE`
 <!--{{{-->
 ```bash
-$ node server.js                   # launch server
-$ explorer 1_index.url             # visit index page
+$ node     SERVER/server.js                 # launch server
+$ explorer http://localhost:83/index.html   # visit index page
 ```
 
 <!--}}}-->
@@ -68,12 +68,27 @@ $ explorer 1_index.url             # visit index page
 
 <hr>
 
-`SERVER WEB PAGE (client frame)` <!--{{{-->
-> * _href to **user feedback page** with **lang** and **user_id** parameters_
-> * _href to the **translation page**_
->    * _lang and user_id will be saved as a site cookie
+<!--{{{-->
 
-> ![server_index_client](/screenshot/server_index_client.png)
+* domains
+
+> ![domains](/screenshot/domains.png)
+
+* pages
+
+> ![pages](/screenshot/pages.png)
+
+* wikipedia
+
+> ![wikipedia](/screenshot/wikipedia.png)
+
+* options
+
+> ![options](/screenshot/options.png)
+
+* logging
+
+> ![logging](/screenshot/logging.png)
 
 <!--}}}-->
 
