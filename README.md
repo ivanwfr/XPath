@@ -3,32 +3,40 @@
         ┌── manifest.json
       ➔ ├── config.json
         │
-      ➔ ├── server.js
         ├── server.sh
         ├── server_mintty.sh
         │
       ➔ ├── 1_index.url
       ➔ ├── index.html
         ├── server_index.html
-      ➔ ├── xpath.html
         ├── xpath_github.html
+        │
+        ├── SERVER
+        │   ├── server.js
+        │   └── server_sql.js
         │
         ├── javascript
         │   ├── config.js
         │   ├── div_tools_html.js
         │   ├── outline.js
-        │   ├── xpath.js
+        │   ├── xpath.js
         │   ├── xpath_background.js
         │   └── xpath_content.js
         │
         └── lib
-        │   ├── lib_postgres.js
-            └── t_details.js
+            ├── lib_log.js
+            ├── lib_popup.js
+            ├── lib_postgres.js
+            ├── lib_util.js
+            └── t_details.js
 
+└── xpath.html
+
+8 directories, 36 files
 }}}-->
 
 # XPH
- Chrome Extension - DOM Nodes XPath selection (PostgreSQL, NodeJS, Admin, User pages)
+ Chrome Extension - DOM Nodes XPath selection (PostgreSQL, NodeJS, Admin and User-pages)
 
 ### ✔ [ZIP archive on GitHub](../../archive/master.zip)
 
