@@ -43,9 +43,8 @@ $ explorer http://localhost:83/index.html   # visit index page
         └── t_details.js
 ```
 
-### `SCREENSHOTS`
-
-<!--{{{-->
+<hr>
+<!-- SCREENSHOTS {{{-->
 
 * visited domains, page selection
 
@@ -54,6 +53,8 @@ $ explorer http://localhost:83/index.html   # visit index page
 > ![wikipedia](/screenshot/wikipedia.png)
 
 > ![options](/screenshot/options.png)
+
+> ![options](/screenshot/expand_xpath.png)
 
 > ![logging](/screenshot/logging.png)
 
