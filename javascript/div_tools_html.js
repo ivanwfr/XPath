@@ -25,7 +25,7 @@
 */
 
 const DIV_TOOLS_HTML_JS_ID     = "div_tools_html_js";
-const DIV_TOOLS_HTML_JS_TAG    =  DIV_TOOLS_HTML_JS_ID  +" (211021:16h:52)";
+const DIV_TOOLS_HTML_JS_TAG    =  DIV_TOOLS_HTML_JS_ID  +" (211026:17h:51)";
 /*}}}*/
 let       div_tools_html_js = (function() {
 /*➔ LOG {{{*/
@@ -246,7 +246,7 @@ DIV.folded        OL {   width: 0; height: 0; min-width: 0; min-height: 0; };
     width            : fit-content;
     white-space      : pre;
     border-radius    : 0.6em;
-    background-color : rgba(170,102,170,0.3);
+    background-color : rgba(170,102,170,0.8);
     color            : white;
     padding          : 0.5em;
     text-shadow      : 1px 1px 0 black;
@@ -622,7 +622,7 @@ let get_div_tools_innerHTML = function()
     let  div_options_innerHTML = `
 <div id="div_options" class="hidden">
 <div id="help">
-&#x1F4A1; Outline refresh page
+&#x1F4A1; Outline refresh
 ➔ Shift Mouse-Click
 … <i>(inside tools GUI)</i>
 <hr>
@@ -630,9 +630,10 @@ let get_div_tools_innerHTML = function()
 ➔ Ctrl-Alt Mouse-Click
 … <i>(inside tools GUI)</i>
 <hr>
-&#x1F4A1; MOUSE-WHEEL-OFFSET FACTOR
+&#x1F4A1; Mouse Wheel offset factor
 ➔ <span class='fg4'> Shift </span> <span class='fg5'> Ctrl </span> <span class='fg6'> Alt </span>
 … <span class='fg4'> x2    </span> <span class='fg5'> x4   </span> <span class='fg6'> x8  </span>
+… <i>(DOM-tree up and down quicker)</i>
 </div>
 
  <button title="Settings"> &#x1F527; </button>
