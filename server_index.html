@@ -4,7 +4,7 @@
 <!-- └─────────────────────────────────────────────────────────────────────┘ -->
 <html lang="fr">
 <head> <!--{{{-->
-  <title>xpath</title>
+  <title>XPath</title>
   <meta http-equiv="content-type" content="text/html" charset="utf-8">
 <!-- STYLE link {{{-->
   <base href="./">
@@ -24,8 +24,10 @@
     summary>h2  { display: inline-block; }
     summary>h3  { display: inline-block; }
 
+/*{{{
     summary>h2  { background-color: transparent; box-shadow: 2px 2px 2px rgba(136,136,136,0.5); }
     summary>h3  { background-color: #FFF;        box-shadow: 2px 2px 2px rgba(136,136,136,0.5); }
+}}}*/
 
    @page { margin: 0.79in }
 
@@ -217,14 +219,11 @@ if( log_this) lib_log.log_key_val_group(_caller+" ➔ "+caller+(message_object.c
       response.parsed_items        = "XPATH x4";
       response.xpaths
        = [ "/html/body/h1"
-//     ,   "/html/body/details/div/ul"
-//     ,   "/html/body/details/div/p[4]"
-//     ,   "/html/body/details[2]/summary/h2"
-       ,   "/html/body/details[3]/div/details[2]/pre"
-       ,   "/html/body/details[5]/ul/li/pre"
-       ,   "/html/body/details[5]/ul/li[2]/pre"
-       ,   "/html/body/details[5]/ul/li[3]/pre"
-       ,   "/html/body/details[5]/ul[2]/li/pre"
+       ,   "/html/body/details/p[1]"
+       ,   "/html/body/details/p[2]"
+       ,   "/html/body/details/p[3]"
+       ,   "/html/body/details/p[4]"
+       ,   "/html/body/details[2]/details/div/pre[2]"
        ];
 
       xpath_content_js.get_xpaths_handler (response.xpaths);
@@ -249,8 +248,22 @@ if( log_this) lib_log.log_key_val_group(_caller+" ➔ "+caller+(message_object.c
 <!--}}}-->
 <body onload='onload(event);'>
 
+<!-- details_radio {{{-->
+<script id="t_details_js" src="lib/t_details.js" ></script>
+<script> document.addEventListener("DOMContentLoaded", t_details.t_details_onload); </script>
+
+<span
+ class   = "p_input"
+ title   = "Single section opening behavior"
+ onclick = 't_details.details_radio_toggle(event);'
+ >
+ <input type="checkbox" id="details_radio"/>
+ <label>details radio</label>
+</span>
+<!--}}}-->
+
 <H1>Wikipedia Web_scraping</H1>
-<details id="details_wikipedia"><summary><H3>Wikipedia</H3></summary> <!--{{{-->
+<details id="details_wikipedia"><summary><H3>Web Scraping</H3></summary> <!--{{{-->
  <a target="wikipedia" href="https://en.wikipedia.org/wiki/Web_scraping" style="float:right;">➔ wikipedia</a>
  <p style="clear:right;">Web scraping, web harvesting, or web data extraction is data scraping used for extracting data from websites. The web scraping software may directly access the World Wide Web using the Hypertext Transfer Protocol or a web browser. While web scraping can be done manually by a software user, the term typically refers to automated processes implemented using a bot or web crawler. It is a form of copying in which specific data is gathered and copied from the web, typically into a central local database or spreadsheet, for later retrieval or analysis.</p>
  <p>Web <em>scraping</em> a web page involves fetching it and extracting from it. Fetching is the downloading of a page (which a browser does when a user views a page). Therefore, web crawling is a main component of web scraping, to fetch pages for later processing. Once fetched, then extraction can take place. The content of a page may be parsed, searched, reformatted, its data copied into a spreadsheet or loaded into a database. Web scrapers typically take something out of a page, to make use of it for another purpose somewhere else. An example would be to find and copy names and telephone numbers, or companies and their URLs, or e-mail addresses to a list (contact scraping).</p>
@@ -631,20 +644,6 @@ REQUEST #61  }}} NO MORE pending_queries
 <!--{{{-->
 
 <div id="div_notes">
-
- <span
- class   = "p_input"
- title   = "
-A l'ouverture d'une section
-les autres seront
-automatiquement refermées
-"
- onclick = 'details_radio_toggle(event);'
- >
- <input type="checkbox" id="details_radio"/>
- <label>details radio</label>
- </span>
-
  <details id="todo">
  <summary>TODO</summary>
 
@@ -814,80 +813,6 @@ automatiquement refermées
 <!-- script -->
 <!--{{{-->
  <script>
- /*_ details_ontoggle {{{*/
- let details_ontoggle = function(event)
- {
-//console.dir(event)
-     let details = event.target;
-     if(!details     ) return;
-
-//console.log("➔ details=["+details+"]")
-     if(details.id) {
-         if(details.open) lib_util.localStorage_setItem(details.id+"_open", "true");
-         else             lib_util.localStorage_delItem(details.id+"_open"        );
-     }
-
-     if(!details.open) return;
-
-     let details_radio  = lib_util.localStorage_getItem("details_radio");
-//console.log("➔ details_radio=["+details_radio+"]")
-     if(!details_radio ) return;
-
-     let parent = details.parentElement;
-     for(let i=0; i<parent.children.length; ++i)
-     {
-         // skip target
-         let siblings = parent.children[i];
-         if(siblings == event.target) continue;
-
-         // close siblings
-         if(siblings.tagName == "DETAILS")
-         {
-             siblings.open = false;
-             if(siblings.id)
-                 lib_util.localStorage_delItem(siblings.id+"_open");
-         }
-     }
- };
- /*}}}*/
-/*_ details_radio {{{*/
-let details_radio_toggle = function(e)
-{
-console.log("details_radio_toggle("+e.target.tagName+")")
-
-   /* input */
-   let    id = "details_radio";
-   let input = (e.target.tagName == "INPUT")
-    ?           e.target
-    :           lib_util.get_tool(id);
-//console.log("➔ input=["+input.tagName+"]")
-
-    /* toggle */
-    if(e.target != input) input.checked = !input.checked;
-
-    /* UI */
-//  if(input.checked) input.parentElement.classList.add   ("selected");
-//  else              input.parentElement.classList.remove("selected");
-//  let container = document .getElementById("todo"   );
-    let container = document.documentElement;
-    let details   = container.querySelectorAll("DETAILS");
-    Array.from(details).forEach( (el) => { el.open = false; });
-
-   /* store */
-   if( input.checked   ) lib_util.localStorage_setItem(id, "true");
-   else                  lib_util.localStorage_delItem(id        );
-};
-
-let details_radio_set_from_localStorage = function()
-{
-//console.log("details_radio_set_from_localStorage")
-
-   let id = "details_radio";
-   let el =                          lib_util.get_tool(id        );
-   if( el ) el.checked = lib_util.localStorage_getItem(id        );
-};
-
-/*}}}*/
 /*_ onload {{{*/
 //console.log("onload:")
 let onload = function()
@@ -895,31 +820,53 @@ let onload = function()
 //console.log("onload") // Note: No localStorage for file:// protocol
 
  title_to_h1();
-
- details_radio_set_from_localStorage();
-
- let details = document.querySelectorAll("DETAILS");
-//console.dir(details)
-
- Array.from(details).forEach( (el) => { el.addEventListener("toggle", details_ontoggle); });
-
- Array.from(details).forEach( (el) => {
-     let open = el.id && lib_util.localStorage_getItem(el.id+"_open");
-     if( open ) {
-//console.log(el.id+" open")
-        el.open = true;
-     }
- });
-
 };
 
 /*}}}*/
 /*_ title_to_h1 {{{*/
 let title_to_h1 = function()
 {
- let server_index_tag = document.querySelector("HEAD>title").textContent +" (211025:23h:01)";
+ let server_index_tag = document.querySelector("HEAD>title").textContent +" (211026:17h:36)";
  let               el = document.querySelector("H1");
  el.textContent       = server_index_tag;
+
+ tag_page(server_index_tag);
+};
+/*}}}*/
+/*_ tag_page {{{*/
+let tag_page = function(page_tag)
+{
+console.log("tag_page("+page_tag+")")//FIXME
+
+    let tag           = document.createElement("I");
+    document.body.insertBefore(tag, document.body.firstElementChild);
+    tag.outerHTML     = "<i style='float:right; clear:right; color:rgba(68,68,255,0.3); margin:  0em 0 0 0;'>"+ page_tag +"</i>";
+
+    let loc           = document.createElement("I");
+    document.body.insertBefore(loc, document.body.firstElementChild);
+    loc.outerHTML     = "<i style='float:right; clear:right; color:rgba(68,68, 68,0.3); margin:1.0em 0 0 0;'>"+location.href+"</i>";
+
+//  let doc           = document.createElement("I");
+//  document.body.insertBefore(doc, document.body.firstElementChild);
+//  doc.outerHTML     = "<a style='float:right; color:rgba(68,68,68,0.3); margin:0;' target='doc' href='/doc/index.html'>&#x1F4A1;</i>";
+
+    let secure = document.location.href.toLowerCase().startsWith("https"    );
+    let local  = document.location.href.toLowerCase().includes  ("//localhost");
+    document.body.style.backgroundColor
+        = secure ? "#EEE" // bright
+        : local  ? "#FFB" // yellowish
+        :          "#FDD" // redish
+        ;
+
+    document.getElementsByTagName("title")[0].innerText
+    = document.location.href
+      .replace(/\/\w+\.html/,   "")
+      .replace(/:\/\//      ," ➔ ")
+      .toUpperCase()
+      ;
+
+    let button = document.getElementById("status"); if(button) button.click();
+
 };
 /*}}}*/
  </script>
@@ -937,9 +884,8 @@ let title_to_h1 = function()
 }}}-->
 <!--{{{
 vim sw=4
-:!start explorer "file:///C:/LOCAL/DATA/ANDROID/PROJECTS/XPH/xpath.html"
-:!start explorer         "C:\LOCAL\DATA\ANDROID\PROJECTS\XPH\"
+:!start "C:/Program Files (x86)/Google/Chrome/Application/chrome.exe" http://localhost:83/server_index.html
+:!start "C:/Program Files (x86)/Google/Chrome/Application/chrome.exe" %:p
 :e manifest.json
-:new                  $WPROJECTS/RTabs/Util/RTabs_Profiles/DEV/javascript/dom_load.js
 }}}-->
 
