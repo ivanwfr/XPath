@@ -23,7 +23,7 @@
 ,"SITE_TREE_TABLE"     : "site_TREE"
 
 
-  , "LOG_MORE"              : true
+  , "LOG_MORE"              : false
   , "I18N_SELECT_feedbacks" : "SELECT * FROM feedbacks WHERE user_id='?' ORDER BY subject,question"
   , "I18N_SELECT_i18n"      : "SELECT * FROM i18n      ORDER BY key"
   , "I18N_SELECT_topics"    : "SELECT * FROM topics    ORDER BY subject,question"
