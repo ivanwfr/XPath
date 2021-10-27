@@ -7,7 +7,7 @@
 /* eslint-disable no-warning-comments */
 
 const SERVER_JS_ID  = "server";
-const SERVER_JS_TAG = SERVER_JS_ID  +" (211022:20h:02)";
+const SERVER_JS_TAG = SERVER_JS_ID  +" (211027:17h:51)";
 /*}}}*/
 let server = (function() {
 "use strict";
@@ -439,8 +439,8 @@ if(config.LOG_MORE) console.log("REQUEST #"+response.request_count+" "+TRACE_OPE
     {
         if( !consumed_by) consumed_by = server_request_data_io .request_data_io    ( args );
         if( !consumed_by) consumed_by =                         request_js_script  ( args );
-        if( !consumed_by) consumed_by =                         request_sql_query  ( args );
         if( !consumed_by) consumed_by = server_request_commands.request_dump_TABLES( args );
+        if( !consumed_by) consumed_by =                         request_sql_query  ( args );
 
     }
 /*}}}*/
@@ -479,11 +479,11 @@ if(config.LOG_MORE) console.log(TRACE_CLOSE);//DEBUG
 /*_ parse_url {{{*/
 let parse_url = function(url)
 {
-    //console.log("parse_url:")
-    //console.log("url:")
-    //console.dir( url  )
-    //console.log("decodeURIComponent(url):")
-    //console.dir( decodeURIComponent(url)  )
+//console.log("parse_url:")
+//console.log("url:")
+//console.dir( url  )
+//console.log("decodeURIComponent(url):")
+//console.dir( decodeURIComponent(url)  )
 
     //..................... scheme://     domain    /path        query
     let url_match
@@ -500,12 +500,16 @@ let parse_url = function(url)
     //console.log("url_match[0]:")
     //console.dir( url_match[0]  )
 
-    return { scheme : url_match[1]
-        //,      port : url_match[2]
-        ,    domain : url_match[3]
-        ,      path : url_match[4]
-        ,     query : url_match[5]
-    };
+    let args
+        = {   scheme : url_match[1]
+          //,   port : url_match[2]
+            , domain : url_match[3]
+            ,   path : url_match[4]
+            ,  query : url_match[5]
+        };
+//console.dir(args)//FIXME
+
+    return  args;
 };
 /*}}}*/
 return { request_listener };
@@ -697,7 +701,8 @@ let request_dump_TABLES = function(args)
     let { uri,          response } = args;
     let consumed_by;
 
-    if((uri.path == "query") && uri.query.includes("dump_TABLES"))
+    if(   (uri.path  && uri.path .includes("dump_TABLES")
+       || (uri.query && uri.query.includes("dump_TABLES"))))
     {
 log_M("  ┌─────────────┐\n"
      +"➔ │ dump_TABLES │\n"
@@ -1007,6 +1012,9 @@ if(config.LOG_MORE) console.log("handle_request("+request.url+")");
 //console.log("consumed_by=["+consumed_by+"]")
 };
 /*}}}*/
+
+
+
 /*_ handle_request_xpath {{{*/
 let handle_request_xpath = function(request,response,args)
 {
