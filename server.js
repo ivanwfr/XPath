@@ -439,8 +439,8 @@ if(config.LOG_MORE) console.log("REQUEST #"+response.request_count+" "+TRACE_OPE
     {
         if( !consumed_by) consumed_by = server_request_data_io .request_data_io    ( args );
         if( !consumed_by) consumed_by =                         request_js_script  ( args );
-        if( !consumed_by) consumed_by =                         request_sql_query  ( args );
         if( !consumed_by) consumed_by = server_request_commands.request_dump_TABLES( args );
+        if( !consumed_by) consumed_by =                         request_sql_query  ( args );
 
     }
 /*}}}*/
