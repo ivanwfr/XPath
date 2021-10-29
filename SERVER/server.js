@@ -7,7 +7,7 @@
 /* eslint-disable no-warning-comments */
 
 const SERVER_JS_ID  = "server";
-const SERVER_JS_TAG = SERVER_JS_ID  +" (211027:17h:51)";
+const SERVER_JS_TAG = SERVER_JS_ID  +" (211029:23h:52)";
 /*}}}*/
 let server = (function() {
 "use strict";
@@ -779,8 +779,10 @@ let request_js_script = function(args) /* eslint-disable-line complexity */
     let consumed_by;
 
     /* [file_name] [lang] [user_id] {{{*/
-    let file_name
-        = uri.path.match(/([^\/]+$)/)[1];
+    let uri_path_match = uri.path.match(/([^\/]+$)/);
+    if(!uri_path_match) return "";
+
+    let file_name = uri_path_match[1];
 
     let { lang , user_id  }
         = get_args_from_request_cookies({"lang":"" , "user_id":""}, request);
