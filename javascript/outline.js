@@ -32,12 +32,13 @@
 */
 
 const OUTLINE_JS_ID         = "outline";
-const OUTLINE_JS_TAG        =  OUTLINE_JS_ID +" (210803:15h:34)";
+const OUTLINE_JS_TAG        =  OUTLINE_JS_ID +" (211116:17h:55)";
 /*}}}*/
 let outline = (function() {
 /*➔ LOG {{{*/
 "use strict";
 
+ /* eslint-disable no-unused-vars */
 /*_ lib_log {{{*/
 
   let   lb0, lb1, lb2, lb3, lb4, lb5, lb6, lb7, lb8, lb9, lbX;
@@ -73,6 +74,8 @@ let report_require_lib_log = function()
 /*}}}*/
 if(lib_log)
     report_require_lib_log();
+
+ /* eslint-ensable no-unused-vars */
 /*}}}*/
 /*{{{*/
 const OUTLINE_SCAN_STEP_MAX = 3;
@@ -99,6 +102,7 @@ const COLORX
 const CAPTURE_TRUE_PASSIVE_FALSE       = {capture:true, passive:false};
 //nst CAPTURE_TRUE_PASSIVE_FALSE_ONCE  = {capture:true, passive:false, once:true }; // NO! WILL REMOVE IT MYSELF
 
+const BODY_WHEEL_TITLE = "TURN MOUSE WHEEL TO SELECT A PARENT CONTAINER";
 /*}}}*/
 
 //┌────────────────────────────────────────────────────────────────────────────┐
@@ -1740,7 +1744,7 @@ let log_this = xpath_content_js.options.LOG2_WHEEL;
         wheelable_node.classList.remove("wheelable");
     }
 
-    if(document.body.title_saved)
+    if(document.body.title == BODY_WHEEL_TITLE)
     {
         /*..*/ document.body.title  = document.body.title_saved;
         delete document.body.title_saved;
@@ -1785,7 +1789,7 @@ let div_mask_hide = function()
 let div_mask_set_wheeling_title = function()
 {
     document.body.title_saved = document.body.title;
-    document.body.title = "TURN MOUSE WHEEL TO SELECT A PARENT CONTAINER";
+    document.body.title = BODY_WHEEL_TITLE;
 };
 /*}}}*/
 /*_ div_mask_onclick_handler {{{*/
@@ -2048,6 +2052,16 @@ if( log_this) log("%c"+caller+": outline_dots.length=["+outline_dots.length+"]",
     outline_dots_used_since_t_outline_clear = 0;
 };
 /*}}}*/
+/*}}}*/
+/*➔ outline_quit {{{*/
+let outline_quit = function(_caller)
+{
+    /* CLEAR ALL PAGE XPATH TARGETS */
+    page_hide_srv_xpath_targets(_caller);
+
+    /* clear GUI */
+    sampling_2_clear();
+};
 /*}}}*/
 
     //┌──────────────────────────────────────────────┐
@@ -2482,9 +2496,9 @@ let set_option = function(key,val) {           xpath_content_js.set_option(key,v
         ,    outline_dots_toggle_handler
         ,    outline_frames_toggle_handler
         ,    outline_option_toggle_e_target
+        ,    outline_quit
         ,    pick_xpath_e_target
         ,    sampling_pick_some_xpath
-        ,    page_hide_srv_xpath_targets
         ,    div_xpaths_click_handler
         ,    data_num_xpath_delete_all
 
@@ -2500,17 +2514,18 @@ let set_option = function(key,val) {           xpath_content_js.set_option(key,v
         ,    div_xpaths_sync_GUI
 
     // DEBUG
-    , outline_delete_xpath
+    , data_num_xpath_array : () => console.table(data_num_xpath_array)
     , div_xpaths_rebuild
+    , outline_delete_xpath
+    , outline_frames_has_some
+    , outline_frames_show
+    , page_hide_srv_xpath_targets
     , page_refresh
     , page_wheel_clr_add_nodes
     , page_wheel_clr_lit_nodes
     , sampling_2_clear
     , sampling_check_button_sample_add_or_clear
     , tools_unselect
-    , outline_frames_show
-    , outline_frames_has_some
-    , data_num_xpath_array : () => console.table(data_num_xpath_array)
 
     };
 /*}}}*/

@@ -24,7 +24,7 @@
 }}}*/
 /*{{{*/
 const XPATH_CONTENT_SCRIPT_ID   = "xpath_content_js";
-const XPATH_CONTENT_SCRIPT_TAG  =  XPATH_CONTENT_SCRIPT_ID  +" (210917:23h:17)";
+const XPATH_CONTENT_SCRIPT_TAG  =  XPATH_CONTENT_SCRIPT_ID  +" (211025:18h:28)";
 /*}}}*/
 let   xpath_content_js = (function() {
 
@@ -1493,7 +1493,7 @@ if( log_this) console.log("%c set_activated: ➔ %c activated "+request.activate
         }
 
         /* CLEAR PAGE HILIGHTED TARGETS */
-        outline.page_hide_srv_xpath_targets(caller+"("+JSON.stringify(request)+")");
+        outline.outline_quit(caller+"("+JSON.stringify(request)+")");
 
         activated         = request.activated;
         shadow_host.style.display = activated ? "block" : "none";
