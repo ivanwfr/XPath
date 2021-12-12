@@ -1,10 +1,14 @@
 {
+    "author"           :   "Ivan Wellesz",
     "name"             :   "XPath GitHub",
-    "version"          :   "2",
+    "short_name"       :   "XPath GitHub",
+    "version"          :   "1.21.11.30",
     "manifest_version" :    2 ,
     "description"      :   "DOM Nodes XPath selection",
-    "icons"            : { "48" : "images/xpath_48_unloaded.png"
-        ,                  "16" : "images/xpath_48.png"
+    "homepage_url"     :   "https://remotetabs.com",
+    "icons"            : {
+        "48"             : "images/xpath_48_unloaded.png",
+        "16"             : "images/xpath_48.png"
     },
     "permissions"      : [ "tabs"
         ,                  "file://*/*"
@@ -18,7 +22,7 @@
             "js"       : [ "lib/lib_log.js"
                 ,          "lib/lib_popup.js"
                 ,          "lib/lib_util.js"
-            ,              "javascript/config.js"
+                ,          "javascript/config.js"
                 ,          "javascript/outline.js"
                 ,          "javascript/div_tools_html.js"
                 ,          "javascript/xpath.js"
