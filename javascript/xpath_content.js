@@ -23,8 +23,8 @@
 
 }}}*/
 /*{{{*/
-const XPATH_CONTENT_SCRIPT_ID   = "xpath_content_js";
-const XPATH_CONTENT_SCRIPT_TAG  =  XPATH_CONTENT_SCRIPT_ID  +" (211025:18h:28)";
+const XPATH_CONTENT_SCRIPT_ID       = "xpath_content_js";
+const XPATH_CONTENT_SCRIPT_TAG      =  XPATH_CONTENT_SCRIPT_ID  +" (211130:16h:44)";
 /*}}}*/
 let   xpath_content_js = (function() {
 
@@ -39,6 +39,7 @@ let config = {
         "TEXT_LEN_MAX" :  96
     };
 
+/* eslint-disable no-unused-vars */
 /*_ {{{*/
 //let lib_log = {};
 
@@ -88,9 +89,9 @@ let div_tools_require_lib_log = function()
 {
 
     /* eslint-disable no-unused-vars */
-    [ lb0, lb1, lb2, lb3, lb4, lb5, lb6, lb7, lb8, lb9, lbX ] = lib_log.LOG_BG_ARR;
-    [ lbA, lbB, lbC, lbF, lbH, lbL, lbR, lbS, lbb           ] = lib_log.LOG_XX_ARR;
-    [ lf0, lf1, lf2, lf3, lf4, lf5, lf6, lf7, lf8, lf9, lfX ] = lib_log.LOG_FG_ARR;
+    ({ lb0, lb1, lb2, lb3, lb4, lb5, lb6, lb7, lb8, lb9, lbX } = lib_log.LOG_BG_CSS);
+    ({ lf0, lf1, lf2, lf3, lf4, lf5, lf6, lf7, lf8, lf9, lfX } = lib_log.LOG_FG_CSS);
+    ({ lbA, lbB, lbC, lbF, lbH, lbL, lbR, lbS, lbb           } = lib_log.LOG_XX_CSS);
 
     [ SAU, SAR, SAD, SAL, SHV, SYN, SBS, SD0, SD1, SD2, SD3, SD4, SD5, SD6, SD7, SD8, SD9 ] = lib_log.LOG_SXX;
     [ L_CHK, L_NEW, L_ARD, L_ARL, L_ARR, L_ARU, L_CLR, L_FNC, L_WRN                       ] = lib_log.LOG_CHR;
@@ -131,6 +132,7 @@ let div_tools_require_lib_log = function()
 };
 /*}}}*/
 div_tools_require_lib_log();
+/* eslint-enable  no-unused-vars */
 /*}}}*/
 
     // ┌───────────────────────────────────────────────────────────────────────┐
@@ -1289,7 +1291,6 @@ let  title = (message_object.cmd || _caller);
 if( log_this) log("%c send_message %c"+title, lbb+lbL+lf4, lbb+lbR+lf7);
 //console.log(message_object)
 /*}}}*/
-
     /* EMBEDDED {{{*/
     let is_embedded = lib_log.is_embedded(XPATH_CONTENT_SCRIPT_ID);
     if( is_embedded ) {
@@ -1395,115 +1396,115 @@ let simulate_send_message_args = function(args,_caller)
     // │ MESSAGE FROM BACKGROUND-SCRIPT [activated] ........... chrome.runtime │
     // └───────────────────────────────────────────────────────────────────────┘
 /*{{{*/
-    /* LISTENER {{{*/
-    let add_message_listener = function()
-    {
+/* LISTENER {{{*/
+let add_message_listener = function()
+{
 let log_this = options.LOG2_MESSAGE;
 
-        try {
-            chrome.runtime.onMessage.addListener( onMessage_listener );
+    try {
+        chrome.runtime.onMessage.addListener( onMessage_listener );
 if(log_this) log("%c LISTENING TO MESSAGE FROM BACKGROUND SCRIPT...", lbH+lf5);
-        }
-        catch(ex) {
-            log("%c"+XPATH_CONTENT_SCRIPT_ID+": CANNOT LISTEN TO MESSAGE FROM BACKGROUND SCRIPT:\n"+ex, lbH+lf2);
-        }
-    };
+    }
+    catch(ex) {
+        log("%c"+XPATH_CONTENT_SCRIPT_ID+": CANNOT LISTEN TO MESSAGE FROM BACKGROUND SCRIPT:\n"+ex, lbH+lf2);
+    }
+};
 
-    let onMessage_listener = function(request, sender, sendResponse) // eslint-disable-line no-unused-vars
-    {
+let onMessage_listener = function(request, sender, sendResponse) // eslint-disable-line no-unused-vars
+{
 let log_this = options.LOG2_MESSAGE;
 
 if( log_this) console.log("%c RECEIVING MESSAGE FROM BACKGROUND SCRIPT...", "color:#AFA");
 if( log_this) console.log( request );
 
-        if(   (      typeof request.activated != "undefined")
-          ) {
-            onMessage_activated(request,sendResponse);
+    if(   (      typeof request.activated != "undefined")
+      ) {
+        onMessage_activated(request,sendResponse);
 
-            sendResponse({ ack: JSON.stringify( request ) });
-        }
-        return true; // async response expected
-    };
-    /*}}}*/
-    /*_ onMessage_activated {{{*/
-    let onMessage_activated = function(request,sendResponse)
-    {
+        sendResponse({ ack: JSON.stringify( request ) });
+    }
+    return true; // async response expected
+};
+/*}}}*/
+/*_ onMessage_activated {{{*/
+let onMessage_activated = function(request,sendResponse)
+{
 let caller = "onMessage_activated";
 if(options.LOG1_STEP) console.log("%c➔ Extension %c activated "+activated+" %c .. "+XPATH_CONTENT_SCRIPT_TAG+" ", "color:#AFA", "background-color:"+(request.activated ? "#0A0" : "#00A"), "background-color: black;");
 //console.trace()
 
-        on_activated_load_options( request );
+    on_activated_load_options( request );
 
-        /* LOADS THE GUI WITH BACKGROUND SCRIPT localStorage OPTIONS */
-        if(activated != request.activated)
-        {
-            div_tools_init( request );
-        }
-        else {
-            div_tools_html_js.update_div_tools_innerHTML(request);
-        }
+    /* LOADS THE GUI WITH BACKGROUND SCRIPT localStorage OPTIONS */
+    if(activated != request.activated)
+    {
+        div_tools_init( request );
+    }
+    else {
+        div_tools_html_js.update_div_tools_innerHTML(request);
+    }
 
-        // ┌───────────────────────────────────────────────────────────────┐
-        // │ CONFIG  FROM BACKGROUND-SCRIPT                                │
-        // └───────────────────────────────────────────────────────────────┘
-        //{{{
-        if( request.  SERVER_URL ) config.  SERVER_URL = request  .SERVER_URL;
-        if( request.TEXT_LEN_MAX ) config.TEXT_LEN_MAX = request.TEXT_LEN_MAX;
+    // ┌───────────────────────────────────────────────────────────────┐
+    // │ CONFIG  FROM BACKGROUND-SCRIPT                                │
+    // └───────────────────────────────────────────────────────────────┘
+    //{{{
+    if( request.  SERVER_URL ) config.  SERVER_URL = request  .SERVER_URL;
+    if( request.TEXT_LEN_MAX ) config.TEXT_LEN_MAX = request.TEXT_LEN_MAX;
 //console.log( config )
 
-        // UI
-        let div_domains = lib_util.get_tool("div_domains");
-        if( div_domains )
-        {
-            let config_txt = ""
-                +"  SERVER_URL\n … "+ config.  SERVER_URL +"\n"
-                +"TEXT_LEN_MAX\n … "+ config.TEXT_LEN_MAX +"\n";
-
-            div_domains.title = config_txt;
-        }
-        //}}}
-        // ┌───────────────────────────────────────────────────────────────┐
-        // │ ACTIVATED ON-OFF                                              │
-        // └───────────────────────────────────────────────────────────────┘
-        //{{{
-        if(!request.activated && request.is_active_tab) // save active tab options
-            save_options_now(caller, sendResponse);
-
-        if(     activated != request.activated)
-            set_activated(   request );
-
-        //}}}
-    };
-    /*}}}*/
-    /*_ set_activated {{{*/
-    let set_activated = function( request )
+    // UI
+    let div_domains = lib_util.get_tool("div_domains");
+    if( div_domains )
     {
-        let caller = "set_activated";
+        let config_txt = ""
+            +"  SERVER_URL\n … "+ config.  SERVER_URL +"\n"
+            +"TEXT_LEN_MAX\n … "+ config.TEXT_LEN_MAX +"\n";
+
+        div_domains.title = config_txt;
+    }
+    //}}}
+    // ┌───────────────────────────────────────────────────────────────┐
+    // │ ACTIVATED ON-OFF                                              │
+    // └───────────────────────────────────────────────────────────────┘
+    //{{{
+    if(!request.activated && request.is_active_tab) // save active tab options
+        save_options_now(caller, sendResponse);
+
+    if(     activated != request.activated)
+        set_activated(   request );
+
+    //}}}
+};
+/*}}}*/
+/*_ set_activated {{{*/
+let set_activated = function( request )
+{
+    let caller = "set_activated";
 let log_this = options.LOG2_MESSAGE;
 
 if( log_this) console.log("%c set_activated: ➔ %c activated "+request.activated, "color:#AFA", "background-color:"+(request.activated ? "#0A0" : "#00A"));
 //console.trace()
 
-        let shadow_host = document.getElementById( lib_util.SHADOW_HOST_ID );
+    let shadow_host = document.getElementById( lib_util.SHADOW_HOST_ID );
 //console.log("shadow_host=["+shadow_host+"]")
-        if(!shadow_host)
-        {
-            activated = false;
-            return;
-        }
+    if(!shadow_host)
+    {
+        activated = false;
+        return;
+    }
 
-        /* CLEAR PAGE HILIGHTED TARGETS */
-        outline.outline_quit(caller+"("+JSON.stringify(request)+")");
+    /* CLEAR PAGE HILIGHTED TARGETS */
+    outline.outline_quit(caller+"("+JSON.stringify(request)+")");
 
-        activated         = request.activated;
-        shadow_host.style.display = activated ? "block" : "none";
+    activated         = request.activated;
+    shadow_host.style.display = activated ? "block" : "none";
 
-        if( activated )
-            query_domains( caller  );
+    if( activated )
+        query_domains( caller  );
 
-        div_tools_confine_to_viewport();
-    };
-    /*}}}*/
+    div_tools_confine_to_viewport();
+};
+/*}}}*/
 /*}}}*/
 
     // ┌───────────────────────────────────────────────────────────────────────┐

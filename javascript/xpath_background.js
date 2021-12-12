@@ -16,8 +16,8 @@
 :!start explorer https://jshint.com/
 }}}*/
 /*{{{*/
-const XPATH_BACKGROUND_SCRIPT_ID   = "xpath_content_js";
-const XPATH_BACKGROUND_SCRIPT_TAG  =  XPATH_BACKGROUND_SCRIPT_ID  +" (210917:23h:35)";
+const XPATH_BACKGROUND_SCRIPT_ID    = "xpath_background_js";
+const XPATH_BACKGROUND_SCRIPT_TAG   =  XPATH_BACKGROUND_SCRIPT_ID  +" (211130:16h:44)";
 
 /*}}}*/
 let xpath_background = (function() {
@@ -31,6 +31,7 @@ let xpath_background = (function() {
 const IMG_ACTIVATE  = "images/xpath_48.png";
 const IMG_UNLOADED  = "images/xpath_48_unloaded.png";
 
+/* eslint-disable no-unused-vars */
 /*_ {{{*/
 //let lib_log = {};
 
@@ -81,9 +82,9 @@ let div_tools_require_lib_log = function()
 {
 
     /* eslint-disable no-unused-vars */
-    [ lb0, lb1, lb2, lb3, lb4, lb5, lb6, lb7, lb8, lb9, lbX ] = lib_log.LOG_BG_ARR;
-    [ lbA, lbB, lbC, lbF, lbH, lbL, lbR, lbS, lbb           ] = lib_log.LOG_XX_ARR;
-    [ lf0, lf1, lf2, lf3, lf4, lf5, lf6, lf7, lf8, lf9, lfX ] = lib_log.LOG_FG_ARR;
+    ({ lb0, lb1, lb2, lb3, lb4, lb5, lb6, lb7, lb8, lb9, lbX } = lib_log.LOG_BG_CSS);
+    ({ lf0, lf1, lf2, lf3, lf4, lf5, lf6, lf7, lf8, lf9, lfX } = lib_log.LOG_FG_CSS);
+    ({ lbA, lbB, lbC, lbF, lbH, lbL, lbR, lbS, lbb           } = lib_log.LOG_XX_CSS);
 
     [ SAU, SAR, SAD, SAL, SHV, SYN, SBS, SD0, SD1, SD2, SD3, SD4, SD5, SD6, SD7, SD8, SD9 ] = lib_log.LOG_SXX;
     [ L_CHK, L_NEW, L_ARD, L_ARL, L_ARR, L_ARU, L_CLR, L_FNC, L_WRN                       ] = lib_log.LOG_CHR;
@@ -125,6 +126,7 @@ let div_tools_require_lib_log = function()
 };
 /*}}}*/
 div_tools_require_lib_log();
+/* eslint-enable  no-unused-vars */
 /*}}}*/
 
     // ┌───────────────────────────────────────────────────────────────────────┐

@@ -27,11 +27,12 @@ let            xpath_js = (function() {
 /*➔ LOG {{{*/
 "use strict";
 let log_this = false;
+/* eslint-disable no-unused-vars */
 /*_ lib_log {{{*/
 
-  let   lb0, lb1, lb2, lb3, lb4, lb5, lb6, lb7, lb8, lb9, lbX;
-  let   lbA, lbB, lbC, lbF, lbH, lbL, lbR, lbS, lbb          ;
-  let   lf0, lf1, lf2, lf3, lf4, lf5, lf6, lf7, lf8, lf9, lfX;
+let   lb0, lb1, lb2, lb3, lb4, lb5, lb6, lb7, lb8, lb9, lbX;
+let   lbA, lbB, lbC, lbF, lbH, lbL, lbR, lbS, lbb          ;
+let   lf0, lf1, lf2, lf3, lf4, lf5, lf6, lf7, lf8, lf9, lfX;
 
 let   log;
 let   log_key_val;
@@ -41,21 +42,18 @@ let   log_key_val_group;
 /*_ report_require_lib_log {{{*/
 let report_require_lib_log = function()
 {
-    /* eslint-disable no-unused-vars */
-
-    [ lb0, lb1, lb2, lb3, lb4, lb5, lb6, lb7, lb8, lb9, lbX ] = lib_log.LOG_BG_ARR;
-    [ lbA, lbB, lbC, lbF, lbH, lbL, lbR, lbS, lbb           ] = lib_log.LOG_XX_ARR;
-    [ lf0, lf1, lf2, lf3, lf4, lf5, lf6, lf7, lf8, lf9, lfX ] = lib_log.LOG_FG_ARR;
+    ({ lb0, lb1, lb2, lb3, lb4, lb5, lb6, lb7, lb8, lb9, lbX } = lib_log.LOG_BG_CSS);
+    ({ lf0, lf1, lf2, lf3, lf4, lf5, lf6, lf7, lf8, lf9, lfX } = lib_log.LOG_FG_CSS);
+    ({ lbA, lbB, lbC, lbF, lbH, lbL, lbR, lbS, lbb           } = lib_log.LOG_XX_CSS);
 
     log                                 = lib_log.log;
     log_key_val                         = lib_log.log_key_val;
     log_key_val_group                   = lib_log.log_key_val_group;
 
-    /* eslint-enable  no-unused-vars */
 };
 /*}}}*/
-if(lib_log)
-    report_require_lib_log();
+if( lib_log ) report_require_lib_log();
+/* eslint-enable  no-unused-vars */
 /*}}}*/
 
     //┌────────────────────────────────────────────────────────────────────────┐
