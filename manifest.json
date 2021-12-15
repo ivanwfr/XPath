@@ -7,8 +7,7 @@
     "description"      :   "DOM Nodes XPath selection",
     "homepage_url"     :   "https://remotetabs.com",
     "icons"            : {
-        "48"             : "images/xpath_48_unloaded.png",
-        "16"             : "images/xpath_48.png"
+        "48"             : "images/icon_48_unloaded.png"
     },
     "permissions"      : [ "tabs"
         ,                  "file://*/*"
@@ -32,7 +31,7 @@
         }
     ],
     "browser_action"   : {
-        "default_icon" :   "images/xpath_48_unloaded.png"
+        "default_icon" :   "images/icon_48_unloaded.png"
     },
     "background"       : {
         "scripts"      : [ "lib/lib_log.js"
