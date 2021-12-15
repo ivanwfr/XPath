@@ -17,7 +17,7 @@
 }}}*/
 /*{{{*/
 const XPATH_BACKGROUND_SCRIPT_ID    = "xpath_background_js";
-const XPATH_BACKGROUND_SCRIPT_TAG   =  XPATH_BACKGROUND_SCRIPT_ID  +" (211130:16h:44)";
+const XPATH_BACKGROUND_SCRIPT_TAG   =  XPATH_BACKGROUND_SCRIPT_ID  +" (211212:17h:20)";
 
 /*}}}*/
 let xpath_background = (function() {
@@ -28,8 +28,8 @@ let xpath_background = (function() {
 /*{{{*/
 "use strict";
 
-const IMG_ACTIVATE  = "images/xpath_48.png";
-const IMG_UNLOADED  = "images/xpath_48_unloaded.png";
+const ICON_ACTIVATE  = "images/icon_48.png";
+const ICON_UNLOADED  = "images/icon_48_unloaded.png";
 
 /* eslint-disable no-unused-vars */
 /*_ {{{*/
@@ -127,192 +127,6 @@ let div_tools_require_lib_log = function()
 /*}}}*/
 div_tools_require_lib_log();
 /* eslint-enable  no-unused-vars */
-/*}}}*/
-
-    // ┌───────────────────────────────────────────────────────────────────────┐
-    // │ EXTENSION ICON .................. chrome.browserAction .. chrome.tabs │
-    // └───────────────────────────────────────────────────────────────────────┘
-// LOG2_MESSAGE
-/*{{{*/
-let browser_action_click_active_tab_ID;
-
-/*}}}*/
-/*➔ add_browser_action_click_listener {{{*/
-let add_browser_action_click_listener = function()
-{
-/*{{{*/
-let log_this = options.LOG2_MESSAGE;
-if( log_this) console.log("%c LISTENING TO BROWSER ACTION CLICK ON EXTENSION ICON...", "color:#FF0");
-
-/*}}}*/
-    chrome.browserAction.onClicked.addListener( browser_action_click_listener );
-};
-/*}}}*/
-/*_ browser_action_click_listener {{{*/
-let browser_action_click_listener = function(active_tab)
-{
-    browser_action_click_active_tab_ID = active_tab.id;
-
-    options_toggle_activated();
-};
-/*}}}*/
-/* ICON {{{*/
-/*_ set_icon_activate {{{*/
-let set_icon_activate = function(tabId) // eslint-disable-line no-unused-vars
-{
-    chrome.browserAction.setIcon ({  path : IMG_ACTIVATE});
-    chrome.browserAction.setTitle({ title : "XPATH ACTIVATED" });
-};
-let set_icon_unloaded = function(tabId) // eslint-disable-line no-unused-vars
-{
-    chrome.browserAction.setIcon ({  path : IMG_UNLOADED});
-    chrome.browserAction.setTitle({ title : "XPATH UNLOADED"  });
-};
-/*}}}*/
-
-
-
-/*}}}*/
-/* TABS {{{*/
-/*… propagate_activated_state_to_all_tabs {{{*/
-/*{{{*/
-const TABS_MESSAGE_INTERVAL = 50;
-
-/*}}}*/
-let propagate_activated_state_to_all_tabs = function(tabs)
-{
-/*{{{*/
-let   caller = "propagate_activated_state_to_all_tabs";
-let log_this = options.LOG2_MESSAGE;
-
-//console.log("propagate_activated_state_to_all_tabs(tabs)")
-//console.log(tabs)
-//console.dir(tabs)
-/*}}}*/
-    if(!tabs) return; /* tabs aee volatile while transitionning */
-
-if(log_this) log_key_val_group(caller+" options", options, 0, true);
-
-    for(let i=0; i<tabs.length; ++i)
-    {
-        if( is_a_browser_tool_url(tabs[i].url) ) {
-if(log_this) console.log("…SKIPPING..TAB [id "+tabs[i].id +"] .. [url "+tabs[i].url+"]");
-
-        }
-        else {
-if(log_this) logBIG("MESSAGING TAB [id "+tabs[i].id +"] .. [url "+tabs[i].url+"]", 4);
-
-            options["is_active_tab"] = (tabs[i].id == browser_action_click_active_tab_ID);
-            let request = options;
-if(log_this) console.log( request );
-
-            /* TIME INTERVAL ALLOWS TO ASSOCIATE [chrome.runtime.lastError] WITH [last_messaged_tab_ID] */
-            setTimeout(function() { send_and_check_message(tabs[i].id, request); }, i*TABS_MESSAGE_INTERVAL);
-        }
-    }
-};
-/*}}}*/
-/*… send_and_check_message {{{*/
-/*{{{*/
-let last_messaged_tab_ID;
-
-/*}}}*/
-let send_and_check_message = function (tab_ID, request)
-{
-/*{{{*/
-let log_this = options.LOG2_MESSAGE;
-
-if(log_this) console.log("send_and_check_message("+tab_ID+")");
-if(log_this) console.log(request);
-/*}}}*/
-
-    last_messaged_tab_ID = tab_ID;
-    chrome.tabs.sendMessage(tab_ID, request, on_message_response);
-};
-/*}}}*/
-/*… on_message_response {{{*/
-let on_message_response = function(response)
-{
-/*{{{*/
-let log_this = options.LOG2_MESSAGE;
-
-/*}}}*/
-    let response_from_last_messaged_tab = (browser_action_click_active_tab_ID == last_messaged_tab_ID);
-    if(!check_lastError(response_from_last_messaged_tab) )
-        return;
-
-    if( response)
-    {
-if(log_this) logBIG("RESPONSE FROM CONTENT SCRIPT:", 6);
-if(log_this) log_key_val_group("response"
-                                       , {   browser_action_click_active_tab_ID
-                                           , last_messaged_tab_ID
-                                           , response_from_last_messaged_tab
-                                           , response
-                                       }, 6, true);
-
-        if( response.div_tools_xy)
-            options["div_tools_xy"]
-                =   { x: response.div_tools_xy.x
-                    , y: response.div_tools_xy.y };
-    }
-};
-/*}}}*/
-/*… is_a_browser_tool_url {{{*/
-let is_a_browser_tool_url = function(url)
-{
-    return (url.startsWith("chrome://") ) ? true
-        :  (url.startsWith("about:"   ) ) ? true
-        :                                  false
-    ;
-};
-/*}}}*/
-/*_ check_lastError {{{*/
-/*{{{*/
-
-const RELOAD_MESSAGE
-    = "┌──────────────────────────────┐\n"
-    + "│  You MUST reload ALL TABS    │\n"
-    + "│ that were ALREADY OPENED     │\n"
-    + "│ when STARTING THE EXTENSION  │\n"
-    + "└──────────────────────────────┘\n";
-
-const LAST_WARN_DELAY_MS = 500;
-let   last_warn_time_MS;
-/*}}}*/
-let check_lastError = function(response_from_last_messaged_tab)
-{
-/*{{{*/
-let log_this = options.LOG2_MESSAGE;
-
-    /* Note:
-     * .. accessing [chrome.runtime.lastError]
-     * .. is all it takes to clear the
-     * .. "Unchecked runtime.lastError" warning
-     */
-/*}}}*/
-
-    if(!chrome.runtime.lastError ) return true; // i.e. checked
-
-if( log_this) console.log("CHECKED %c some tabs to reload ? %c"+chrome.runtime.lastError.message
-                    ,       "background-color:#600",  "background-color:#600");
-
-    if(   response_from_last_messaged_tab
-       && chrome.runtime.lastError.message.includes("Receiving end does not exist")
-      ) {
-        let time_MS = new Date().getTime();
-        if((time_MS - last_warn_time_MS) < LAST_WARN_DELAY_MS) return true; // No sweat, same bunch, already warned about
-
-if( log_this) console.log("%c"+RELOAD_MESSAGE, "background-color:#600");
-
-        last_warn_time_MS = time_MS;
-
-        /* USER ALERT */
-        chrome.tabs.executeScript ({code : "alert('"+ RELOAD_MESSAGE.replace(/│*\n/g,"\\n")+"')"});
-    }
-    return false;
-};
-/*}}}*/
 /*}}}*/
 
     // ┌───────────────────────────────────────────────────────────────────────┐
@@ -722,6 +536,192 @@ if( log_this) console.log("sendResponse("+answer+"):");
 /*}}}*/
 
     // ┌───────────────────────────────────────────────────────────────────────┐
+    // │ EXTENSION ICON .................. chrome.browserAction .. chrome.tabs │
+    // └───────────────────────────────────────────────────────────────────────┘
+// LOG2_MESSAGE
+/*{{{*/
+let browser_action_click_active_tab_ID;
+
+/*}}}*/
+/*➔ add_browser_action_click_listener {{{*/
+let add_browser_action_click_listener = function()
+{
+/*{{{*/
+let log_this = options.LOG2_MESSAGE;
+if( log_this) console.log("%c LISTENING TO BROWSER ACTION CLICK ON EXTENSION ICON...", "color:#FF0");
+
+/*}}}*/
+    chrome.browserAction.onClicked.addListener( browser_action_click_listener );
+};
+/*}}}*/
+/*_ browser_action_click_listener {{{*/
+let browser_action_click_listener = function(active_tab)
+{
+    browser_action_click_active_tab_ID = active_tab.id;
+
+    options_toggle_activated();
+};
+/*}}}*/
+/* ICON {{{*/
+/*_ set_icon_activate {{{*/
+let set_icon_activate = function(tabId) // eslint-disable-line no-unused-vars
+{
+    chrome.browserAction.setIcon ({  path : ICON_ACTIVATE});
+    chrome.browserAction.setTitle({ title : "XPATH ACTIVATED" });
+};
+let set_icon_unloaded = function(tabId) // eslint-disable-line no-unused-vars
+{
+    chrome.browserAction.setIcon ({  path : ICON_UNLOADED});
+    chrome.browserAction.setTitle({ title : "XPATH UNLOADED"  });
+};
+/*}}}*/
+
+
+
+/*}}}*/
+/* TABS {{{*/
+/*… propagate_activated_state_to_all_tabs {{{*/
+/*{{{*/
+const TABS_MESSAGE_INTERVAL = 50;
+
+/*}}}*/
+let propagate_activated_state_to_all_tabs = function(tabs)
+{
+/*{{{*/
+let   caller = "propagate_activated_state_to_all_tabs";
+let log_this = options.LOG2_MESSAGE;
+
+//console.log("propagate_activated_state_to_all_tabs(tabs)")
+//console.log(tabs)
+//console.dir(tabs)
+/*}}}*/
+    if(!tabs) return; /* tabs aee volatile while transitionning */
+
+if(log_this) log_key_val_group(caller+" options", options, 0, true);
+
+    for(let i=0; i<tabs.length; ++i)
+    {
+        if( is_a_browser_tool_url(tabs[i].url) ) {
+if(log_this) console.log("…SKIPPING..TAB [id "+tabs[i].id +"] .. [url "+tabs[i].url+"]");
+
+        }
+        else {
+if(log_this) logBIG("MESSAGING TAB [id "+tabs[i].id +"] .. [url "+tabs[i].url+"]", 4);
+
+            options["is_active_tab"] = (tabs[i].id == browser_action_click_active_tab_ID);
+            let request = options;
+if(log_this) console.log( request );
+
+            /* TIME INTERVAL ALLOWS TO ASSOCIATE [chrome.runtime.lastError] WITH [last_messaged_tab_ID] */
+            setTimeout(function() { send_and_check_message(tabs[i].id, request); }, i*TABS_MESSAGE_INTERVAL);
+        }
+    }
+};
+/*}}}*/
+/*… send_and_check_message {{{*/
+/*{{{*/
+let last_messaged_tab_ID;
+
+/*}}}*/
+let send_and_check_message = function (tab_ID, request)
+{
+/*{{{*/
+let log_this = options.LOG2_MESSAGE;
+
+if(log_this) console.log("send_and_check_message("+tab_ID+")");
+if(log_this) console.log(request);
+/*}}}*/
+
+    last_messaged_tab_ID = tab_ID;
+    chrome.tabs.sendMessage(tab_ID, request, on_message_response);
+};
+/*}}}*/
+/*… on_message_response {{{*/
+let on_message_response = function(response)
+{
+/*{{{*/
+let log_this = options.LOG2_MESSAGE;
+
+/*}}}*/
+    let response_from_last_messaged_tab = (browser_action_click_active_tab_ID == last_messaged_tab_ID);
+    if(!check_lastError(response_from_last_messaged_tab) )
+        return;
+
+    if( response)
+    {
+if(log_this) logBIG("RESPONSE FROM CONTENT SCRIPT:", 6);
+if(log_this) log_key_val_group("response"
+                                       , {   browser_action_click_active_tab_ID
+                                           , last_messaged_tab_ID
+                                           , response_from_last_messaged_tab
+                                           , response
+                                       }, 6, true);
+
+        if( response.div_tools_xy)
+            options["div_tools_xy"]
+                =   { x: response.div_tools_xy.x
+                    , y: response.div_tools_xy.y };
+    }
+};
+/*}}}*/
+/*… is_a_browser_tool_url {{{*/
+let is_a_browser_tool_url = function(url)
+{
+    return (url.startsWith("chrome://") ) ? true
+        :  (url.startsWith("about:"   ) ) ? true
+        :                                  false
+    ;
+};
+/*}}}*/
+/*_ check_lastError {{{*/
+/*{{{*/
+
+const RELOAD_MESSAGE
+    = "┌──────────────────────────────┐\n"
+    + "│  You MUST reload ALL TABS    │\n"
+    + "│ that were ALREADY OPENED     │\n"
+    + "│ when STARTING THE EXTENSION  │\n"
+    + "└──────────────────────────────┘\n";
+
+const LAST_WARN_DELAY_MS = 500;
+let   last_warn_time_MS;
+/*}}}*/
+let check_lastError = function(response_from_last_messaged_tab)
+{
+/*{{{*/
+let log_this = options.LOG2_MESSAGE;
+
+    /* Note:
+     * .. accessing [chrome.runtime.lastError]
+     * .. is all it takes to clear the
+     * .. "Unchecked runtime.lastError" warning
+     */
+/*}}}*/
+
+    if(!chrome.runtime.lastError ) return true; // i.e. checked
+
+if( log_this) console.log("CHECKED %c some tabs to reload ? %c"+chrome.runtime.lastError.message
+                    ,       "background-color:#600",  "background-color:#600");
+
+    if(   response_from_last_messaged_tab
+       && chrome.runtime.lastError.message.includes("Receiving end does not exist")
+      ) {
+        let time_MS = new Date().getTime();
+        if((time_MS - last_warn_time_MS) < LAST_WARN_DELAY_MS) return true; // No sweat, same bunch, already warned about
+
+if( log_this) console.log("%c"+RELOAD_MESSAGE, "background-color:#600");
+
+        last_warn_time_MS = time_MS;
+
+        /* USER ALERT */
+        chrome.tabs.executeScript ({code : "alert('"+ RELOAD_MESSAGE.replace(/│*\n/g,"\\n")+"')"});
+    }
+    return false;
+};
+/*}}}*/
+/*}}}*/
+
+    // ┌───────────────────────────────────────────────────────────────────────┐
     // │ OPTIONS [LOAD] [APPLY] [SAVE] ....................................... │
     // └───────────────────────────────────────────────────────────────────────┘
 /*{{{*/
@@ -927,19 +927,18 @@ if( log_this) log_sep_bot(caller, 6);
 /*}}}*/
 
     /* EXPORT {{{*/
-    return { add_browser_action_click_listener
+    return { load_config_json
+        ,    add_browser_action_click_listener
         ,    add_message_listener
-        ,    load_config_json
         ,    load_localStorage
     };
     /*}}}*/
 })();
-/* ONLOAD {{{*/
-    xpath_background.load_config_json();  // config async will call localStorage
-    xpath_background.add_browser_action_click_listener();
-    xpath_background.add_message_listener();
+/* ONLOAD */
+xpath_background.load_config_json();                    // config async will call localStorage
+xpath_background.add_browser_action_click_listener();   // browser icon click
+xpath_background.add_message_listener();                // content_script action
 
-/*}}}*/
 /* VIM .. [negative look ahead] {{{
 /^let\(.*function\|.*caller\|.*log_this\)\@!
 :help \@=
