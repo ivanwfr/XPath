@@ -1,13 +1,11 @@
 // ┌───────────────────────────────────────────────────────────────────────────┐
 // │ config.js ............................................................... │
 // └───────────────────────────────────────────────────────────────────────────┘
-/* jshint esversion: 9, laxbreak:true, laxcomma:true, boss:true */ /*{{{*/
+/* jshint esversion: 9, laxbreak:true, laxcomma:true, boss:true {{{*/
+
 /* exported config_js, CONFIG_JS_TAG */
 
-/*
-:update|1,$y *
-:!start explorer https://jshint.com/
-}}}*/
+/*}}}*/
 /*{{{*/
 const CONFIG_JS_ID   = "config_js";
 const CONFIG_JS_TAG  =  CONFIG_JS_ID  +" (210611:15h:26)";
