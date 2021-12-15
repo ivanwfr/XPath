@@ -25,7 +25,7 @@
 */
 
 const DIV_TOOLS_HTML_JS_ID     = "div_tools_html_js";
-const DIV_TOOLS_HTML_JS_TAG    =  DIV_TOOLS_HTML_JS_ID  +" (211026:17h:51)";
+const DIV_TOOLS_HTML_JS_TAG    =  DIV_TOOLS_HTML_JS_ID  +" (211213:02h:45)";
 /*}}}*/
 let       div_tools_html_js = (function() {
 /*➔ LOG {{{*/
@@ -930,7 +930,7 @@ let shadow_host_click_handler = function(event)
 {
 let log_this = xpath_content_js.options.LOG5_DIV_TOOLS;
 /*{{{*/
-    if(event.shiftKey               ) outline.page_refresh();
+    if(event.shiftKey               ) outline.outline_clear_all();
     if(event.ctrlKey && event.altKey) outline.data_num_xpath_delete_all();
     if(event.ctrlKey) return;
     if(event.altKey ) return;
@@ -1015,6 +1015,10 @@ let log_this = xpath_content_js.options.LOG5_DIV_TOOLS;
 if( log_this) lib_log.log("load_tools");
 /*}}}*/
     /* ID ➔ [handler] {{{*/
+
+    // ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+    // │                  TOOLS_GUI =             BUTTON_ID           ➔ CALLBACK                                                  │
+    // └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
 
     /* grid row 1 ➔ DOMAINS */
     tools.div_domains               = {       id: "div_domains"       , handler: xpath_content_js.get_domains                    };
@@ -1167,9 +1171,9 @@ let set_option = function(key,val) {           xpath_content_js.set_option(key,v
 
 /* EXPORT {{{*/
 return { inject_shadow_root
-    ,    details_load_open_state
     ,    div_tools_layout_cmd
     ,    update_div_tools_innerHTML
+    ,    details_load_open_state
 };
 
 /*}}}*/

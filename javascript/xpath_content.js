@@ -1,7 +1,7 @@
 // ┌───────────────────────────────────────────────────────────────────────────┐
 // │ [xpath_content_js] ................................. XPATH CONTENT SCRIPT │
 // └───────────────────────────────────────────────────────────────────────────┘
-/* jshint esversion: 9, laxbreak:true, laxcomma:true, boss:true */ /*{{{*/
+/* jshint esversion: 9, laxbreak:true, laxcomma:true, boss:true {{{*/
 /* globals lib_log, lib_popup */
 /* globals div_tools_html_js */
 /* globals chrome */
@@ -16,15 +16,11 @@
 /* exported XPATH_CONTENT_SCRIPT_TAG */
 
 /* eslint-disable no-warning-comments */
-/* eslint-disable dot-notation        */
-/*
-:update|1,$y *
-:!start explorer https://jshint.com/
 
-}}}*/
+/*}}}*/
 /*{{{*/
 const XPATH_CONTENT_SCRIPT_ID       = "xpath_content_js";
-const XPATH_CONTENT_SCRIPT_TAG      =  XPATH_CONTENT_SCRIPT_ID  +" (211130:16h:44)";
+const XPATH_CONTENT_SCRIPT_TAG      =  XPATH_CONTENT_SCRIPT_ID  +" (211215:17h:29)";
 /*}}}*/
 let   xpath_content_js = (function() {
 
@@ -481,7 +477,9 @@ if( log_this) logBIG(caller+": ["+document.location.href+"] FIRST CHECK", 8);
     {
 if( log_this) logBIG(caller+": ["+location_href_checked+"] UNCHANGED", 8);
 
-        outline.page_refresh();
+/*{{{
+        outline.outline_clear_all();
+}}}*/
         return;
     }
 
@@ -490,12 +488,7 @@ if( log_this) logBIG(caller+": FROM ["+location_href_checked+"] TO ["+document.l
     location_href_checked = document.location.href;
 
     activated = undefined;
-//  on_activated_load_options();
-//  div_tools_html_js.update_div_tools_innerHTML();
-//  div_tools_init();
-//  outline.page_refresh();
-//  activated = undefined;
-//  send_message({ activated }, caller);
+
     query_domains( caller  );
 };
 /*}}}*/
@@ -1187,8 +1180,8 @@ if( log_this) console.log("...url_clicked=["+  url_clicked+"]");
             let div_reload = lib_util.get_tool("div_reload");
             div_reload.classList.add("waiting_animation");
 
-            options["location_href"] = url_clicked;
-            document.location.href   = url_clicked;
+            options .location_href = url_clicked;
+            document.location.href = url_clicked;
             return false;
         }
 
@@ -1494,7 +1487,7 @@ if( log_this) console.log("%c set_activated: ➔ %c activated "+request.activate
     }
 
     /* CLEAR PAGE HILIGHTED TARGETS */
-    outline.outline_quit(caller+"("+JSON.stringify(request)+")");
+    outline.outline_clear_all(caller+"("+JSON.stringify(request)+")");
 
     activated         = request.activated;
     shadow_host.style.display = activated ? "block" : "none";
@@ -1828,9 +1821,6 @@ let check_script_loaded = function()
 {
 /* [is_embedded] {{{*/
     let is_embedded = lib_log.is_embedded(XPATH_CONTENT_SCRIPT_ID);
-//  let is_embedded
-//      =  (typeof chrome         != "undefined")
-//      && (typeof chrome.runtime != "undefined");
 if(options.LOG5_DIV_TOOLS) logBIG("LOADING "+(is_embedded ? "EMBEDDED" : "EXTENSION")+" "+XPATH_CONTENT_SCRIPT_ID, lbB+lbH+lfX[is_embedded ? 5:2]);
 
 /*}}}*/
@@ -2014,9 +2004,9 @@ if(options.LOG1_STEP) lib_log.logBIG("EXTENSION UNLOADED");
     /*}}}*/
     /* [options] .. (updated current postion and location) {{{*/
 
-    options["div_tools_xy" ] = { x: div_tools.offsetLeft , y: div_tools.offsetTop };
+    options.div_tools_xy  = { x: div_tools.offsetLeft , y: div_tools.offsetTop };
 
-    options["location_href"] = document.location.href;
+    options.location_href = document.location.href;
 
 if(log_this) log_key_val_group(caller+"("+_caller+(sendResponse ? (", "+sendResponse.name) : "")+")", options, 5, true);
     /*}}}*/

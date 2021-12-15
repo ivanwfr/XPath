@@ -1,0 +1,36 @@
+/* ┌────────────────────────────────────────────────────────────────────────┐ */
+/* │ dom_details.css                                   _TAG (211212:23h:40) │ */
+/* └────────────────────────────────────────────────────────────────────────┘ */
+
+DETAILS.wall_of_text_split                       { margin-left      : 1em !important;                      }
+DETAILS.wall_of_text_split                       { width            : max-content;                         }
+DETAILS.wall_of_text_split:not([open])           { opacity          : 0.8;                                 }
+
+/* SUMMARY */
+DETAILS.wall_of_text_split       SUMMARY         { cursor           : pointer;                             }
+DETAILS.wall_of_text_split       SUMMARY         { border           : 2px solid rgba(255,255,255,0.8);     }
+DETAILS.wall_of_text_split       SUMMARY         { box-shadow       : 1px 1px 0 3px rgba(000,000,000,0.1); }
+DETAILS.wall_of_text_split       SUMMARY         { border-radius    : 1.0em;                               }
+DETAILS.wall_of_text_split       SUMMARY         { padding          : 0 0.5em;                             }
+                                 SUMMARY::marker { font-size        : 150%;                                }
+DETAILS.wall_of_text_split[open]>SUMMARY::marker { color            : red; background-color: black;        }
+DETAILS.wall_of_text_split[open]>SUMMARY         { border-radius    : 1em 1em 0 0;                         }
+DETAILS.wall_of_text_split       SUMMARY         { background       : linear-gradient(to bottom , rgba(000,000,255,0.3)                            , rgba(000,000,000,0.0)) !important; }
+DETAILS.wall_of_text_split[open]>SUMMARY         { background       : linear-gradient(to bottom , rgba(255,000,000,1.0) , rgba(255,000,000,0.3) 5px, rgba(000,000,000,0.0)) !important; }
+
+/*{{{
+DETAILS:not([open])             >SUMMARY         { margin-top       : 1em;                                 }
+DETAILS.wall_of_text_split[open] SUMMARY         { border           : 3px outset red;                      }
+}}}*/
+
+DETAILS.wall_of_text_split>SPAN                  { vertical-align   : top;                                 }
+
+DETAILS[open] > * {
+  animation       : sweep_animation 500ms ease-in-out;
+}
+@keyframes sweep_animation {
+  0%    { opacity: 0; transform: translateX(-10px); }
+  100%  { opacity: 1; transform: translateX(  0  ); }
+}
+
+

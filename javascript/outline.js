@@ -32,7 +32,7 @@
 */
 
 const OUTLINE_JS_ID         = "outline";
-const OUTLINE_JS_TAG        =  OUTLINE_JS_ID +" (211116:17h:55)";
+const OUTLINE_JS_TAG        =  OUTLINE_JS_ID +" (211215:17h:14)";
 /*}}}*/
 let outline = (function() {
 /*➔ LOG {{{*/
@@ -1801,6 +1801,7 @@ let log_this = (xpath_content_js.options.LOG3_MASK || xpath_content_js.options.L
 
 if( log_this) logBIG("CLICK: div_mask", 9);
 /*}}}*/
+    div_mask_onclick_preventDefault(e);
     /* HIDE [div_mask] {{{*/
     lib_util.cancel_event(e);
     lib_popup.log_popup(null);
@@ -1822,6 +1823,17 @@ if( log_this) logBIG("CLICK: div_mask", 9);
 
     }
     /*}}}*/
+};
+/*}}}*/
+/*_ div_mask_onclick_preventDefault {{{*/
+let div_mask_onclick_preventDefault = function(e)
+{
+    if(e.cancelable)
+    {
+        if( e.stopPropagation          ) e.stopPropagation         (); /* capturing and bubbling phases */
+        if( e.stopImmediatePropagation ) e.stopImmediatePropagation(); /* other listeners of the same event */
+        if( e.preventDefault           ) e.preventDefault          (); /* browser agent default .. (checkbox toggle) */
+    }
 };
 /*}}}*/
 /*_ div_mask_onclick_add_xpath_at_XY {{{*/
@@ -2053,8 +2065,8 @@ if( log_this) log("%c"+caller+": outline_dots.length=["+outline_dots.length+"]",
 };
 /*}}}*/
 /*}}}*/
-/*➔ outline_quit {{{*/
-let outline_quit = function(_caller)
+/*➔ outline_clear_all {{{*/
+let outline_clear_all = function(_caller)
 {
     /* CLEAR ALL PAGE XPATH TARGETS */
     page_hide_srv_xpath_targets(_caller);
@@ -2492,11 +2504,13 @@ let set_option = function(key,val) {           xpath_content_js.set_option(key,v
         //┌───────┐
         //│ EVENT │
         //└───────┘
+        ,    outline_clear_all
         ,    cancel_pending_event
+
         ,    outline_dots_toggle_handler
         ,    outline_frames_toggle_handler
         ,    outline_option_toggle_e_target
-        ,    outline_quit
+
         ,    pick_xpath_e_target
         ,    sampling_pick_some_xpath
         ,    div_xpaths_click_handler
@@ -2512,20 +2526,6 @@ let set_option = function(key,val) {           xpath_content_js.set_option(key,v
         //│ GUI    │
         //└────────┘
         ,    div_xpaths_sync_GUI
-
-    // DEBUG
-    , data_num_xpath_array : () => console.table(data_num_xpath_array)
-    , div_xpaths_rebuild
-    , outline_delete_xpath
-    , outline_frames_has_some
-    , outline_frames_show
-    , page_hide_srv_xpath_targets
-    , page_refresh
-    , page_wheel_clr_add_nodes
-    , page_wheel_clr_lit_nodes
-    , sampling_2_clear
-    , sampling_check_button_sample_add_or_clear
-    , tools_unselect
 
     };
 /*}}}*/
