@@ -4,6 +4,8 @@
 /* jshint eslint {{{*/
 /* jshint esversion: 9, laxbreak:true, laxcomma:true, boss:true */
 
+/* globals console       */
+/* globals window        */
 /* globals document      */
 /* globals lib_log       */
 /* globals lib_util      */
@@ -25,7 +27,7 @@
 */
 
 const DIV_TOOLS_HTML_JS_ID     = "div_tools_html_js";
-const DIV_TOOLS_HTML_JS_TAG    =  DIV_TOOLS_HTML_JS_ID  +" (211213:02h:45)";
+const DIV_TOOLS_HTML_JS_TAG    =  DIV_TOOLS_HTML_JS_ID  +" (211215:19h:36)";
 /*}}}*/
 let       div_tools_html_js = (function() {
 /*➔ LOG {{{*/
@@ -34,22 +36,16 @@ let       div_tools_html_js = (function() {
 /*}}}*/
 
     // ┌───────────────────────────────────────────────────────────────────────┐
-    // │ CSS (INLINED)                                                         │
+    // │ CSS .. DYNAMIC JS-INLINING ............ [../stylesheet/div_tools.css] │
     // └───────────────────────────────────────────────────────────────────────┘
-/* INLINING FROM VIM .. XPH/stylesheet/div_tools.css stylesheet/div_tools.css {{{*/
+  /** [div_tools_css_data] {{{*/
 /*
-:/^<style>/+,/<\/style>/-d|-read!sed -e 's;\\\\;\\\\\\\\;g' %:h/../stylesheet/div_tools.css
-:/^<style>/+,/<\/style>/-d|s/^/\r/
-:e %:h/../stylesheet/div_tools.css
+../stylesheet/div_tools.css
 */
-const DIV_TOOLS_CSS =
-`
-<style>
-/* ┌────────────────────────────────────────────────────────────────────────┐ */
-/* │ XPH stylesheet div_tools.css                      _TAG (210709:18h:06) │ */
-/* └────────────────────────────────────────────────────────────────────────┘ */
-/* waiting_animation {{{*/
+let div_tools_css_data ="data:text/css,"+ escape(`
+/*INLINE{{{*/
 
+#div_tools_css_tag { content: "dom_tools_css (211215:18h:33)"; }
 .waiting_animation SPAN {
     display                   : inline-block;
     font-size                 : 150%;
@@ -64,77 +60,24 @@ const DIV_TOOLS_CSS =
     from { transform : rotate(  0deg); }
     to   { transform : rotate(360deg); }
 }
-/*}}}*/
-
-/* .folded {{{*/
 DIV        BUTTON *  { transition : all 500ms; }
 DIV        BUTTON *  { pointer-events: none;                           }
 DIV        BUTTON EM { display:        inline; white-space :   nowrap; }
 DIV.folded BUTTON EM { display: table-caption; white-space : pre-wrap; }
 DIV.folded        OL {   width: 0; height: 0; min-width: 0; min-height: 0; };
-
-/*}}}*/
-/* .selected {{{*/
-
 #div_domains        button.selected,
 #div_urls           button.selected,
 #div_outline_pick   button.selected,
 #div_outline_sample button.selected {
     border              : 5px solid black !important;
-/*{{{
-    outline             : 0;
-    border-bottom-width : 3px;
-    border-style        : solid;
-    border-color        : red;
-    box-shadow          : none;
-}}}*/
-/*{{{
-    #div_outline_pick_button          { width  : 100% !important; }
-    #div_outline_pick_button.selected { outline : 3px solid black; }
-}}}*/
-/*{{{
-    border-radius             : 1em 1em 0 0;
-    display                   : inline-block;
-}}}*/
-/*{{{
-    text-decoration           : underline;
-    text-decoration-thickness : 3px;
-    text-decoration-color     : red;
-}}}*/
 }
 
 #div_xpaths .selected                                        { border  : 5px  solid black !important; }
 #div_xpaths .selected.confirm                                { border  : 5px dashed black !important; }
 #div_xpaths .selected.confirm     >EM:nth-of-type(1)         { color   : transparent;                           }
 #div_xpaths .selected.confirm     >EM:nth-of-type(1)::before { content : "✔"; color:black; font-weight: bolder; }
-
-/*
-#div_xpaths .selected.confirm     >EM:nth-of-type(1)         { text-decoration-line: line-through; }
-#div_xpaths .selected.confirm     >EM:nth-of-type(1)         { max-width : 0; }
-#div_xpaths .selected.confirm     >EM:nth-of-type(1)         { visibility : hidden; }
-#div_xpaths .selected.confirm     >EM:nth-of-type(2)::before { content : "✔"; }
-#div_xpaths .selected             *                          { opacity : 0.2; }
-#div_xpaths .selected             >EM:nth-of-type(2)         { opacity : 1.0; }
-#div_xpaths .selected             >EM                        { opacity : 1.0; }
-*/
 #div_xpaths DIV.wheelable>EM:nth-child(2)         { color   : transparent;                           }
 #div_xpaths DIV.wheelable>EM:nth-child(2)::before { color   : black; content : "\\21C5 "; font-size: 150%; vertical-align: middle; }
-
-/*}}}*/
-/* stage {{{*/
-/*
-#div_tools                             >* { font-size:  70%; opacity: 0.7; }
-#div_tools.stage_options     #div_options { font-size: 100%; opacity: 1.0; }
-#div_tools.stage_domains     #div_domains { font-size: 100%; opacity: 1.0; }
-#div_tools.stage_urls        #div_urls    { font-size: 100%; opacity: 1.0; }
-#div_tools.stage_pick        #div_pick    { font-size: 100%; opacity: 1.0; }
-#div_tools.stage_sample      #div_sample  { font-size: 100%; opacity: 1.0; }
-#div_tools.stage_xpaths      #div_xpaths  { font-size: 100%; opacity: 1.0; }
-#div_tools.stage_delete      #div_xpaths  { font-size: 100%; opacity: 1.0; }
-#div_tools.stage_add         #div_xpaths  { font-size: 100%; opacity: 1.0; }
-*/
-/*}}}*/
-/* transition {{{*/
 #div_tools     { transition    : transform 150ms ease-in; }
 #div_options   { transition    : all 150ms ease-in;       }
 #div_options>* { transition    : all 150ms ease-in;       }
@@ -143,29 +86,10 @@ DIV.folded        OL {   width: 0; height: 0; min-width: 0; min-height: 0; };
             OL { min-height    : 32px;               }
             OL { margin        :  0;                 }
             LI { white-space   : nowrap;             }
-/*{{{
-.add    EM:first-of-type { transition : all 500ms ease; transform: rotate(45deg); }
-.delete EM:first-of-type { transition : all 500ms ease; transform: rotate( 0deg); }
-}}}*/
-
-/*}}}*/
-/* overflow {{{*/
-
 #div_domains >OL          { overflow: auto; max-height:  8em; }
 #div_urls    >OL          { overflow: auto; max-height:  8em; }
-/*
-#div_xpaths               { overflow: auto; max-height: 20em; }
-*/
-
 #div_domains >button      { overflow: auto;                   }
 #div_urls    >button      { overflow: auto;                   }
-/*
-#div_domains  EM.selected { overflow: auto;                   }
-#div_urls     EM.selected { overflow: auto;                   }
-*/
-
-/*}}}*/
-/* BUTTON {{{*/
 #div_tools BUTTON    { width            :                   100%; }
 #div_tools BUTTON    { border           :                      0; }
 #div_tools BUTTON    { border-radius    :                  1.0em; }
@@ -179,12 +103,7 @@ DIV.folded        OL {   width: 0; height: 0; min-width: 0; min-height: 0; };
 #div_tools BUTTON    { font-weight      :                               900; }
 #div_tools BUTTON    { color            :                              #000; }
 #div_tools BUTTON    { text-shadow      : 1px 1px 1px rgba(255,255,255,0.7); }
-
-/*}}}*/
-/* SUMMARY {{{*/
 #div_tools SUMMARY                        { white-space: nowrap; };
-/*}}}*/
-/* SCROLLBAR {{{*/
 ::-webkit-scrollbar                       { width         : 0.7rem; }
 ::-webkit-scrollbar:horizontal            { height        : 0.7rem; }
 ::-webkit-scrollbar                       { width         : 0.7rem; }
@@ -200,29 +119,12 @@ DIV.folded        OL {   width: 0; height: 0; min-width: 0; min-height: 0; };
 ::-webkit-scrollbar-corner                { background    : transparent;       }
 
 #magnified_div::-webkit-scrollbar-thumb  { min-height    : 100px; }
-/*}}}*/
-/* max-width {{{*/
 #div_tools BUTTON { max-width        : 20em;             }
 #div_tools OL     { max-width        : 20em;             }
-
-/*}}}*/
-
-/* div_tools layout {{{*/
 #div_tools { font-size:  initial !important; }
-/*
-#div_tools {     height : fit-content;       }
-#div_tools { max-height :         80%;       }
-*/
-/*}}}*/
-/* [div_tools] GRID {{{*/
-/*
-#div_tools                    { border                : 3px solid rgba(000,000,000,0.5);          }
-*/
 #div_tools                    { display               : grid;                     }
 #div_tools                    { grid-gap              : 0.5em;                    }
 #div_tools                    { grid-template-columns : 1fr 1fr 1fr;              }
-
-/* ROWS COLUMNS */
 #div_tools>*                  { margin                : 0 0.5em;                  }
 #div_tools>*                  { grid-column-start: 1; grid-column-end: 4;                            }
           #div_reload         { grid-column-start: 1; grid-column-end: 2; grid-row-start        : 1; margin: 0; }
@@ -235,27 +137,19 @@ DIV.folded        OL {   width: 0; height: 0; min-width: 0; min-height: 0; };
           #div_outline_pick   {                                           grid-row-start        : 5; }
           #div_outline_sample {                                           grid-row-start        : 6; }
           #div_xpaths         {                                           grid-row-start        : 7; }
-
-/*}}}*/
-/* #help {{{*/
 #help {
-    position         : absolute; top: 2em; left: 100%;
-    pointer-events   : none;
-    transform        : rotate(5deg);
-    display          : block;
-    width            : fit-content;
-    white-space      : pre;
-    border-radius    : 0.6em;
-    background-color : rgba(170,102,170,0.8);
-    color            : white;
-    padding          : 0.5em;
-    text-shadow      : 1px 1px 0 black;
-    font-weight      : 900;
+    position       : absolute; top: 2em; left: 100%;
+    pointer-events : none;
+    transform      : rotate(5deg);
+    display        : block;
+    width          : fit-content;
+    white-space    : pre;
+    color          : white;
+    text-shadow    : 1px 1px 0 black;
+    font-weight    : 900;
 }
 
 .hidden #help { display: none; }
-/*}}}*/
-/* top-band buttons {{{*/
 #div_reload           button { border-radius    : 0.6em 0.2em 0.6em 0.2em; margin: 0; }
 #div_magnify          button { border-radius    : 0     0     1.0em 1.0em; margin: 0; }
 
@@ -274,17 +168,9 @@ DIV.folded        OL {   width: 0; height: 0; min-width: 0; min-height: 0; };
 #div_magnify          button { box-shadow       :  0px -2px 4px rgba(255,255,255,0.3) inset  !important; }
 
 #div_options          button { box-shadow       :  2px -2px 4px rgba(255,255,255,0.3) inset  !important; }
-
-/* tear-off */
 #div_options.hidden          { position: unset   ;                         }
 #div_options                 { position: absolute; top: 0.7em; left: 100%; }
-
-/*}}}*/
-/* #div_reload {{{*/
 #div_reload           button         { border : 0 !important; }
-
-/*}}}*/
-/* #div_magnify {{{*/
          #div_magnify button         { padding          : 0.1em 1.5em;                        }
          #div_magnify button         { border           : 0                       !important; }
 
@@ -292,18 +178,12 @@ DIV.folded        OL {   width: 0; height: 0; min-width: 0; min-height: 0; };
 .magnify #div_magnify button::before { content          : "\\1F50D";                           }
 
 .magnify #div_magnify button         { background-color : #F0F                    !important; }
-
-/*}}}*/
-/* #button_sample {{{*/
 #button_sample                       { font-weight      : bolder;                }
 #button_sample                       { line-height      : 1em;                   }
 #button_sample::before               { content          : "\\2795  \\2795  \\2795"; }
 #button_sample.can_add::before       { content          : "\\2573  \\2573  \\2573"; }
 #button_sample.can_add               { color            : red;                   }
 #button_sample.can_add               { background-color : rgba(034,034,034,0.5); }
-
-/*}}}*/
-/* #div_options {{{*/
 #div_options>*               { margin        : 0.5em;                                  }
 
 #div_options                 { opacity       : 1.0;                                      }
@@ -323,15 +203,7 @@ DIV.folded        OL {   width: 0; height: 0; min-width: 0; min-height: 0; };
 #div_options             div:first-of-type { border-width: 3px; }
 #div_options             div:first-of-type {  margin-left: 1em; }
 #div_options             div               {  margin-left: 2em; }
-/*}}}*/
-/* #div_domains {{{*/
-
-/*}}}*/
-/* #div_urls {{{*/
 #div_urls.disabled    { opacity : 50%; }
-
-/*}}}*/
-/* #div_xpaths {{{*/
 #div_xpaths>DIV.add>EM:first-of-type {
     display          : inline-block;
     border           : 2px solid black;
@@ -354,8 +226,6 @@ DIV.folded        OL {   width: 0; height: 0; min-width: 0; min-height: 0; };
 #div_xpaths>DIV      >EM              { text-align    : left;                              }
 #div_xpaths>DIV      >EM              { min-width     : 2em;                               }
 #div_xpaths>DIV.delete                { border        : 2px solid black;                   }
-
-
 #div_xpaths             >DIV                 { display:   grid; }
 #div_xpaths             >DIV>EM:nth-child(3) { display:   none; }
 .xpath_expand #div_xpaths>DIV>EM:nth-child(3) { display: inline; }
@@ -368,13 +238,6 @@ DIV.folded        OL {   width: 0; height: 0; min-width: 0; min-height: 0; };
 
 .docked      #div_xpaths>DIV>EM:nth-child(3) { display:   none; }
 .docked      #div_xpaths>DIV>EM:nth-child(2) {                                grid-column-end: 4; }
-/*}}}*/
-
-
-/* ECC {{{ */
-
-/* ECC #964B00 #FF0000 #FFA500 #FFFF00 #9ACD32 #6495ED #EE82EE #A0A0A0 #FFFFFF #CFB53B #C0C0C0 */
-/*      111111  222222  333333  444444  555555  666666  777777  888888  999999  000000  111111 */
 .cc1 { color: #FFF; background-color:#964B00 !important; }
 .cc2 { color: #FFF; background-color:#FF0000 !important; }
 .cc3 { color: #000; background-color:#FFA500 !important; }
@@ -386,18 +249,18 @@ DIV.folded        OL {   width: 0; height: 0; min-width: 0; min-height: 0; };
 .cc9 { color: #000; background-color:#FFFFFF !important; }
 .cc0 { color: #FFF; background-color:#202020 !important; }
 
-.bg1 { background-color : rgba(150,  75,   0, .9); color : black; outline: 2px solid rgb(150,  75,   0); outline-offset: 2px; }
-.bg2 { background-color : rgba(255,   0,   0, .9); color : black; outline: 2px solid rgb(255,   0,   0); outline-offset: 2px; }
-.bg3 { background-color : rgba(255, 165,   0, .9); color : black; outline: 2px solid rgb(255, 165,   0); outline-offset: 2px; }
-.bg4 { background-color : rgba(255, 255,   0, .9); color : black; outline: 2px solid rgb(255, 255,   0); outline-offset: 2px; }
-.bg5 { background-color : rgba(154, 205,  50, .9); color : black; outline: 2px solid rgb(154, 205,  50); outline-offset: 2px; }
-.bg6 { background-color : rgba(100, 149, 237, .9); color : black; outline: 2px solid rgb(100, 149, 237); outline-offset: 2px; }
-.bg7 { background-color : rgba(238, 130, 238, .9); color : black; outline: 2px solid rgb(238, 130, 238); outline-offset: 2px; }
-.bg8 { background-color : rgba(160, 160, 160, .9); color : black; outline: 2px solid rgb(160, 160, 160); outline-offset: 2px; }
-.bg9 { background-color : rgba(255, 255, 255, .9); color : black; outline: 2px solid rgb(255, 255, 255); outline-offset: 2px; }
-.bg0 { background-color : rgba(128, 128, 128, .9); color : black; outline: 2px solid rgb(128, 128, 128); outline-offset: 2px; }
+.bg1 { background-color : rgba(150,  75,   0, .9); color : black; outline: 2px solid rgb(150,  75,   0); outline-offset: 0px; }
+.bg2 { background-color : rgba(255,   0,   0, .9); color : black; outline: 2px solid rgb(255,   0,   0); outline-offset: 0px; }
+.bg3 { background-color : rgba(255, 165,   0, .9); color : black; outline: 2px solid rgb(255, 165,   0); outline-offset: 0px; }
+.bg4 { background-color : rgba(255, 255,   0, .9); color : black; outline: 2px solid rgb(255, 255,   0); outline-offset: 0px; }
+.bg5 { background-color : rgba(154, 205,  50, .9); color : black; outline: 2px solid rgb(154, 205,  50); outline-offset: 0px; }
+.bg6 { background-color : rgba(100, 149, 237, .9); color : black; outline: 2px solid rgb(100, 149, 237); outline-offset: 0px; }
+.bg7 { background-color : rgba(238, 130, 238, .9); color : black; outline: 2px solid rgb(238, 130, 238); outline-offset: 0px; }
+.bg8 { background-color : rgba(160, 160, 160, .9); color : black; outline: 2px solid rgb(160, 160, 160); outline-offset: 0px; }
+.bg9 { background-color : rgba(255, 255, 255, .9); color : black; outline: 2px solid rgb(255, 255, 255); outline-offset: 0px; }
+.bg0 { background-color : rgba(128, 128, 128, .9); color : black; outline: 2px solid rgb(128, 128, 128); outline-offset: 0px; }
 
-.fg1 {            color : rgba(200,  99,   0, 1) !important; } /* overrides [ccX] color */
+.fg1 {            color : rgba(200,  99,   0, 1) !important; }
 .fg2 {            color : rgba(255,   0,   0, 1) !important; }
 .fg3 {            color : rgba(255, 165,   0, 1) !important; }
 .fg4 {            color : rgba(255, 255,   0, 1) !important; }
@@ -407,27 +270,12 @@ DIV.folded        OL {   width: 0; height: 0; min-width: 0; min-height: 0; };
 .fg8 {            color : rgba(160, 160, 160, 1) !important; }
 .fg9 {            color : rgba(255, 255, 255, 1) !important; }
 .fg0 {            color : rgba(  0,   0,   0, 1) !important; text-shadow : 0px -1px #FFFFFF; }
-
-/* }}} */
-/* details .. summary {{{*/
-
     button                 { white-space   : nowrap; }
-/*..replaced by a DIV>EM
-    details[open]>summary  { display       : inline; }
-    details[open]>summary  { margin-right  :  1.0em; }
-*/
-/*
-    summary::marker        { content       :   none; }
-    summary>button         { font-size     :   300%; }
-*/
     summary>button         { min-width     :  2.0em; }
     summary>button         { border-radius :  0.5em; }
-
-/*}}}*/
-/* #details_options {{{*/
     #details_options       summary>button { font-size           :  1em; }
     #details_options[open] summary>button { box-shadow          : none; }
-    #details_options[open] summary>button { margin-bottom       : -2px; } /* to hide pre top border */
+    #details_options[open] summary>button { margin-bottom       : -2px; }
 
     #details_options       summary>button { background          : rgba(136,136,136,0.5) !important; }
     #details_options[open] summary>button { background          : rgba(221,221,221,1.0) !important; }
@@ -450,10 +298,6 @@ DIV.folded        OL {   width: 0; height: 0; min-width: 0; min-height: 0; };
     #details_options[open]        >div      { border                : 2px solid #DDD ; }
     #details_options              >div      { margin                : 0;               }
     #details_options              >div      { background            : rgba(221,221,221,0.3) !important; }
-
-/*}}}*/
-/* .p_input {{{*/
-
     .p_input {
          background-color: rgba(255,000,255,0.3);
          width           : min-content;
@@ -467,35 +311,22 @@ DIV.folded        OL {   width: 0; height: 0; min-width: 0; min-height: 0; };
 
     SPAN.p_input:first-of-type       { background : white; display: inline-block; margin: 0.5em 1.0em; }
     .p_input                          {                                            margin-top:   0.2em; }
-    .p_input LABEL                    {                                            margin-left:  1.0em; } /* ✔ */
-    .p_input LABEL.selected::before   { content: "\\2714"; position: absolute;      margin-left: -1.0em; } /* ✔ */
-
-/*}}}*/
-
-/* #div_tools {{{*/
-
+    .p_input LABEL                    {                                            margin-left:  1.0em; }
+    .p_input LABEL.selected::before   { content: "\\2714"; position: absolute;      margin-left: -1.0em; }
 #div_tools.magnify   { transform       : scale(1.5); }
 #div_tools           { transform-origin: 0 0;        }
 
 #div_tools {
 
     position              : fixed; top: 1em; left: 1em;
-    z-index               : 2147483646; /* JUST BELLOW DIV_MASK */
+    z-index               : 2147483646;
     border-radius         : 0.8em;
     box-shadow            : 5px 5px 5px rgba(255,255,255,0.5) inset;
 
     background            : #D8D;
 
     padding               : 0 0 0.5em 0;
-/*{{{
-    width                 : 20%;
-    transform             : scale(2.0);
-    transform-origin      : top left;
 
-    box-shadow            : 2px 2px 2px rgba(136,136,136,0.5);
-
-    background            : linear-gradient(to bottom right, rgba(255,255,0,1.0), rgba(255,255,0,0.5));
-}}}*/
 }
 #div_tools.docked.xpath_expand {
     border-width      : 0 0 0 5px;
@@ -519,23 +350,15 @@ DIV.folded        OL {   width: 0; height: 0; min-width: 0; min-height: 0; };
     vertical-align    : middle;
     font-weight       : bolder;
 }
-
-/*}}}*/
-/* options: xpath_expand outline_log_dot outline_log_frame smooth_scroll {{{*/
-
-          #xpath_expand.selected::before      { content     : "\\2714"; position: absolute; margin-left: -1em; }   /* ✔ */
-          #outline_log_dot.selected::before   { content     : "\\2714"; position: absolute; margin-left: -1em; }   /* ✔ */
-          #outline_log_frame.selected::before { content     : "\\2714"; position: absolute; margin-left: -1em; }   /* ✔ */
-          #smooth_scroll.selected::before     { content     : "\\2714"; position: absolute; margin-left: -1em; }   /* ✔ */
+          #xpath_expand.selected::before      { content     : "\\2714"; position: absolute; margin-left: -1em; }
+          #outline_log_dot.selected::before   { content     : "\\2714"; position: absolute; margin-left: -1em; }
+          #outline_log_frame.selected::before { content     : "\\2714"; position: absolute; margin-left: -1em; }
+          #smooth_scroll.selected::before     { content     : "\\2714"; position: absolute; margin-left: -1em; }
 
           #xpath_expand                       { text-align  : right; line-height : 1.0em; }
           #outline_log_dot                    { text-align  : right; line-height : 1.0em; }
           #outline_log_frame                  { text-align  : right; line-height : 1.0em; }
           #smooth_scroll                      { text-align  : right; line-height : 1.0em; }
-
-/*}}}*/
-/* lit wheelable div_mask {{{*/
-
 .wheelable    { background-color : rgba(128,128,128,0.5) !important; color: #FFF !important; }
 
           .lit{ outline-offset   : 7px;                              }
@@ -558,8 +381,6 @@ DIV.folded        OL {   width: 0; height: 0; min-width: 0; min-height: 0; };
 .lit.bg8      { background-color : rgba(160,160,160,0.5) !important; }
 .lit.bg9      { background-color : rgba(255,255,255,0.5) !important; }
 .lit.bg0      { background-color : rgba(032,032,032,0.5) !important; }
-
-
 #div_mask.bg1 { background-color : rgba(150,075,000,0.9) !important; }
 #div_mask.bg2 { background-color : rgba(255,000,000,0.9) !important; }
 #div_mask.bg3 { background-color : rgba(255,165,000,0.9) !important; }
@@ -570,15 +391,95 @@ DIV.folded        OL {   width: 0; height: 0; min-width: 0; min-height: 0; };
 #div_mask.bg8 { background-color : rgba(160,160,160,0.9) !important; }
 #div_mask.bg9 { background-color : rgba(255,255,255,0.9) !important; }
 #div_mask.bg0 { background-color : rgba(032,032,032,0.9) !important; }
+/*INLINE}}}*/
+/*# sourceURL=div_tools.css */
+`
+)
+ .replace(/\\(\\x+)/g,"\\\\$1")
+;
+/*}}}*/
+/*_ [div_tools_css] {{{*/
+let  div_tools_css;
+/*_ dom_load {{{*/
+let dom_load = function(html_fragment)
+{
+console.log("dom_load(html_fragment):");
+console.log(         "html_fragment:");
+console.dir(          html_fragment  );
+console.log(DIV_TOOLS_HTML_JS_ID+": LOADING DATA .. try");
+/*{{{
+}}}*/
+    try {
 
+        window.addEventListener("error", load_onerror, false);
+
+        div_tools_css = load_css_EL("div_tools_css", div_tools_css_data);
+        html_fragment.appendChild(   div_tools_css );
+    }
+    catch(ex) {
+        console.log(DIV_TOOLS_HTML_JS_ID+": LOADING DATA .. catch");
+        console.dir(ex);
+    }
+    finally {
+console.log(DIV_TOOLS_HTML_JS_ID+": LOADING DATA .. finally: div_tools_css.length=["+div_tools_css.length+"]");
+        window.removeEventListener("error", load_onerror, false);
+
+/*{{{
+console.log("div_tools_css:");
+console.dir( div_tools_css  );
+}}}*/
+    }
+};
+/*}}}*/
+/*… load_onerror {{{*/
+let load_onerror_count = 0;
+let load_onerror = function(e)
+{
+    console.log("%c "+DIV_TOOLS_HTML_JS_TAG      +" %c * load_onerror #"+(++load_onerror_count)
+                ,"background-color:#111",  "background-color:#500"                    );
+    console.dir( e  );
+
+    if( e.error          ) try { console.log("e.error..."+ e.error  ); } catch(ex) { console.log(ex); }
+    if( e.message        ) try { console.log("e.message."+ e.message); } catch(ex) { console.log(ex); }
+    if( e.name           ) try { console.log("e.name...."+ e.name   ); } catch(ex) { console.log(ex); }
+    if( e.type != "error") try { console.log("e.type...."+ e.type   ); } catch(ex) { console.log(ex); }
+    if( e.target         ) try { console.log(              e.target ); } catch(ex) { console.log(ex); }
+};
+/*}}}*/
+/*… load_css_EL {{{*/
+let load_css_EL = function(id, scheme_arg) {
+    let el           = document.createElement("link");
+    el.id            = id;
+
+    el.href          = scheme_arg;
+    el.type          = "text/css";
+    el.charset       = "utf-8";
+    el.rel           = "stylesheet";
+    el.addEventListener("error", load_onerror);
+
+    return el;
+};
+/*}}}*/
 /*}}}*/
 
-/* INJECTED BY: javascript/div_tools_html.js */
+    // ┌───────────────────────────────────────────────────────────────────────┐
+    // │ CSS (INLINED) ......................... [../stylesheet/div_tools.css] │
+    // └───────────────────────────────────────────────────────────────────────┘
+/* INLINING FROM VIM .. XPH/stylesheet/div_tools.css stylesheet/div_tools.css {{{*/
+/*
+:/^<style>/+,/<\/style>/-d|-read!sed -e 's;\\\\;\\\\\\\\;g' %:h/../stylesheet/div_tools.css
+:/^<style>/+,/<\/style>/-d|s/^/\r/
+:e %:h/../stylesheet/div_tools.css
+*/
+const DIV_TOOLS_CSS =
+`
+<style>
+
 </style>
 `;
 /*}}}*/
 /* MISSING_INLINE_CSS .. (just in case .. as nothing happens on the screen otherwise...) {{{*/
-const MISSING_INLINE_CSS =
+const MISSING_INLINE_CSS = /* eslint-disable-line no-unused-vars */
 `
 <style>
 #div_tools         {
@@ -719,9 +620,10 @@ let get_div_tools_innerHTML = function()
     let is_embedded = lib_log.is_embedded(DIV_TOOLS_HTML_JS_ID);
     let    css_link = "<link href='stylesheet/div_tools.css' rel='stylesheet' type='text/css' />"; // wont work with manifest.json
     let tools_css
-        = (DIV_TOOLS_CSS.length > 500) ?  DIV_TOOLS_CSS
-        : is_embedded                  ?  css_link
-        :                                 MISSING_INLINE_CSS;
+        = (DIV_TOOLS_CSS.length > 64) ?  DIV_TOOLS_CSS
+        : is_embedded                 ?  css_link
+        :                                ""//MISSING_INLINE_CSS
+    ;
 
     return ""
         + tools_css
@@ -854,6 +756,8 @@ if(log_this) lib_log.logBIG(caller+"...OK [shadow_host]", 1);
     /*}}}*/
     /* [div_tools] {{{*/
     html_fragment.innerHTML = get_div_tools_innerHTML();
+
+    dom_load( html_fragment );
 
     update_div_tools_innerHTML( xpath_content_js.options );
 
