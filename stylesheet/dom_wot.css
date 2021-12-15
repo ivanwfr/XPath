@@ -1,0 +1,135 @@
+/* ┌────────────────────────────────────────────────────────────────────────┐ */
+/* │ dom_wot.css                                       _TAG (211212:23h:34) │ */
+/* └────────────────────────────────────────────────────────────────────────┘ */
+/* .wall_of_text_split {{{*/
+
+/*
+.wall_of_text_split[open]             { display       : contents; }
+*/
+
+.wall_of_text_split                   { border        : 0                !important; }
+.wall_of_text_split                   { padding       : 0                !important; }
+.wall_of_text_split                   { margin        : 0                !important; }
+.wall_of_text_split                   { white-space   : pre-wrap         !important; } /*//FIXME was commented-out .. find out why */
+.wall_of_text_split                   { word-wrap     : break-word       !important; }
+/*{{{
+.wall_of_text_split                   { border        : 7px ridge red    !important; }
+.wall_of_text_split                   { border-radius : 1em              !important; }
+.wall_of_text_split                   { overflow      : visible                    ; }
+}}}*/
+
+.wall_of_text_split.wall_of_text_fold { border-radius : 0em 1em 1em 0em            ; }
+.wall_of_text_split.wall_of_text_fold { border        : 3px outset red             ; }
+.wall_of_text_split.wall_of_text_fold { border-left   : 1em solid rgba(255,0,0,0.3); }
+.wall_of_text_split.wall_of_text_fold { margin-left   :-1em                        ; }
+.wall_of_text_split.wall_of_text_fold { padding       : 0.2em                      ; }
+/*}}}*/
+/* .line_num {{{*/
+html { box-sizing    : border-box !important; }
+.line_num {
+    position         : absolute;
+    left             : 0;
+    margin-right     : 1em;
+
+    font-family      : monospace;
+    user-select      : none;
+    pointer-events   : none;
+    background-color : rgba(192,192,192,0.4)        !important;
+    padding-right    : 1em;
+}
+
+/*
+details                                 .line_num { border-right:    3px solid #000; }
+details details                         .line_num { border-right:    3px solid #000; }
+details details details                 .line_num { border-right:    3px solid #000; }
+details details details details         .line_num { border-right:    3px solid #000; }
+details details details details details .line_num { border-right:    3px solid #000; }
+
+details                                 .line_num { padding-right: 0.0em; }
+details details                         .line_num { padding-right: 0.5em; }
+details details details                 .line_num { padding-right: 1.0em; }
+details details details details         .line_num { padding-right: 2.0em; }
+details details details details details .line_num { padding-right: 2.5em; }
+*/
+
+details                                 .line_num { border-right: 0.0em solid rgba(000,000,000,0.3); }
+details details                         .line_num { border-right: 0.5em solid rgba(000,000,000,0.3); }
+details details details                 .line_num { border-right: 1.0em solid rgba(000,000,000,0.3); }
+details details details details         .line_num { border-right: 2.0em solid rgba(000,000,000,0.3); }
+details details details details details .line_num { border-right: 2.5em solid rgba(000,000,000,0.3); }
+
+/*}}}*/
+/* .wall_of_text_parent {{{*/
+.wall_of_text_parent                  { border        : 0                !important; }
+.wall_of_text_parent                  { margin        : 0 0 0 6em        !important; } /* room for line-num negative margin */
+.wall_of_text_parent                  { padding       : 0                !important; }
+
+/*
+.wall_of_text_parent details:not([open])>summary  { font-size: 200%; }
+.wall_of_text_parent details            >summary  { font-size: 150%; }
+*/
+
+.wall_of_text_parent details                  > pre           { display: inline-block; margin:0; padding-left: 5px; border-radius: 0 0 1em 1em; }
+
+.wall_of_text_parent details:nth-of-type( 1n) > pre           { background : rgba(150, 75,  0,0.2); box-shadow: inset 0px 0px 2px 2px rgb(150, 75,  0); }
+.wall_of_text_parent details:nth-of-type( 2n) > pre           { background : rgba(255,  0,  0,0.2); box-shadow: inset 0px 0px 2px 2px rgb(255,  0,  0); }
+.wall_of_text_parent details:nth-of-type( 3n) > pre           { background : rgba(255,165,  0,0.2); box-shadow: inset 0px 0px 2px 2px rgb(255,165,  0); }
+.wall_of_text_parent details:nth-of-type( 4n) > pre           { background : rgba(255,255,  0,0.2); box-shadow: inset 0px 0px 2px 2px rgb(255,255,  0); }
+.wall_of_text_parent details:nth-of-type( 5n) > pre           { background : rgba(154,205, 50,0.2); box-shadow: inset 0px 0px 2px 2px rgb(154,205, 50); }
+.wall_of_text_parent details:nth-of-type( 6n) > pre           { background : rgba(100,149,237,0.2); box-shadow: inset 0px 0px 2px 2px rgb(100,149,237); }
+.wall_of_text_parent details:nth-of-type( 7n) > pre           { background : rgba(238,130,238,0.2); box-shadow: inset 0px 0px 2px 2px rgb(238,130,238); }
+.wall_of_text_parent details:nth-of-type( 8n) > pre           { background : rgba(160,160,160,0.2); box-shadow: inset 0px 0px 2px 2px rgb(160,160,160); }
+.wall_of_text_parent details:nth-of-type( 9n) > pre           { background : rgba(255,255,221,0.2); box-shadow: inset 0px 0px 2px 2px rgb(255,255,221); }
+.wall_of_text_parent details:nth-of-type(10n) > pre           { background : rgba(192,192,192,0.2); box-shadow: inset 0px 0px 2px 2px rgb(192,192,192); }
+
+.wall_of_text_parent details:nth-of-type( 1n) > pre .line_num { background : rgba(150, 75,  0,0.1) !important; }
+.wall_of_text_parent details:nth-of-type( 2n) > pre .line_num { background : rgba(255,  0,  0,0.1) !important; }
+.wall_of_text_parent details:nth-of-type( 3n) > pre .line_num { background : rgba(255,165,  0,0.1) !important; }
+.wall_of_text_parent details:nth-of-type( 4n) > pre .line_num { background : rgba(255,255,  0,0.1) !important; }
+.wall_of_text_parent details:nth-of-type( 5n) > pre .line_num { background : rgba(154,205, 50,0.1) !important; }
+.wall_of_text_parent details:nth-of-type( 6n) > pre .line_num { background : rgba(100,149,237,0.1) !important; }
+.wall_of_text_parent details:nth-of-type( 7n) > pre .line_num { background : rgba(238,130,238,0.1) !important; }
+.wall_of_text_parent details:nth-of-type( 8n) > pre .line_num { background : rgba(160,160,160,0.1) !important; }
+.wall_of_text_parent details:nth-of-type( 9n) > pre .line_num { background : rgba(255,255,221,0.1) !important; }
+.wall_of_text_parent details:nth-of-type(10n) > pre .line_num { background : rgba(192,192,192,0.1) !important; }
+
+.wall_of_text_parent details:nth-of-type( 1n) > pre .line_num { margin-left : 0.1em !important; }
+.wall_of_text_parent details:nth-of-type( 2n) > pre .line_num { margin-left : 0.2em !important; }
+.wall_of_text_parent details:nth-of-type( 3n) > pre .line_num { margin-left : 0.3em !important; }
+.wall_of_text_parent details:nth-of-type( 4n) > pre .line_num { margin-left : 0.4em !important; }
+.wall_of_text_parent details:nth-of-type( 5n) > pre .line_num { margin-left : 0.5em !important; }
+.wall_of_text_parent details:nth-of-type( 6n) > pre .line_num { margin-left : 0.6em !important; }
+.wall_of_text_parent details:nth-of-type( 7n) > pre .line_num { margin-left : 0.7em !important; }
+.wall_of_text_parent details:nth-of-type( 8n) > pre .line_num { margin-left : 0.8em !important; }
+.wall_of_text_parent details:nth-of-type( 9n) > pre .line_num { margin-left : 0.9em !important; }
+.wall_of_text_parent details:nth-of-type(10n) > pre .line_num { margin-left : 1.0em !important; }
+/*}}}*/
+/* .wall_of_text_block {{{*/
+.wall_of_text_block {
+    border-radius    : 0.25em                       !important;
+    text-align       : left                         !important;
+    background       : linear-gradient(to left,rgba(0,0,0,0.3), rgba(0,0,0,0.5) 50%, rgba(255,255,255,0.5) 98%, rgba(0,0,0,0.7) 99%, rgba(255,0,0,0.7)) !important;
+    background-color : rgba(0,255,0,0.5)            !important;
+    padding          : 0.1em 0.5em 0.1em 0.5em      !important;
+}
+
+.wall_of_text_block.region   {
+    background-color : rgba(0,0,255,0.5)            !important;
+/*{{{
+    font-size        : 40px                         !important;
+}}}*/
+}
+.wall_of_text_block.function {
+    background-color : rgba(255,0,0,0.5)            !important;
+/*{{{
+    font-size        : 30px                         !important;
+}}}*/
+}
+/*}}}*/
+/* .show_seekzone .wall_of_text_split {{{*/
+.show_seekzone .wall_of_text_split    { outline : 1px solid black; }
+.show_seekzone .wall_of_text_parent   { outline : 1px solid black; }
+.show_seekzone .text_line             { outline : 1px solid black; }
+
+/*}}}*/
+
