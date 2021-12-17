@@ -22,18 +22,31 @@ $ explorer http://localhost:83/index.html   # visit index page
     ├── 1_index.url
     ├── index.html
     ├── server_index.html
+    ├── xpath_embedded.html
+    │
+    ├── javascript
+    │   ├── config.js
+    │   ├── div_tools_html.js
+    │   ├── taxo_content.js
+    │   ├── taxo_json_201118.js
+    │   ├── taxo_json_211211.js
+    │   ├── taxo_pods_html.js
+    │   ├── xpath_outline.js
+    │   ├── xpath.js
+    │   ├── xpath_background.js
+    │   └── xpath_content.js
+    │
+    ├── CONTROL
+    │   ├── index_control.html
+    │   ├── query_format.js
+    │   └── server_control.js
     │
     ├── SERVER
     │   ├── server.js
     │   └── server_sql.js
     │
-    ├── javascript
-    │   ├── config.js
-    │   ├── div_tools_html.js
-    │   ├── outline.js
-    │   ├── xpath.js
-    │   ├── xpath_background.js
-    │   └── xpath_content.js
+    ├── DOC
+    │   └── xpath_js.html
     │
     └── lib
         ├── lib_log.js
