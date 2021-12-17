@@ -1,35 +1,31 @@
 // ┌───────────────────────────────────────────────────────────────────────────┐
 // │ xpath_background.js ................................... BACKGROUND SCRIPT │
 // └───────────────────────────────────────────────────────────────────────────┘
-/* jshint esversion: 9, laxbreak:true, laxcomma:true, boss:true */ /*{{{*/
+/* jshint esversion: 9, laxbreak:true, laxcomma:true, boss:true {{{*/
+
 /* globals console, chrome, setTimeout */
 /* globals XMLHttpRequest */
 /* globals FileReader */
 /* globals lib_log, lib_util  */
 /* globals config_js */
+
 /* exported XPATH_BACKGROUND_SCRIPT_TAG */
 
 /* eslint-disable no-warning-comments */
-/* eslint-disable dot-notation        */
-/*
-:update|1,$y *
-:!start explorer https://jshint.com/
-}}}*/
-/*{{{*/
-const XPATH_BACKGROUND_SCRIPT_ID    = "xpath_background_js";
-const XPATH_BACKGROUND_SCRIPT_TAG   =  XPATH_BACKGROUND_SCRIPT_ID  +" (211212:17h:20)";
 
+const XPATH_BACKGROUND_SCRIPT_ID    = "xpath_background_js";
+const XPATH_BACKGROUND_SCRIPT_TAG   =  XPATH_BACKGROUND_SCRIPT_ID  +" (211217:15h:02)";
 /*}}}*/
 let xpath_background = (function() {
-
-    // ┌───────────────────────────────────────────────────────────────────────┐
-    // │  LOG STATE STORAGE IMAGES ........................................... │
-    // └───────────────────────────────────────────────────────────────────────┘
-/*{{{*/
 "use strict";
 
-const ICON_ACTIVATE  = "images/icon_48.png";
-const ICON_UNLOADED  = "images/icon_48_unloaded.png";
+
+// ┌───────────────────────────────────────────────────────────────────────────┐
+// │  LOG STATE STORAGE IMAGES ............................................... │
+// └───────────────────────────────────────────────────────────────────────────┘
+/*{{{*/
+const ICON_ACTIVATE = "images/icon_48.png";
+const ICON_UNLOADED = "images/icon_48_unloaded.png";
 
 /* eslint-disable no-unused-vars */
 /*_ {{{*/
@@ -132,6 +128,7 @@ div_tools_require_lib_log();
     // ┌───────────────────────────────────────────────────────────────────────┐
     // │ MESSAGE FROM CONTENT-SCRIPT .......................... chrome.runtime │
     // └───────────────────────────────────────────────────────────────────────┘
+/*{{{*/
 // LOG2_MESSAGE
 /*➔ add_message_listener {{{*/
 let add_message_listener = function()
@@ -156,28 +153,27 @@ if( log_this) console.log( request  );
     /* 1. PAGE-LOAD-TIME ACTIVATED QUERY {{{*/
     if( request.activated && (request.activated == "undefined"))
     {
-console.log( "%c onMessage_listener:\n"
-       + "➔ Extension\n"
-       + "… activated "                             + options.activated                                 + "\n"
-       , "background-color:"+(options.activated     ? "#060" : "#008")
-       );
+console.log( "%c onMessage_listener: %c"
+           + "➔ Extension\n"
+           + "… activated "+options.activated
+           ,               "color:#AFA", "background-color:"+(options.activated ? "#0A0" : "#00A"));
+if(options.div_tools_xy)
+    console.log("...options.div_tools_xy=["+options.div_tools_xy.x+" @ "+options.div_tools_xy.y+"]");
 
+        /* LOAD STORAGE */
         if(!options) load_localStorage();
 
+        /* SEND RESPONSE */
         let response = options;
-
 if(log_this) console.log("SENDING response:");
 if(log_this) console.log(         response  );
-        sendResponse(         response  );
+
+        sendResponse(             response  );
     }
     /*}}}*/
     /* 2. [div_tools_xy] {{{*/
     else if(             request.div_tools_xy)
     {
-//          options["div_tools_xy"]
-//              = {   x: request.div_tools_xy.x
-//                  , y: request.div_tools_xy.y };
-
         /* client controls all options, except [activated] .. (which is controled by browser_action_click) */
         Object.keys(request).forEach( function(k) { if(k != "activated") options[k] = request[k]; });
 
@@ -190,7 +186,7 @@ if(log_this) console.log("%c➔ Saving options", "color:#AFA");
         {
             console.log("...request.caller=["+request.caller+"] ...div_tools_xy not forwarded to other tabs");
 
-            options["location_href"] = (request.location_href || options.location_href);
+            options.location_href = (request.location_href || options.location_href);
 //console.log(request)
 //console.dir(request)
         }
@@ -204,14 +200,13 @@ if(log_this) console.log("%c➔ Saving options", "color:#AFA");
         send_XMLHttpRequest(request, sendResponse); // FORWARD SERVER RESPONSE
 
     }
-    /*}}}*/
 /*{{{
 :!start explorer "https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/runtime/onMessage"
 To send an asynchronous response, there are two options:
 return true from the event listener. This keeps the sendResponse()
 function valid after the listener returns, so you can call it later.
-
 }}}*/
+    /*}}}*/
     return sendResponse ? true : false; // i.e. ASYNC / SYNC usage of sendResponse
 };
 /*}}}*/
@@ -284,11 +279,11 @@ if( log_this) logBIG("RESPONSE TO ["+args.cmd+"]:", 5);
             try {
                 switch( args.cmd )
                 {
-                case "domains" : get_domains_handler(args, xhr, sendResponse); break;
-                case "urls"    :    get_urls_handler(args, xhr, sendResponse); break;
+                case "domains" : get_domains_reply_handler(args, xhr, sendResponse); break;
+                case "urls"    :    get_urls_reply_handler(args, xhr, sendResponse); break;
                 case "xpaths"  : // fall-throught
                 case "add"     : // fall-throught
-                case "delete"  :  get_xpaths_handler(args, xhr, sendResponse); break;
+                case "delete"  :  get_xpaths_reply_handler(args, xhr, sendResponse); break;
                 default: { logBIG("send_XMLHttpRequest: unsupported cmd=["+args.cmd+"]"); return; }
                 }
             }
@@ -339,11 +334,11 @@ if( log_this) logBIG("RESPONSE TO ["+args.cmd+"]:", 5);
 };
 /*}}}*/
 // LOG4_XHR
-/*_ get_domains_handler {{{*/
-let get_domains_handler = function(args,xhr,sendResponse)
+/*_ get_domains_reply_handler {{{*/
+let get_domains_reply_handler = function(args,xhr,sendResponse)
 {
 /*{{{*/
-let   caller = "get_domains_handler";
+let   caller = "get_domains_reply_handler";
 let log_this = options.LOG4_XHR;
 
 if( log_this) log_sep_top("DOMAINS", 3);
@@ -389,11 +384,11 @@ if( log_this) log_sep_bot(caller, 3);
     return false;
 };
 /*}}}*/
-/*_ get_urls_handler {{{*/
-let get_urls_handler = function(args,xhr,sendResponse)
+/*_ get_urls_reply_handler {{{*/
+let get_urls_reply_handler = function(args,xhr,sendResponse)
 {
 /*{{{*/
-let   caller = "get_urls_handler";
+let   caller = "get_urls_reply_handler";
 let log_this = options.LOG4_XHR;
 if( log_this) log_sep_top("URLS", 4);
 
@@ -437,11 +432,11 @@ if( log_this) log_sep_bot(caller, 4);
     return sendResponse ? true : false; // i.e. ASYNC / SYNC usage of sendResponse
 };
 /*}}}*/
-/*_ get_xpaths_handler {{{*/
-let get_xpaths_handler = function(args,xhr,sendResponse)
+/*_ get_xpaths_reply_handler {{{*/
+let get_xpaths_reply_handler = function(args,xhr,sendResponse)
 {
 /*{{{*/
-let   caller = "get_xpaths_handler";
+let   caller = "get_xpaths_reply_handler";
 let log_this = options.LOG4_XHR;
 
 if( log_this) log_sep_top("XPATHS", 5);
@@ -534,10 +529,12 @@ if( log_this) console.log("sendResponse("+answer+"):");
     return false;
 };
 /*}}}*/
+/*}}}*/
 
     // ┌───────────────────────────────────────────────────────────────────────┐
     // │ EXTENSION ICON .................. chrome.browserAction .. chrome.tabs │
     // └───────────────────────────────────────────────────────────────────────┘
+/*{{{*/
 // LOG2_MESSAGE
 /*{{{*/
 let browser_action_click_active_tab_ID;
@@ -548,8 +545,8 @@ let add_browser_action_click_listener = function()
 {
 /*{{{*/
 let log_this = options.LOG2_MESSAGE;
-if( log_this) console.log("%c LISTENING TO BROWSER ACTION CLICK ON EXTENSION ICON...", "color:#FF0");
 
+if( log_this) console.log("%c LISTENING TO BROWSER ACTION CLICK ON EXTENSION ICON...", "color:#FF0");
 /*}}}*/
     chrome.browserAction.onClicked.addListener( browser_action_click_listener );
 };
@@ -569,6 +566,8 @@ let set_icon_activate = function(tabId) // eslint-disable-line no-unused-vars
     chrome.browserAction.setIcon ({  path : ICON_ACTIVATE});
     chrome.browserAction.setTitle({ title : "XPATH ACTIVATED" });
 };
+/*}}}*/
+/*_ set_icon_unloaded {{{*/
 let set_icon_unloaded = function(tabId) // eslint-disable-line no-unused-vars
 {
     chrome.browserAction.setIcon ({  path : ICON_UNLOADED});
@@ -595,7 +594,7 @@ let log_this = options.LOG2_MESSAGE;
 //console.log(tabs)
 //console.dir(tabs)
 /*}}}*/
-    if(!tabs) return; /* tabs aee volatile while transitionning */
+    if(!tabs) return; /* tabs are volatile while transitionning */
 
 if(log_this) log_key_val_group(caller+" options", options, 0, true);
 
@@ -608,7 +607,7 @@ if(log_this) console.log("…SKIPPING..TAB [id "+tabs[i].id +"] .. [url "+tabs[i
         else {
 if(log_this) logBIG("MESSAGING TAB [id "+tabs[i].id +"] .. [url "+tabs[i].url+"]", 4);
 
-            options["is_active_tab"] = (tabs[i].id == browser_action_click_active_tab_ID);
+            options.is_active_tab = (tabs[i].id == browser_action_click_active_tab_ID);
             let request = options;
 if(log_this) console.log( request );
 
@@ -658,7 +657,7 @@ if(log_this) log_key_val_group("response"
                                        }, 6, true);
 
         if( response.div_tools_xy)
-            options["div_tools_xy"]
+            options.div_tools_xy
                 =   { x: response.div_tools_xy.x
                     , y: response.div_tools_xy.y };
     }
@@ -701,7 +700,7 @@ let log_this = options.LOG2_MESSAGE;
     if(!chrome.runtime.lastError ) return true; // i.e. checked
 
 if( log_this) console.log("CHECKED %c some tabs to reload ? %c"+chrome.runtime.lastError.message
-                    ,       "background-color:#600",  "background-color:#600");
+                         ,        "background-color:#600",  "background-color:#600");
 
     if(   response_from_last_messaged_tab
        && chrome.runtime.lastError.message.includes("Receiving end does not exist")
@@ -720,10 +719,12 @@ if( log_this) console.log("%c"+RELOAD_MESSAGE, "background-color:#600");
 };
 /*}}}*/
 /*}}}*/
+/*}}}*/
 
     // ┌───────────────────────────────────────────────────────────────────────┐
     // │ OPTIONS [LOAD] [APPLY] [SAVE] ....................................... │
     // └───────────────────────────────────────────────────────────────────────┘
+/*{{{*/
 /*{{{*/
 let options = {};
 
@@ -736,7 +737,7 @@ let   caller = "options_toggle_activated";
 let log_this = options.LOG3_SERVER;
 
 /*}}}*/
-    options["activated"] = !options["activated"];
+    options.activated = !options.activated;
 if( log_this) log(caller+" ➔ %c BROWSER ACTION %c activated "+options.activated, lf4, lfX[options.ativated ? 5 : 6]);
 
     if( options.activated ) set_icon_activate();
@@ -745,10 +746,12 @@ if( log_this) log(caller+" ➔ %c BROWSER ACTION %c activated "+options.activate
     chrome.tabs.query({}, propagate_activated_state_to_all_tabs);
 };
 /*}}}*/
+/*}}}*/
 
     // ┌───────────────────────────────────────────────────────────────────────┐
     // │ CONFIG [config.json] ................................. chrome.runtime │
     // └───────────────────────────────────────────────────────────────────────┘
+/*{{{*/
 /*{{{*/
 /* eslint-disable no-unused-vars */
 /* eslint-disable quotes         */
@@ -865,10 +868,12 @@ logBIG("* getFile_errorCallback ["+config.file_name+"]",2);
     console.log("%c"+e, "color: red");
 };
 /*}}}*/
+/*}}}*/
 
     // ┌───────────────────────────────────────────────────────────────────────┐
     // │ PARAMS [localStorage] ............................................... │
     // └───────────────────────────────────────────────────────────────────────┘
+/*{{{*/
 // LOG3_SERVER
 /*➔ load_localStorage {{{*/
 let load_localStorage = function()
@@ -925,6 +930,7 @@ if(log_this && val) console.log("SAVING "+key+": "+val);
 if( log_this) log_sep_bot(caller, 6);
 };
 /*}}}*/
+/*}}}*/
 
     /* EXPORT {{{*/
     return { load_config_json
@@ -951,17 +957,26 @@ xpath_background.add_message_listener();                // content_script action
 :argu2 ; " XPH/javascript/xpath_content.js
 :argu3 ; " XPH/javascript/div_tools_html.js
 :argu4 ; " XPH/javascript/div_tools.css
-:argu5 ; " XPH/javascript/outline.js
+:argu5 ; " XPH/javascript/xpath_outline.js
 :argu6 ; " XPH/javascript/xpath.js
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ [TAXO]                                                                       │
+├──────────────────────────────────────────────────────────────────────────────┤
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ [LIB]                                                                        │
+├──────────────────────────────────────────────────────────────────────────────┤
 :new       %:h/../../lib/lib_log.js
 :new       %:h/../../lib/lib_popup.js
 :new       %:h/../../lib/lib_util.js
+
 ├──────────────────────────────────────────────────────────────────────────────┤
-:new    XPH/xpath.html
-:new    USR/server_index.html
-:!start explorer "file:///C:/LOCAL/DATA/ANDROID/PROJECTS/iwintoo/XPH/xpath.html"
+:new        xpath_embedded.html
+:new        server_index.html
+:!start /b "C:/Program Files (x86)/Google/Chrome/Application/chrome.exe" file:///C:/LOCAL/DATA/ANDROID/PROJECTS/XPH/xpath_embedded.html
 ├─────────────────────────────────────────────────────── dom_util ─────────────┤
-:new   $WPROJECTS/RTabs/Util/RTabs_Profiles/DEV/javascript/dom_util.js
+:new   $WPROJECTS/RTabs/Util/RTabs_Profiles/DEV/script/dom_util.js
 └──────────────────────────────────────────────────────────────────────────────┘
 
 }}}*/
