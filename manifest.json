@@ -1,8 +1,8 @@
 {
     "author"           :   "Ivan Wellesz",
-    "name"             :   "XPath GitHub",
-    "short_name"       :   "XPath GitHub",
-    "version"          :   "1.21.11.30",
+    "name"             :   "XPath",
+    "short_name"       :   "XPath",
+    "version"          :   "1.211217",
     "manifest_version" :    2 ,
     "description"      :   "DOM Nodes XPath selection",
     "homepage_url"     :   "https://remotetabs.com",
@@ -22,10 +22,14 @@
                 ,          "lib/lib_popup.js"
                 ,          "lib/lib_util.js"
                 ,          "javascript/config.js"
-                ,          "javascript/outline.js"
+                ,          "javascript/xpath_outline.js"
                 ,          "javascript/div_tools_html.js"
                 ,          "javascript/xpath.js"
                 ,          "javascript/xpath_content.js"
+
+                ,          "javascript/taxo_json_211211.js"
+                ,          "javascript/taxo_pods_html.js"
+                ,          "javascript/taxo_content.js"
             ],
             "css"      : [ "stylesheet/dom_host.css" ]
         }
