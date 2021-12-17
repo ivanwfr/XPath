@@ -20,7 +20,7 @@
 /*}}}*/
 /*{{{*/
 const XPATH_CONTENT_SCRIPT_ID       = "xpath_content_js";
-const XPATH_CONTENT_SCRIPT_TAG      =  XPATH_CONTENT_SCRIPT_ID  +" (211215:17h:29)";
+const XPATH_CONTENT_SCRIPT_TAG      =  XPATH_CONTENT_SCRIPT_ID  +" (211217:15h:56)";
 /*}}}*/
 let   xpath_content_js = (function() {
 
@@ -134,7 +134,7 @@ div_tools_require_lib_log();
     // ┌───────────────────────────────────────────────────────────────────────┐
     // │ LOAD                                                                  │
     // └───────────────────────────────────────────────────────────────────────┘
-/*_ div_tools_init .. (listeners) {{{*/
+/*➔ div_tools_init .. (listeners) {{{*/
 /*{{{*/
 let   CAPTURE_TRUE_PASSIVE_FALSE  = {capture:true, passive:false};
 
@@ -207,6 +207,28 @@ if(options.LOG3_SERVER) log_query_step("EMBEDDED", caller);
         setTimeout(function() { set_activated({ activated: true }); }, 0);
     }
     /*}}}*/
+    /* ADD EVENT LISTENERS {{{*/
+    div_tools_init_add_listeners();
+
+    /*}}}*/
+    /* HIDE until actiated {{{*/
+    if(!activated)
+    {
+        let shadow_host = document.getElementById( lib_util.SHADOW_HOST_ID );
+        shadow_host.style.display = "none";
+    }
+    /*}}}*/
+};
+/*}}}*/
+/*_ div_tools_init_add_listeners {{{*/
+let div_tools_init_add_listeners = function()
+{
+/*{{{*/
+let   caller = "div_tools_init_add_listeners";
+let log_this = options.LOG5_DIV_TOOLS;
+
+if( log_this) log(caller);
+/*}}}*/
     /* ON [ORIENTATION] {{{*/
     window.addEventListener("orientationchange", div_tools_onOrientationchange_CB);
 
@@ -253,26 +275,6 @@ if(log_this) logBIG("➔ ADDING [click] LISTENER", 3);
         div_tools.addEventListener("click"     , div_tools_onClick, CAPTURE_TRUE_PASSIVE_FALSE);
     }
     /*}}}*/
-    /* HIDE until actiated {{{*/
-    if(!activated)
-    {
-        let shadow_host = document.getElementById( lib_util.SHADOW_HOST_ID );
-        shadow_host.style.display = "none";
-    }
-    /*}}}*/
-};
-/*}}}*/
-/*_ div_tools_beforeunload {{{*/
-let div_tools_beforeunload = function(e)
-{
-/*{{{*/
-let   caller = "div_tools_beforeunload";
-let log_this = options.LOG5_DIV_TOOLS;
-
-if( log_this) log("%c"+caller+"%c"+e.type, lbb+lbL+lf2, lbb+lbR+lf3);
-/*}}}*/
-
-    save_options( caller );
 };
 /*}}}*/
 
@@ -280,8 +282,8 @@ if( log_this) log("%c"+caller+"%c"+e.type, lbb+lbL+lf2, lbb+lbR+lf3);
     // │ EVENT DOWN MOVE UP CLICK RESIZE KEY SCROLL                            │
     // └───────────────────────────────────────────────────────────────────────┘
 /*{{{*/
-/*{{{*/
 /* DOWN */
+/*{{{*/
 /*_ div_tools_onDown {{{*/
 /*{{{*/
 let has_moved;
@@ -315,28 +317,17 @@ if( log_this) log(caller+": %c("+e.type+" ON "+lib_util.get_id_or_tag_and_classN
     lib_util.set_onDown_XY(e, caller);
     has_moved = false;
     /*}}}*/
-/*}}}*/
-    /* has_scrollable_parent {{{*/
+    /* on_touch_device {{{*/
     let on_touch_device = ("ontouchstart" in document.documentElement);
     if( on_touch_device )
     {
-        let scrollable_parent = lib_util.has_scrollable_parent(e.target);
-        if( scrollable_parent )
-        {
-            div_tools_preventScrolling();
-
-            return;
-        }
+        div_tools_preventScrolling(caller);
     }
     /*}}}*/
     /* [moving_target] {{{*/
-    let moving_target = div_tools_onDown_moving_target(e);
+    let moving_target = div_tools_onDown_moving_target(e, div_tools);
     if( moving_target )
     {
-        div_tools_preventScrolling();
-
-//      e.moving_target = moving_target;
-
         div_tools_add_onmove_listener( moving_target );
     }
     /*}}}*/
@@ -357,65 +348,73 @@ let div_options_toggle = function()
 /*}}}*/
 /*_ div_tools_onDown_moving_target {{{*/
 /*{{{*/
-//const FONTSIZE_DEFAULT = 12;
+const FONTSIZE_DEFAULT = 12;
 
 /*}}}*/
-let div_tools_onDown_moving_target = function(e)
+let div_tools_onDown_moving_target = function(e,moving_target)
 {
 /*{{{*/
-let   caller = "div_tools_onDown_moving_target";
+let   caller = "xpath_content.div_tools_onDown_moving_target";
 let log_this = options.LOG6_MOVE_TOOL;
 
 let e_target = lib_util.get_event_target(e);
 if( log_this) log(caller+": %c("+e.type+" ON "+lib_util.get_id_or_tag_and_className(e_target)+")", lf1);
-if( log_this) console.dir(e);
-
 /*}}}*/
-    /* [moving_target] {{{*/
-    if(log_this) logBIG("e_target.className=["+e_target.className+"]");
+    /* movable [moving_target] .. up from [e_target] {{{*/
+    if(!moving_target) return null;
 
-    let moving_target = div_tools;
+    if(!lib_util.is_el_child_of_id(e_target, moving_target.id) )
+    {
+if( log_this) log("NOT A CHILD OF ["+moving_target.id+"]");
 
-    if(!moving_target ) return null;
+        return null;
+    }
+    /*}}}*/
+    /* [transformOrigin] drift towards view center {{{*/
+    /* NOTE: [transformOrigin] is not used when [fontSize] does the scaling */
 
-    if( !lib_util.is_el_child_of_id(e_target, div_tools.id) ) return null;
+    /* [click-to-origin-offset] */
+    let event_xy    = lib_util.get_event_XY(e               );
+    let e_target_xy = lib_util.get_el_xy   (moving_target, caller);
 
-    if( !lib_util.has_el_class(moving_target, "movable"   ) ) return null;
+    let          dx = (event_xy.x - e_target_xy.x);
+    let          dy = (event_xy.y - e_target_xy.y);
 
-    if(!moving_target ) return null;
+    /* [transformOrigin] */
+    let   x_percent = (100 * dx / moving_target.offsetWidth ).toFixed(2);
+    let   y_percent = (100 * dy / moving_target.offsetHeight).toFixed(2);
+    moving_target.style.transformOrigin = x_percent+"% "+ y_percent+"%";
+
+    /* [fontSize] */
+    let fontSize    = parseFloat( moving_target.style.fontSize );
+    let scale       = fontSize / FONTSIZE_DEFAULT;
 
     /*}}}*/
+/*{{{*/
+if(log_this)
+    log_key_val_group( caller
+        , {     moving_target
+           ,    event_xy
+           ,    e_target_xy
+           ,    dx
+           ,    dy
+           ,    transformOrigin : moving_target.style.transformOrigin
+           ,    fontSize
+           ,    scale
+        }, lf4, false);
 
-    /* transformOrigin drift towards view center */
-    /*{{{
-    let el = e_target;
-
-    let event_xy = lib_util.get_event_XY(e);
-    let    el_xy = lib_util.get_el_xy   (el, caller);
-
-    let       dx = (event_xy.x - el_xy.x);
-    let       dy = (event_xy.y - el_xy.y);
-
-
-    let x_percent = (100 * dx / el.offsetWidth ).toFixed(2);
-    let y_percent = (100 * dy / el.offsetHeight).toFixed(2);
-
-        //el.style.transformOrigin = x_percent+"% "+ y_percent+"%";
-    moving_target.style.transformOrigin = x_percent+"% "+ y_percent+"%";
-}}}*/
-
-        if(log_this) console.log("moving_target=["+lib_util.get_id_or_tag(moving_target)+"]");
-        return moving_target;
+/*}}}*/
+    return moving_target;
 };
 /*}}}*/
-/* [ORIENTATION] */
+/*}}}*/
+/* ORIENTATION */
 /*_ div_tools_onOrientationchange_CB {{{*/
 let div_tools_onOrientationchange_CB = function(e) /* eslint-disable-line no-unused-vars */
 {
     div_tools_confine_to_viewport();
 };
 /*}}}*/
-
 /* RESIZE */
 /*_ div_tools_onResize_CB {{{*/
 let div_tools_onResize_CB = function(e) /* eslint-disable-line no-unused-vars */
@@ -564,12 +563,13 @@ let div_tools_onKey_CB = function(e)
 /*}}}*/
 /* SCROLL */
 /*_ div_tools_preventScrolling {{{*/
-let div_tools_preventScrolling = function()
+let div_tools_preventScrolling = function(_caller)
 {
-    /*{{{*/
-    let   caller = "div_tools_preventScrolling"; // eslint-disable-line no-unused-vars
+/*{{{*/
+let   caller = "div_tools_preventScrolling";
+let log_this = options.LOG5_DIV_TOOLS || options.LOG6_MOVE_TOOL;
 
-    /*}}}*/
+/*}}}*/
     /* NO SCROLLBAR TO HIDE {{{*/
     let on_touch_device = ("ontouchstart" in document.documentElement);
     if(!on_touch_device && !lib_util.has_scrollbar(document.documentElement)) return;
@@ -610,19 +610,21 @@ let div_tools_preventScrolling = function()
         /* CACHE WORKING VALUES */
         document.documentElement.scrolling_context
             = {  standby_overflow
-                ,  standby_marginRight
-                ,  standby_marginBottom
-                ,  d_w
-                ,  d_h
-                ,  hidden_marginRight
-                ,  hidden_marginBottom
+              ,  standby_marginRight
+              ,  standby_marginBottom
+              ,  d_w
+              ,  d_h
+              ,  hidden_marginRight
+              ,  hidden_marginBottom
             };
 
     }
     /*}}}*/
-    /*{{{
+/*{{{*/
+if( log_this) {
+
     if(document.documentElement.scrolling_context)
-        log_key_val_group(caller+": document.documentElement.scrolling_context"
+        log_key_val_group(_caller+"➔"+caller+": scrolling_context"
             , document.documentElement.scrolling_context
             , lbH+lf9, false);
 
@@ -631,7 +633,8 @@ let div_tools_preventScrolling = function()
         , marginRight  : document.documentElement.style.marginRight
         , marginBottom : document.documentElement.style.marginBottom
         }, lf2, false);
-}}}*/
+}
+/*}}}*/
 };
 /*}}}*/
 /*_ div_tools_restoreScrolling {{{*/
@@ -680,6 +683,20 @@ let div_tools_onScroll = function(e) // eslint-disable-line no-unused-vars
     if( log_this) logBIG("div_tools_onScroll");
 
     div_tools_del_onmove_listener();
+};
+/*}}}*/
+/* UNLOAD */
+/*_ div_tools_beforeunload {{{*/
+let div_tools_beforeunload = function(e)
+{
+/*{{{*/
+let   caller = "div_tools_beforeunload";
+let log_this = options.LOG5_DIV_TOOLS;
+
+if( log_this) log("%c"+caller+"%c"+e.type, lbb+lbL+lf2, lbb+lbR+lf3);
+/*}}}*/
+
+    save_options( caller );
 };
 /*}}}*/
 /*}}}*/
@@ -1821,7 +1838,8 @@ let check_script_loaded = function()
 {
 /* [is_embedded] {{{*/
     let is_embedded = lib_log.is_embedded(XPATH_CONTENT_SCRIPT_ID);
-if(options.LOG5_DIV_TOOLS) logBIG("LOADING "+(is_embedded ? "EMBEDDED" : "EXTENSION")+" "+XPATH_CONTENT_SCRIPT_ID, lbB+lbH+lfX[is_embedded ? 5:2]);
+//if(options.LOG5_DIV_TOOLS)
+    logBIG("LOADING "+(is_embedded ? "EMBEDDED" : "EXTENSION")+" "+XPATH_CONTENT_SCRIPT_ID, lbB+lbH+lfX[is_embedded ? 5:2]);
 
 /*}}}*/
 /* chrome or browser {{{
@@ -2155,6 +2173,7 @@ return { check_script_loaded
     , smooth_scroll_toggle_handler
     , div_tools_preventScrolling
     , div_tools_restoreScrolling
+    ,    get_div_tools : () => lib_util.get_tool("div_tools")
 
     // OPTIONS
     , options
@@ -2165,7 +2184,7 @@ return { check_script_loaded
     // DEBUG
     , on_activated_load_options
 
-    // DEBUG EMBEDDING XPH/xpath.html
+    // DEBUG EMBEDDING [XPH/xpath_embedded.html]
     ,  get_domains_handler
     ,  get_urls_handler
     ,  get_xpaths_handler
