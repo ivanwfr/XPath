@@ -1,5 +1,5 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐ */
-   #div_tools_css_tag { content: "dom_tools_css (211215:18h:34)";           }
+   #div_tools_css_tag { content: "dom_tools_css (211216:16h:36)";           }
 /* └────────────────────────────────────────────────────────────────────────┘ */
 /* waiting_animation {{{*/
 
@@ -59,7 +59,7 @@ DIV.folded        OL {   width: 0; height: 0; min-width: 0; min-height: 0; };
 #div_xpaths .selected                                        { border  : 5px  solid black !important; }
 #div_xpaths .selected.confirm                                { border  : 5px dashed black !important; }
 #div_xpaths .selected.confirm     >EM:nth-of-type(1)         { color   : transparent;                           }
-#div_xpaths .selected.confirm     >EM:nth-of-type(1)::before { content : "✔"; color:black; font-weight: bolder; }
+#div_xpaths .selected.confirm     >EM:nth-of-type(1)::before { content : "\2714"; color:black; font-weight: bolder; }
 
 /*
 #div_xpaths .selected.confirm     >EM:nth-of-type(1)         { text-decoration-line: line-through; }
