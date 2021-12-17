@@ -27,7 +27,7 @@
 */
 
 const DIV_TOOLS_HTML_JS_ID     = "div_tools_html_js";
-const DIV_TOOLS_HTML_JS_TAG    =  DIV_TOOLS_HTML_JS_ID  +" (211215:19h:36)";
+const DIV_TOOLS_HTML_JS_TAG    =  DIV_TOOLS_HTML_JS_ID  +" (211216:19h:56)";
 /*}}}*/
 let       div_tools_html_js = (function() {
 /*➔ LOG {{{*/
@@ -45,7 +45,7 @@ let       div_tools_html_js = (function() {
 let div_tools_css_data ="data:text/css,"+ escape(`
 /*INLINE{{{*/
 
-#div_tools_css_tag { content: "dom_tools_css (211215:18h:33)"; }
+   #div_tools_css_tag { content: "dom_tools_css (211216:16h:36)";           }
 .waiting_animation SPAN {
     display                   : inline-block;
     font-size                 : 150%;
@@ -75,7 +75,7 @@ DIV.folded        OL {   width: 0; height: 0; min-width: 0; min-height: 0; };
 #div_xpaths .selected                                        { border  : 5px  solid black !important; }
 #div_xpaths .selected.confirm                                { border  : 5px dashed black !important; }
 #div_xpaths .selected.confirm     >EM:nth-of-type(1)         { color   : transparent;                           }
-#div_xpaths .selected.confirm     >EM:nth-of-type(1)::before { content : "✔"; color:black; font-weight: bolder; }
+#div_xpaths .selected.confirm     >EM:nth-of-type(1)::before { content : "\\2714"; color:black; font-weight: bolder; }
 #div_xpaths DIV.wheelable>EM:nth-child(2)         { color   : transparent;                           }
 #div_xpaths DIV.wheelable>EM:nth-child(2)::before { color   : black; content : "\\21C5 "; font-size: 150%; vertical-align: middle; }
 #div_tools     { transition    : transform 150ms ease-in; }
@@ -403,31 +403,23 @@ let  div_tools_css;
 /*_ dom_load {{{*/
 let dom_load = function(html_fragment)
 {
-console.log("dom_load(html_fragment):");
-console.log(         "html_fragment:");
-console.dir(          html_fragment  );
-console.log(DIV_TOOLS_HTML_JS_ID+": LOADING DATA .. try");
-/*{{{
-}}}*/
     try {
 
         window.addEventListener("error", load_onerror, false);
 
-        div_tools_css = load_css_EL("div_tools_css", div_tools_css_data);
-        html_fragment.appendChild(   div_tools_css );
+        div_tools_css   = load_css_EL("div_tools_css", div_tools_css_data);
+        if(div_tools_css.href.length    < 128)
+            console.warn("%c"+DIV_TOOLS_HTML_JS_TAG+": [div_tools] CSS NOT LOADED", "font-size:200%;");
+
+        html_fragment.appendChild( div_tools_css );
     }
     catch(ex) {
         console.log(DIV_TOOLS_HTML_JS_ID+": LOADING DATA .. catch");
         console.dir(ex);
     }
     finally {
-console.log(DIV_TOOLS_HTML_JS_ID+": LOADING DATA .. finally: div_tools_css.length=["+div_tools_css.length+"]");
+//console.log(DIV_TOOLS_HTML_JS_ID+": LOADING DATA .. finally: div_tools_css.length=["+div_tools_css.length+"]")
         window.removeEventListener("error", load_onerror, false);
-
-/*{{{
-console.log("div_tools_css:");
-console.dir( div_tools_css  );
-}}}*/
     }
 };
 /*}}}*/
@@ -708,7 +700,7 @@ let div_tools;
 /*}}}*/
 // ┌───────────────────────────────────────────────────────────────────────────┐
 // │ LOAD-SEQUENCE FOR EMBEDDED SCRIPT                                         │
-// │ 1. xpath.html loads all scripts                                           │
+// │ 1. xpath_embedded.html loads all scripts                                  │
 // │ 2. shadowRoot is injected                                                 │
 // │ 3. content_script is loaded by embedding html page                        │
 // │ 4. setTimeout calls shadow_host_addEventListener reference content_script │
