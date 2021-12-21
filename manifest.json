@@ -1,13 +1,12 @@
 {
-    "author"           :   "Ivan Wellesz",
-    "name"             :   "XPath",
-    "short_name"       :   "XPath",
-    "version"          :   "1.211217",
-    "manifest_version" :    2 ,
-    "description"      :   "DOM Nodes XPath selection",
-    "homepage_url"     :   "https://remotetabs.com",
-    "icons"            : {
-        "48"             : "images/icon_48_unloaded.png"
+    "author"           : "Ivan Wellesz",
+    "name"             : "XPath",
+    "short_name"       : "XPath",
+    "version"          : "1.211217",
+    "manifest_version" :  2 ,
+    "description"      : "DOM Nodes XPath selection",
+    "homepage_url"     : "https://remotetabs.com",
+    "icons"            : { "48" : "images/icon_48_unloaded.png"
     },
     "permissions"      : [ "tabs"
         ,                  "file://*/*"
