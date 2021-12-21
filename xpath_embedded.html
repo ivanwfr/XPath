@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <!-- ┌─────────────────────────────────────────────────────────────────────┐ -->
-<!-- │ XPH [xpath_embedded.html]                      _TAG (211220:22h:28) │ -->
+<!-- │ XPH [xpath_embedded.html]                      _TAG (211221:02h:48) │ -->
 <!-- └─────────────────────────────────────────────────────────────────────┘ -->
 <html lang="fr">
 <head> <!--{{{-->
@@ -180,7 +180,6 @@
 <!--}}}-->
 <!-- SCRIPT simulate_send_message {{{-->
  <script>
-xpath_content.div_tools_init();
 /*_ simulate_send_message {{{*/
 /*{{{*/
 const XPATH_ARRAY
@@ -828,13 +827,14 @@ let onload = function()
 //console.log("onload") // Note: No localStorage for file:// protocol
 
  title_to_h1();
+ xpath_content.div_tools_init();
  t_details.details_onload();
 };
 /*}}}*/
 /*_ title_to_h1 {{{*/
 let title_to_h1 = function()
 {
- let server_index_tag = document.querySelector("HEAD>title").textContent +" (211026:17h:36)";
+ let server_index_tag = document.querySelector("HEAD>title").textContent +" (211221:02h:48)";
  let               el = document.querySelector("H1");
  el.textContent       = server_index_tag;
 
