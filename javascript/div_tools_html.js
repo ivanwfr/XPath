@@ -10,30 +10,23 @@
 /* globals lib_log       */
 /* globals lib_util      */
 /* globals setTimeout    */ // eslint-disable-line no-unused-vars
-/* globals outline       */
-/* globals xpath_content_js */
+/* globals xpath_outline */
+/* globals xpath_content */
 
 /* exported div_tools_html_js, DIV_TOOLS_HTML_JS_TAG */
 
-/*    eslint-disable no-global-assign    */
-/*    eslint-disable no-implicit-globals */
-/*    eslint-disable no-native-reassign  */
-/*    eslint-disable no-warning-comments */
-/*    eslint-disable no-mixed-operators  */
-
-/*
-:update|1,$y *
-:!start explorer https://jshint.com/
-*/
+/* eslint-disable no-global-assign    */
+/* eslint-disable no-implicit-globals */
+/* eslint-disable no-native-reassign  */
+/* eslint-disable no-warning-comments */
+/* eslint-disable no-mixed-operators  */
 
 const DIV_TOOLS_HTML_JS_ID     = "div_tools_html_js";
-const DIV_TOOLS_HTML_JS_TAG    =  DIV_TOOLS_HTML_JS_ID  +" (211216:19h:56)";
+const DIV_TOOLS_HTML_JS_TAG    =  DIV_TOOLS_HTML_JS_ID  +" (211221:02h:22)";
 /*}}}*/
 let       div_tools_html_js = (function() {
-/*➔ LOG {{{*/
 "use strict";
 
-/*}}}*/
 
     // ┌───────────────────────────────────────────────────────────────────────┐
     // │ CSS .. DYNAMIC JS-INLINING ............ [../stylesheet/div_tools.css] │
@@ -409,7 +402,11 @@ let dom_load = function(html_fragment)
 
         div_tools_css   = load_css_EL("div_tools_css", div_tools_css_data);
         if(div_tools_css.href.length    < 128)
-            console.warn("%c"+DIV_TOOLS_HTML_JS_TAG+": [div_tools] CSS NOT LOADED", "font-size:200%;");
+        {
+            let error_msg = "[div_tools_css_data] IS MISSING";
+            console.log   ("%c *** "+error_msg+" *** ", "font-size:200%; background-color:red;");
+            console.error (DIV_TOOLS_HTML_JS_ID+": "+error_msg);
+        }
 
         html_fragment.appendChild( div_tools_css );
     }
@@ -647,17 +644,10 @@ let update_div_tools_innerHTML = function(options={}) // eslint-disable-line com
 {
 /*{{{*/
 let caller = "update_div_tools_innerHTML";
-let log_this = xpath_content_js.options.LOG5_DIV_TOOLS;
+let log_this = xpath_content.options.LOG5_DIV_TOOLS;
 
 if(log_this) lib_log.log_key_val(caller+"(options)", options);
 /*}}}*/
-    /* [div_tools_xy] {{{*/
-    if( div_tools ) {
-        div_tools.style.left = (options.div_tools_xy ? options.div_tools_xy.x : DIV_TOOLS_XY.x)+"px";
-        div_tools.style.top  = (options.div_tools_xy ? options.div_tools_xy.y : DIV_TOOLS_XY.y)+"px";
-
-    }
-    /*}}}*/
     /* div_options LOG_TOOLS .. LOG_OUTLINE .. details_options {{{*/
     let id;              let el;
 
@@ -694,7 +684,6 @@ if(log_this) lib_log.log_key_val(caller+"(options)", options);
 /* inject_shadow_root {{{*/
 /*{{{*/
 const CAPTURE_TRUE_PASSIVE_FALSE  = { capture:true , passive:false };
-const DIV_TOOLS_XY                = { x: 32 , y: 32 };
 
 let div_tools;
 /*}}}*/
@@ -709,7 +698,7 @@ let inject_shadow_root = function()
 {
 /*{{{*/
 let caller = "inject_shadow_root";
-let log_this = xpath_content_js.options.LOG5_DIV_TOOLS;
+let log_this = xpath_content.options.LOG5_DIV_TOOLS;
 
 /*}}}*/
 //lib_log.log_caller()
@@ -751,20 +740,16 @@ if(log_this) lib_log.logBIG(caller+"...OK [shadow_host]", 1);
 
     dom_load( html_fragment );
 
-    update_div_tools_innerHTML( xpath_content_js.options );
+    update_div_tools_innerHTML( xpath_content.options );
 
     div_tools = html_fragment.getElementById("div_tools");
 
-    let div_tools_xy = get_option("div_tools_xy");
-
-    div_tools.style.left = (div_tools_xy ? div_tools_xy.x : DIV_TOOLS_XY.x)+"px";
-    div_tools.style.top  = (div_tools_xy ? div_tools_xy.y : DIV_TOOLS_XY.y)+"px";
     /*}}}*/
 
     shadow_host_addEventListener();
 
     let div_options = html_fragment.getElementById("div_options");
-    div_options.addEventListener("click", xpath_content_js.log_toggle, CAPTURE_TRUE_PASSIVE_FALSE);
+    div_options.addEventListener("click", xpath_content.log_toggle, CAPTURE_TRUE_PASSIVE_FALSE);
 
     /* [DETAILS] RESTORE OPEN STATE SAVED IN localStorage {{{*/
     details_load_open_state();
@@ -824,10 +809,10 @@ let shadow_host_addEventListener = function() // eslint-disable-line no-unused-v
 /*_ shadow_host_click_handler {{{*/
 let shadow_host_click_handler = function(event)
 {
-let log_this = xpath_content_js.options.LOG5_DIV_TOOLS;
+let log_this = xpath_content.options.LOG5_DIV_TOOLS;
 /*{{{*/
-    if(event.shiftKey               ) outline.outline_clear_all();
-    if(event.ctrlKey && event.altKey) outline.data_num_xpath_delete_all();
+    if(event.shiftKey               ) xpath_outline.outline_clear_all();
+    if(event.ctrlKey && event.altKey) xpath_outline.data_num_xpath_delete_all();
     if(event.ctrlKey) return;
     if(event.altKey ) return;
 
@@ -906,7 +891,7 @@ const tools = { loaded  : false };
 let load_tools = function() // eslint-disable-line complexity
 {
 /*{{{*/
-let log_this = xpath_content_js.options.LOG5_DIV_TOOLS;
+let log_this = xpath_content.options.LOG5_DIV_TOOLS;
 
 if( log_this) lib_log.log("load_tools");
 /*}}}*/
@@ -917,26 +902,26 @@ if( log_this) lib_log.log("load_tools");
     // └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
 
     /* grid row 1 ➔ DOMAINS */
-    tools.div_domains               = {       id: "div_domains"       , handler: xpath_content_js.get_domains                    };
+    tools.div_domains               = {       id: "div_domains"       , handler: xpath_content.get_domains                    };
 
     /* grid row 2 ➔ URLS */
-    tools.div_urls                  = {       id: "div_urls"          , handler: xpath_content_js.get_urls                       };
+    tools.div_urls                  = {       id: "div_urls"          , handler: xpath_content.get_urls                       };
 
     /* div_options➔ OPTIONS */
     tools.details_options           = {       id: "details_options"   , handler: null                                            };
-    tools.xpath_expand              = {       id: "xpath_expand"      , handler:          outline.outline_option_toggle_e_target };
-    tools.outline_log_dot           = {       id: "outline_log_dot"   , handler:          outline.outline_dots_toggle_handler    };
-    tools.outline_log_frame         = {       id: "outline_log_frame" , handler:          outline.outline_frames_toggle_handler  };
-    tools.smooth_scroll             = {       id: "smooth_scroll"     , handler: xpath_content_js.smooth_scroll_toggle_handler   };
+    tools.xpath_expand              = {       id: "xpath_expand"      , handler:          xpath_outline.outline_option_toggle_e_target };
+    tools.outline_log_dot           = {       id: "outline_log_dot"   , handler:          xpath_outline.outline_dots_toggle_handler    };
+    tools.outline_log_frame         = {       id: "outline_log_frame" , handler:          xpath_outline.outline_frames_toggle_handler  };
+    tools.smooth_scroll             = {       id: "smooth_scroll"     , handler: xpath_content.smooth_scroll_toggle_handler   };
 
     /* grid row 3 ➔ PICK */
-    tools.div_outline_pick          = {       id: "div_outline_pick"  , handler:          outline.pick_xpath_e_target            };
+    tools.div_outline_pick          = {       id: "div_outline_pick"  , handler:          xpath_outline.pick_xpath_e_target            };
 
     /* grid row 4 ➔ SAMPLE */
-    tools.div_outline_sample        = {       id: "div_outline_sample", handler:          outline.sampling_pick_some_xpath       };
+    tools.div_outline_sample        = {       id: "div_outline_sample", handler:          xpath_outline.sampling_pick_some_xpath       };
 
     /* grid row 5 ➔ XPATHS */
-    tools.div_xpaths                = {       id: "div_xpaths"        , handler:          outline.div_xpaths_click_handler       };
+    tools.div_xpaths                = {       id: "div_xpaths"        , handler:          xpath_outline.div_xpaths_click_handler       };
 
     /*}}}*/
     /* ID ➔ [el] .. (warn about GUI missing tools) {{{*/
@@ -1020,7 +1005,7 @@ let caller = "div_tools_layout";
 let div_tools_layout_cmd = function(cmd, div_tools_child_id)
 {
 let caller = "div_tools_layout_cmd";
-let log_this = xpath_content_js.options.LOG3_SERVER;
+let log_this = xpath_content.options.LOG3_SERVER;
 
     for(let i=0; i< STAGE_LIST.length; ++i)
         div_tools.classList.remove( STAGE_LIST[i] );
@@ -1060,8 +1045,8 @@ let get_div_tools_child_for_el = function(el)
     // │ OPTIONS                                                               │
     // └───────────────────────────────────────────────────────────────────────┘
 /*{{{*/
-let get_option = function(key    ) { let val = xpath_content_js.get_option(key    ); return val; };
-let set_option = function(key,val) {           xpath_content_js.set_option(key,val);             };
+let get_option = function(key    ) { let val = xpath_content.get_option(key    ); return val; };
+let set_option = function(key,val) {           xpath_content.set_option(key,val);             };
 
 /*}}}*/
 

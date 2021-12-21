@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <!-- ┌─────────────────────────────────────────────────────────────────────┐ -->
-<!-- │ XPH [xpath_embedded.html]                      _TAG (211217:19h:59) │ -->
+<!-- │ XPH [xpath_embedded.html]                      _TAG (211220:22h:28) │ -->
 <!-- └─────────────────────────────────────────────────────────────────────┘ -->
 <html lang="fr">
 <head> <!--{{{-->
@@ -180,26 +180,28 @@
 <!--}}}-->
 <!-- SCRIPT simulate_send_message {{{-->
  <script>
-xpath_content_js.div_tools_init();
+xpath_content.div_tools_init();
 /*_ simulate_send_message {{{*/
 /*{{{*/
- const XPATH_ARRAY
-  = [ "/html/body/h1"
-  ,   "/html/body/details/p[1]"
-  ,   "/html/body/details/p[2]"
-  ,   "/html/body/details/p[5]"
-  ,   "/html/body/details/p[6]"
-  ,   "/html/body/details[2]/details/div/pre[2]"
-  ];
+const XPATH_ARRAY
+ = [ "/html/body/h1"
+ ,   "/html/body/details/p[1]"
+ ,   "/html/body/details/p[2]"
+ ,   "/html/body/details/p[5]"
+ ,   "/html/body/details/p[6]"
+ ,   "/html/body/details[2]/details/div/pre[2]"
+ ];
 
+ // from: javascript/xpath_content.js
 
-
-
+let config = { "CMD_ADD"      : "add"
+ ,             "CMD_DELETE"   : "delete"
+};
 /*}}}*/
 let simulate_send_message = function(message_object,_caller)
 {
 let caller = "simulate_send_message";
-let log_this = xpath_content_js.options.LOG3_SERVER;
+let log_this = xpath_content.options.LOG3_SERVER;
 if( log_this) lib_log.log_key_val_group(_caller+" ➔ "+caller+(message_object.cmd ? " "+message_object.cmd : ""),message_object, 9, true);
 
     let response = JSON.parse( JSON.stringify(message_object) ); /* DEEP COPY */
@@ -216,7 +218,7 @@ if( log_this) lib_log.log_key_val_group(_caller+" ➔ "+caller+(message_object.c
        , "wikipedia.org"
        ];
 
-      xpath_content_js.get_domains_handler(response.domains);
+      xpath_content.get_domains_handler(response.domains);
       break;
 
      case "urls"    :
@@ -232,7 +234,7 @@ if( log_this) lib_log.log_key_val_group(_caller+" ➔ "+caller+(message_object.c
        , "https://www.wikipedia.org/"
        ];
 
-      xpath_content_js.get_urls_handler   (response.urls);
+      xpath_content.get_urls_handler   (response.urls);
       break;
 
      case "xpaths":
@@ -241,13 +243,13 @@ if( log_this) lib_log.log_key_val_group(_caller+" ➔ "+caller+(message_object.c
       response.parsed_items        = "XPATH x4";
       response.xpaths              = XPATH_ARRAY;
 
-      xpath_content_js.get_xpaths_handler (response.xpaths);
+      xpath_content.get_xpaths_handler (response.xpaths);
       break;
 
-     case "add"     :
-     case "delete"  :
+     case config.CMD_ADD     :
+     case config.CMD_DELETE  :
 
-      outline.add_or_delete_server_response_handler(response, message_object);
+      xpath_outline.add_or_delete_server_response_handler(response, message_object);
       break;
 
      default:

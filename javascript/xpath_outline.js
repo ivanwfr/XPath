@@ -12,10 +12,10 @@
 /* globals lib_popup     */
 /* globals lib_util      */
 /* globals xpath_js      */
-/* globals xpath_content_js */
+/* globals xpath_content */
 /* globals setTimeout clearTimeout */ // eslint-disable-line no-unused-vars
 
-/* exported outline, OUTLINE_JS_ID */
+/* exported xpath_outline, XPATH_OUTLINE_JS_ID */
 
 //┌───────────────────────────────────────┐
 //│ eslint NodeJS dependencies            │
@@ -31,10 +31,10 @@
 :!start explorer https://jshint.com/
 */
 
-const OUTLINE_JS_ID         = "outline";
-const OUTLINE_JS_TAG        =  OUTLINE_JS_ID +" (211215:17h:14)";
+const XPATH_OUTLINE_JS_ID         = "outline";
+const XPATH_OUTLINE_JS_TAG        =  XPATH_OUTLINE_JS_ID +" (211220:22h:28)";
 /*}}}*/
-let outline = (function() {
+let xpath_outline = (function() {
 /*➔ LOG {{{*/
 "use strict";
 
@@ -105,6 +105,13 @@ const CAPTURE_TRUE_PASSIVE_FALSE       = {capture:true, passive:false};
 const BODY_WHEEL_TITLE = "TURN MOUSE WHEEL TO SELECT A PARENT CONTAINER";
 /*}}}*/
 
+let config = {};
+let set_config = function(_config)
+{
+//console.trace()
+    config = _config;
+//log_key_val_group("set_config config", config , 7)
+};
 //┌────────────────────────────────────────────────────────────────────────────┐
 //│ TOOL [STATE-TRANSITION]                                                    │
 //└────────────────────────────────────────────────────────────────────────────┘
@@ -114,7 +121,7 @@ let cancel_pending_event = function(e_target)
 {
 /*{{{*/
 let   caller = "cancel_pending_event";
-let log_this = xpath_content_js.options.LOG1_EVENT;
+let log_this = xpath_content.options.LOG1_EVENT;
 
 /*}}}*/
 if( log_this) lib_log.log_sep_top(caller+"("+lib_util.get_id_or_tag(e_target)+")", 0, true);
@@ -124,7 +131,7 @@ if( log_this) log_caller();
 
     pick1_outline_onclick_stop();
 
-    xpath_content_js.div_tools_restoreScrolling();
+    xpath_content.div_tools_restoreScrolling();
 
     tools_unselect();
 
@@ -157,7 +164,7 @@ let tools_unselect = function()
 {
 /*{{{*/
 let   caller = "tools_unselect";
-let log_this = xpath_content_js.options.LOG1_EVENT;
+let log_this = xpath_content.options.LOG1_EVENT;
 
 /*}}}*/
     let             div_tools = lib_util.get_tool         ("div_tools"  );
@@ -195,7 +202,7 @@ let outline_option_toggle_e_target = function(e_target) // eslint-disable-line n
 {
 /*{{{*/
 let   caller = "outline_option_toggle_e_target";
-let log_this = xpath_content_js.options.LOG5_XPATH;
+let log_this = xpath_content.options.LOG5_XPATH;
 
 if( log_this) logBIG(caller,1);
 /*}}}*/
@@ -224,7 +231,7 @@ let outline_dots_toggle_handler = function(e_target)
 {
 /*{{{*/
 let caller = "outline_dots_toggle_handler";
-let log_this = xpath_content_js.options.LOG4_FRAMES;
+let log_this = xpath_content.options.LOG4_FRAMES;
 
 if( log_this) logBIG(caller,1);
 /*}}}*/
@@ -253,7 +260,7 @@ let outline_frames_toggle_handler = function(e_target)
 {
 /*{{{*/
 let caller = "outline_frames_toggle_handler";
-let log_this = xpath_content_js.options.LOG4_FRAMES;
+let log_this = xpath_content.options.LOG4_FRAMES;
 
 if( log_this) logBIG(caller,1);
 /*}}}*/
@@ -290,7 +297,7 @@ let pick_xpath_e_target = function(e_target)
 {
 /*{{{*/
 let caller = "pick_xpath_e_target";
-let log_this = xpath_content_js.options.LOG5_XPATH;
+let log_this = xpath_content.options.LOG5_XPATH;
 
 if( log_this) logBIG(caller,1);
 /*}}}*/
@@ -319,7 +326,7 @@ let pick1_outline_onclick_stop  = function()
 {
 /*{{{*/
 let   caller = "pick1_outline_onclick_stop";
-let log_this = xpath_content_js.options.LOG5_XPATH;
+let log_this = xpath_content.options.LOG5_XPATH;
 
 if( log_this) log("%c"+caller, lbH+lf6);
 /*}}}*/
@@ -335,7 +342,7 @@ let pick2_outline_onclick_start = function()
 {
 /*{{{*/
 let caller = "pick2_outline_onclick_start";
-let log_this = xpath_content_js.options.LOG5_XPATH;
+let log_this = xpath_content.options.LOG5_XPATH;
 
 if( log_this) log("%c"+caller, lbH+lf0);
 /*}}}*/
@@ -360,7 +367,7 @@ let sampling_pick_some_xpath = function(e_target) // eslint-disable-line no-unus
 {
 /*{{{*/
 let caller = "sampling_pick_some_xpath";
-let log_this = xpath_content_js.options.LOG5_XPATH;
+let log_this = xpath_content.options.LOG5_XPATH;
 
 if( log_this) logBIG(caller, 1);
 /*}}}*/
@@ -398,7 +405,7 @@ let sampling_1_has_some = function()
 {
 /*{{{*/
 let caller = "sampling_1_has_some";
-let log_this = xpath_content_js.options.LOG4_FRAMES;
+let log_this = xpath_content.options.LOG4_FRAMES;
 
 /*}}}*/
     let div_xpaths = lib_util.get_tool("div_xpaths");
@@ -422,7 +429,7 @@ let sampling_2_clear = function()
 {
 /*{{{*/
 let caller = "sampling_2_clear";
-let log_this = xpath_content_js.options.LOG5_XPATH;
+let log_this = xpath_content.options.LOG5_XPATH;
 
 if( log_this) logBIG(caller,lbH+lf0);
 /*}}}*/
@@ -442,7 +449,7 @@ let sampling_2_clear2_div_xpaths_children = function()
 {
 /*{{{*/
 let caller = "sampling_2_clear2_div_xpaths_children";
-let log_this = xpath_content_js.options.LOG5_XPATH;
+let log_this = xpath_content.options.LOG5_XPATH;
 
     let       div_xpaths = lib_util.get_tool("div_xpaths");
 if( log_this) log("%c"+caller+": div_xpaths.children.length=["+div_xpaths.children.length+"]", lbH+lf9);
@@ -465,7 +472,7 @@ let sampling_3_pick_some = function()
 {
 /*{{{*/
 let caller = "sampling_3_pick_some";
-let log_this = xpath_content_js.options.LOG5_XPATH;
+let log_this = xpath_content.options.LOG5_XPATH;
 
 if( log_this) log(caller);
 /*}}}*/
@@ -546,7 +553,7 @@ let div_xpaths_click_handler = function(e_target,e) // eslint-disable-line no-un
 {
 /*{{{*/
 let   caller = "div_xpaths_click_handler";
-let log_this = xpath_content_js.options.LOG5_XPATH;
+let log_this = xpath_content.options.LOG5_XPATH;
 
     let consumed_by; let lxx = 0;
 /*}}}*/
@@ -585,18 +592,18 @@ let log_this = xpath_content_js.options.LOG5_XPATH;
     if(!consumed_by && click2_cmd_add_or_delete)
     {
         let cmd
-            = div_xpaths_child.classList.contains("delete" ) ? "delete"
-            : div_xpaths_child.classList.contains("add"    ) ?    "add"
-            :                                                        ""
+            = div_xpaths_child.classList.contains(config.CMD_DELETE ) ? config.CMD_DELETE
+            : div_xpaths_child.classList.contains(config.CMD_ADD    ) ? config.CMD_ADD
+            :                                                           ""
         ;
         if( cmd ) {
             consumed_by =  cmd;
-            lxx         = (cmd == "add"   ) ? 3
-                        : (cmd == "delete") ? 2
-                        :                     1;
+            lxx         = (cmd == config.CMD_ADD   ) ? 3
+                        : (cmd == config.CMD_DELETE) ? 2
+                        :                              1;
 
             let user_offset_xpath = data_num_xpath_get_num_actual_user_xpath( div_xpaths_child.dataset.num );
-            xpath_content_js.send_xpath_cmd(user_offset_xpath, cmd, "FROM USER");
+            xpath_content.send_xpath_cmd(user_offset_xpath, cmd, "FROM USER");
 
             cancel_pending_event(e_target);
         }
@@ -630,7 +637,7 @@ let log_this = xpath_content_js.options.LOG5_XPATH;
     /*}}}*/
     sampling_check_button_sample_add_or_clear();
 /*{{{*/
-if(xpath_content_js.options.LOG1_STEP) xpath_content_js.log_query_step("XPATH CLICK", consumed_by);
+if(xpath_content.options.LOG1_STEP) xpath_content.log_query_step("XPATH CLICK", consumed_by);
 
 if( log_this) log_key_val_group( caller +" "+consumed_by
                                  , {   div_xpaths_child_on_cooldown
@@ -667,14 +674,14 @@ let data_num_xpath_array = [];
 /*_ data_num_xpath_delete_all {{{*/
 let data_num_xpath_delete_all = function()
 {
-if(xpath_content_js.options.LOG1_STEP) log("%c DELETING ALL x"+data_num_xpath_array.length+" %c XPATHS %c" , lbB+lbL+lf2 , lbB+lbC+lf3 , lbB+lbR+lf4);
+if(xpath_content.options.LOG1_STEP) log("%c DELETING ALL x"+data_num_xpath_array.length+" %c XPATHS %c" , lbB+lbL+lf2 , lbB+lbC+lf3 , lbB+lbR+lf4);
 
     cancel_pending_event();
 
     for(let i=0; i<data_num_xpath_array.length; ++i)
     {
         if(        data_num_xpath_array[i].from_server )
-            xpath_content_js.send_xpath_cmd(data_num_xpath_array[i].xpath, "delete", "REPLACED");
+            xpath_content.send_xpath_cmd(data_num_xpath_array[i].xpath, config.CMD_DELETE, config.ACTION_REPLACED);
     }
 
     data_num_xpath_array.splice(0); // NO MUTATION
@@ -686,7 +693,7 @@ if(xpath_content_js.options.LOG1_STEP) log("%c DELETING ALL x"+data_num_xpath_ar
 let data_num_xpath_load_array = function(_data_num_xpath_array)
 {
 /*{{{*/
-let log_this = xpath_content_js.options.LOG1_STEP;
+let log_this = xpath_content.options.LOG1_STEP;
 
 if( log_this && _data_num_xpath_array) log("%c LOADING %c "+(_data_num_xpath_array ? (_data_num_xpath_array.length) : "0")+" XPATHS" , lbB+lbL+lf2 , lbB+lbR+lf3 );
 /*}}}*/
@@ -716,7 +723,7 @@ let data_num_xpath_keep_from_server_only = function()
 {
 /*{{{*/
 let   caller = "data_num_xpath_keep_from_server_only";
-let log_this = xpath_content_js.options.LOG5_XPATH;
+let log_this = xpath_content.options.LOG5_XPATH;
 
 if( log_this) logBIG(caller+": data_num_xpath_array.length=["+data_num_xpath_array.length+"]", 0);
 /*}}}*/
@@ -755,7 +762,7 @@ let data_num_xpath_add_at_XY = function(num,x,y,silent=false)
 {
 /*{{{*/
 let caller   = "data_num_xpath_add_at_XY";
-let log_this = !silent && xpath_content_js.options.LOG5_XPATH;
+let log_this = !silent && xpath_content.options.LOG5_XPATH;
 
 if( log_this) log(caller+"(XY=["+x+" "+y+"] , num=["+num+"])");
 /*}}}*/
@@ -791,7 +798,7 @@ let data_num_xpath_add_range_at_XY = function(range,left,top,num,silent)
 {
 /*{{{*/
 let caller   = "data_num_xpath_add_range_at_XY";
-let log_this = !silent && xpath_content_js.options.LOG5_XPATH;
+let log_this = !silent && xpath_content.options.LOG5_XPATH;
 
 if( log_this) log(caller+"(range, XY=["+left+" "+top+"] , num=["+num+"])");
 /*}}}*/
@@ -852,12 +859,12 @@ let data_num_xpath_set_new_xpath = function(from_server,data_num_xpath,div_xpath
 
     /* TOOL: SHOW USER ACTION [add] or [delete] */
     if( data_num_xpath.from_server ) {
-        div_xpaths_child.classList.add    ( "delete" );
-        div_xpaths_child.classList.remove ( "add"    );
+        div_xpaths_child.classList.add    ( config.CMD_DELETE );
+        div_xpaths_child.classList.remove ( config.CMD_ADD    );
     }
     else {
-        div_xpaths_child.classList.remove ( "delete" );
-        div_xpaths_child.classList.add    ( "add"    );
+        div_xpaths_child.classList.remove ( config.CMD_DELETE );
+        div_xpaths_child.classList.add    ( config.CMD_ADD    );
     }
 
     /* TOOL: UPDATE XPATH ENTRY */
@@ -951,7 +958,7 @@ let div_xpaths_rebuild = function(_caller)
 {
 /*{{{*/
 let caller   = "div_xpaths_rebuild";
-let log_this = xpath_content_js.options.LOG5_XPATH;
+let log_this = xpath_content.options.LOG5_XPATH;
 
 if( log_this) logBIG("REBUILD ➔ "+_caller, lbb+lf9);
 /*}}}*/
@@ -1014,8 +1021,8 @@ let div_xpaths_child_for_xpath = function(xpath)
         if(div_xpaths.children[i].dataset.xpath != xpath)
             continue;
 
-        if(   div_xpaths.children[i].classList.contains("delete")
-           || div_xpaths.children[i].classList.contains("add"   )
+        if(   div_xpaths.children[i].classList.contains(config.CMD_DELETE)
+           || div_xpaths.children[i].classList.contains(config.CMD_ADD   )
           )
             return div_xpaths.children[i];
     }
@@ -1070,7 +1077,7 @@ let div_xpaths_sync_GUI_handler = function(docked)
     else             div_tools.classList.remove("xpath_expand");
     /*}}}*/
     /* VIEWPORT {{{*/
-//  xpath_content_js.div_tools_confine_to_viewport();
+//  xpath_content.div_tools_confine_to_viewport();
 
     /*}}}*/
 };
@@ -1096,7 +1103,7 @@ let wheel_add_listener = function(lit_node)
     wheel_handler_factor    = 1;
     logged_has_moved_report = undefined;
 
-    xpath_content_js.div_tools_preventScrolling();
+    xpath_content.div_tools_preventScrolling();
 
    /*  [div_mask] ADD listeners .. (will be shown by log_popup_follow_mask_el) {{{*/
     if(!div_mask           ) div_mask_get();
@@ -1126,7 +1133,7 @@ let wheel_del_listener = function()
 {
 /*{{{*/
 let   caller = "wheel_del_listener";
-let log_this = xpath_content_js.options.LOG1_EVENT;
+let log_this = xpath_content.options.LOG1_EVENT;
 
 if( log_this) log("%c"+caller, lbH+lf6);
 /*}}}*/
@@ -1175,7 +1182,7 @@ let wheel_pointermove = function(e)
 {
 /*{{{*/
 let   caller = "wheel_pointermove";
-let log_this = xpath_content_js.options.LOG1_EVENT;
+let log_this = xpath_content.options.LOG1_EVENT;
 
 /*}}}*/
     /* [!has_moved] {{{*/
@@ -1217,7 +1224,7 @@ let wheel_handler = function(e,move_delta) /* eslint-disable-line complexity */
 {
 /*{{{*/
 let caller = "wheel_handler";
-let log_this = xpath_content_js.options.LOG1_EVENT;
+let log_this = xpath_content.options.LOG1_EVENT;
 
 /*}}}*/
     /* [return false] .. f(!wheelable_lit_node) {{{*/
@@ -1305,7 +1312,7 @@ let wheel_handler_is_on_cooldown = function()
 {
 /*{{{*/
 let   caller = "wheel_handler_is_on_cooldown";
-let log_this = xpath_content_js.options.LOG2_WHEEL;
+let log_this = xpath_content.options.LOG2_WHEEL;
 
 /*}}}*/
     /* ellapsed time {{{*/
@@ -1367,7 +1374,7 @@ let wheel_start_from_div_xpaths_child = function(div_xpaths_child)
 {
 /*{{{*/
 let   caller = "wheel_start_from_div_xpaths_child"; /* eslint-disable-line no-unused-vars */
-let log_this = xpath_content_js.options.LOG2_WHEEL;  /* eslint-disable-line no-unused-vars */
+let log_this = xpath_content.options.LOG2_WHEEL;  /* eslint-disable-line no-unused-vars */
 
 /*}}}*/
     /* RESELECT [div_xpaths_child] .. [xpath] {{{*/
@@ -1438,7 +1445,7 @@ if( log_this) console.table(data_num_xpath_array);
 let wheel_start_from_lit_node = function(wheelable_node)
 {
 /*{{{*/
-let log_this = xpath_content_js.options.LOG2_WHEEL;
+let log_this = xpath_content.options.LOG2_WHEEL;
 
 if( log_this) lib_log.log_sep_top("WHEEL START: "+xpath_js.get_nodeXPath(wheelable_node), 6, false);
 /*}}}*/
@@ -1458,7 +1465,7 @@ let wheel_handler_lit_node_offset = function(e_target,wheel_offset)
 {
 /*{{{*/
 let   caller = "wheel_handler_lit_node_offset"; // eslint-disable-line no-unused-vars
-let log_this = xpath_content_js.options.LOG2_WHEEL || xpath_content_js.options.LOG5_XPATH;
+let log_this = xpath_content.options.LOG2_WHEEL || xpath_content.options.LOG5_XPATH;
 
 /*}}}*/
     /* cap wheel_offset below BODY {{{*/
@@ -1569,7 +1576,7 @@ let wheel_stop_handler = function(e) // eslint-disable-line complexity
 if(e.ctrlKey) return;
 if(e. altKey) return;
 let   caller = "wheel_stop_handler";
-let log_this = xpath_content_js.options.LOG2_WHEEL;
+let log_this = xpath_content.options.LOG2_WHEEL;
 
 let has_moved = lib_util.get_has_moved_since_onDown_XY();
 if( log_this && has_moved) log("%c"+caller+": .. has_moved=["+has_moved+"]", lbH+lf8);
@@ -1597,10 +1604,10 @@ if(log_this) lib_log.log_sep_bot("WHEEL STOP", 6);
     let cmd = "";
     if(e_target == div_xpaths_child.firstElementChild)
     {
-        cmd = div_xpaths_child.classList.contains("confirm") ? "confirm"
-            : div_xpaths_child.classList.contains("delete" ) ?  "delete"
-            : div_xpaths_child.classList.contains("add"    ) ?     "add"
-            :                                                         "";
+        cmd = div_xpaths_child.classList.contains(config.CMD_CONFIRM) ? config.CMD_CONFIRM
+            : div_xpaths_child.classList.contains(config.CMD_DELETE ) ? config.CMD_DELETE
+            : div_xpaths_child.classList.contains(config.CMD_ADD    ) ? config.CMD_ADD
+            :                                                           "";
 
     }
     /*}}}*/
@@ -1681,31 +1688,31 @@ let wheel_confirmed_click = function(div_xpaths_child,cmd,data_num_xpath,wheelto
 {
 /*{{{*/
 let   caller = "wheel_confirmed_click";
-let log_this = xpath_content_js.options.LOG2_WHEEL;
+let log_this = xpath_content.options.LOG2_WHEEL;
 
 if( log_this) logBIG(caller+"(cmd=["+cmd+"])");
 /*}}}*/
     /* SERVER [delete] REPLACED XPATH .. f(from_server) {{{*/
     if(data_num_xpath.from_server)
     {
-if(log_this || xpath_content_js.options.LOG1_STEP  ) logBIG("WHEEL: SERVER [delete] [" + data_num_xpath.xpath  +"]", 2);
+if(log_this || xpath_content.options.LOG1_STEP  ) logBIG("WHEEL: SERVER [delete] [" + data_num_xpath.xpath  +"]", 2);
 
-        xpath_content_js.send_xpath_cmd(data_num_xpath.xpath, "delete", "WHEEL OFFSET");
+        xpath_content.send_xpath_cmd(data_num_xpath.xpath, config.CMD_DELETE, "WHEEL OFFSET");
     }
     /*}}}*/
     /* SERVER [add] or [delete] NEW XPATH .. f(wheelto_xpath) {{{*/
-    if((cmd == "add") || (cmd == "delete"))
+    if((cmd == config.CMD_ADD) || (cmd == config.CMD_DELETE))
     {
-if(xpath_content_js.options.LOG3_SERVER) logBIG("WHEEL: SERVER ["+cmd+"] ["+ wheelto_xpath      +"]", 4);
+if(xpath_content.options.LOG3_SERVER) logBIG("WHEEL: SERVER ["+cmd+"] ["+ wheelto_xpath      +"]", 4);
 
-        xpath_content_js.send_xpath_cmd(       wheelto_xpath, cmd     , "WHEEL CONFIRM");
+        xpath_content.send_xpath_cmd(       wheelto_xpath, cmd     , "WHEEL CONFIRM");
     }
     /*}}}*/
     /* XPATH f(wheelto_xpath) {{{*/
 
-    if((cmd == "confirm") || (cmd == "add"))
+    if((cmd == config.CMD_CONFIRM) || (cmd == config.CMD_ADD))
     {
-if(log_this || xpath_content_js.options.LOG1_STEP  ) logBIG("WHEEL: PAGE   [select] [" + wheelto_xpath      +"]", 5);
+if(log_this || xpath_content.options.LOG1_STEP  ) logBIG("WHEEL: PAGE   [select] [" + wheelto_xpath      +"]", 5);
 
         div_xpaths_child = data_num_xpath_set_new_xpath(false, data_num_xpath, div_xpaths_child, wheelto_xpath);
     }
@@ -1718,7 +1725,7 @@ let wheel_clr_wheelable = function()
 {
 /*{{{*/
 let   caller = "wheel_clr_wheelable";
-let log_this = xpath_content_js.options.LOG2_WHEEL;
+let log_this = xpath_content.options.LOG2_WHEEL;
 
 //if( log_this) logBIG(caller, 0);
 /*}}}*/
@@ -1797,7 +1804,7 @@ let div_mask_onclick_handler = function(e)
 {
 /*{{{*/
 let caller = "div_mask_onclick_handler"; // eslint-disable-line no-unused-vars
-let log_this = (xpath_content_js.options.LOG3_MASK || xpath_content_js.options.LOG1_EVENT);
+let log_this = (xpath_content.options.LOG3_MASK || xpath_content.options.LOG1_EVENT);
 
 if( log_this) logBIG("CLICK: div_mask", 9);
 /*}}}*/
@@ -1841,7 +1848,7 @@ let div_mask_onclick_add_xpath_at_XY = function(left,top)
 {
 /*{{{*/
 let caller = "div_mask_onclick_add_xpath_handler";
-let log_this = (xpath_content_js.options.LOG3_MASK || xpath_content_js.options.LOG1_EVENT);
+let log_this = (xpath_content.options.LOG3_MASK || xpath_content.options.LOG1_EVENT);
 
 if( log_this) logBIG(caller);
 /*}}}*/
@@ -1910,7 +1917,7 @@ let outline_frames_add_el_at_XY = function(el,top_left,num)
 {
 /*{{{*/
 let caller = "outline_frames_add_el_at_XY";
-let log_this = xpath_content_js.options.LOG4_FRAMES;
+let log_this = xpath_content.options.LOG4_FRAMES;
 
 /*}}}*/
 
@@ -1947,7 +1954,7 @@ let outline_frames_show = function()
 {
 /*{{{*/
 let caller = "outline_frames_show";
-let log_this = xpath_content_js.options.LOG4_FRAMES;
+let log_this = xpath_content.options.LOG4_FRAMES;
 
 if( log_this) log(caller+": outline_frames.length=["+outline_frames.length+"]");
 if( log_this ) {
@@ -1975,7 +1982,7 @@ let outline_frames_clear = function()
 {
 /*{{{*/
 let caller = "outline_frames_clear";
-let log_this = xpath_content_js.options.LOG4_FRAMES;
+let log_this = xpath_content.options.LOG4_FRAMES;
 
 if( log_this) log("%c"+caller+": outline_frames.length=["+outline_frames.length+"]", lbH+lf1);
 /*}}}*/
@@ -1995,7 +2002,7 @@ let outline_frames_has_some = function()
 {
 /*{{{*/
 let caller = "outline_frames_has_some";
-let log_this = xpath_content_js.options.LOG4_FRAMES;
+let log_this = xpath_content.options.LOG4_FRAMES;
 
 if( log_this) log("%c"+caller+": outline_frames.length=["+outline_frames.length+"]", lbH+lf0);
 /*}}}*/
@@ -2009,7 +2016,7 @@ let outline_dots_add_num_at_XY = function(num,left,top)
 {
 /*{{{*/
 let caller = "outline_dots_add_num_at_XY";
-let log_this = xpath_content_js.options.LOG4_FRAMES;
+let log_this = xpath_content.options.LOG4_FRAMES;
 
 if( log_this) log("%c"+caller+"("+num+" , "+left+" , "+top+")", lbH+lf3);
 /*}}}*/
@@ -2049,7 +2056,7 @@ let outline_dots_clear = function()
 {
 /*{{{*/
 let caller = "outline_dots_clear";
-let log_this = xpath_content_js.options.LOG4_FRAMES;
+let log_this = xpath_content.options.LOG4_FRAMES;
 
 if( log_this) log("%c"+caller+": outline_dots.length=["+outline_dots.length+"]", lbH+lf1);
 /*}}}*/
@@ -2085,7 +2092,7 @@ let page_hide_srv_xpath_targets = function(_caller)
 {
 /*{{{*/
 let caller = "page_hide_srv_xpath_targets";
-let log_this = xpath_content_js.options.LOG5_XPATH;
+let log_this = xpath_content.options.LOG5_XPATH;
 
 if( log_this) logBIG(caller+"("+_caller+")", 2);
 /*}}}*/
@@ -2118,7 +2125,7 @@ let page_show_srv_xpath_targets = function()
 {
 /*{{{*/
 let caller = "page_show_srv_xpath_targets";
-let log_this = xpath_content_js.options.LOG5_XPATH || xpath_content_js.options.LOG5_XPATH;
+let log_this = xpath_content.options.LOG5_XPATH || xpath_content.options.LOG5_XPATH;
 
 if( log_this) logBIG(caller, 4);
 /*}}}*/
@@ -2135,7 +2142,7 @@ let page_set_srv_xpath_target_bgnum = function(xpath,bgnum)
 {
 /*{{{*/
 let caller = "page_set_srv_xpath_target_bgnum";
-let log_this = xpath_content_js.options.LOG5_XPATH || xpath_content_js.options.LOG5_XPATH;
+let log_this = xpath_content.options.LOG5_XPATH || xpath_content.options.LOG5_XPATH;
 
 if( log_this) log("%c"+caller+" %c"+xpath, lb5, lbX[(bgnum % 10)]);
 /*}}}*/
@@ -2153,7 +2160,7 @@ let page_show_usr_xpath_targets = function(_caller)
 {
 /*{{{*/
 let caller = "page_show_usr_xpath_targets";
-let log_this = xpath_content_js.options.LOG5_XPATH;
+let log_this = xpath_content.options.LOG5_XPATH;
 
 if( log_this) logBIG(caller+"("+_caller+")", 4);
 /*}}}*/
@@ -2163,7 +2170,7 @@ if( log_this) logBIG(caller+"("+_caller+")", 4);
     for(let i=0; i< div_xpaths.children.length; ++i)
     {
         let div_xpaths_child = div_xpaths.children[i];
-        if( div_xpaths_child.classList.contains("add") )
+        if( div_xpaths_child.classList.contains(config.CMD_ADD) )
         {
             let            xpath = div_xpaths_child.dataset.xpath;
             let   data_num_xpath = data_num_xpath_get_xpath_entry( xpath );
@@ -2178,7 +2185,7 @@ let page_set_usr_xpath_target_bgnum = function(xpath,bgnum)
 {
 /*{{{*/
 let caller = "page_set_usr_xpath_target_bgnum";
-let log_this = xpath_content_js.options.LOG5_XPATH;
+let log_this = xpath_content.options.LOG5_XPATH;
 
 if( log_this) log("%c"+caller+" %c"+xpath, lf5, lfX[(bgnum % 10)]);
 /*}}}*/
@@ -2194,7 +2201,7 @@ if( log_this) log("%c"+caller+" %c"+xpath, lf5, lfX[(bgnum % 10)]);
 let page_wheel_from_xpath = function(xpath)
 {
 /*{{{*/
-let log_this = xpath_content_js.options.LOG5_XPATH;
+let log_this = xpath_content.options.LOG5_XPATH;
 
 if( log_this) logBIG("page_wheel_from_xpath("+xpath+")", 2);
 /*}}}*/
@@ -2236,7 +2243,7 @@ let page_wheel_from_el_with_offset = function(offset_el,parent_offset)
 {
 /*{{{*/
 let caller = "page_wheel_from_el_with_offset";
-let log_this = xpath_content_js.options.LOG5_XPATH;
+let log_this = xpath_content.options.LOG5_XPATH;
 
 if( log_this) logBIG(caller+"("+lib_util.get_id_or_tag(offset_el)+" , parent_offset=["+parent_offset+"])", 3);
 //log_caller()
@@ -2265,8 +2272,8 @@ if( log_this) logBIG(caller+"("+lib_util.get_id_or_tag(offset_el)+" , parent_off
     if(parent_offset && div_xpaths_child && (div_xpaths_child != wheelable_div_xpaths_child))
     {
         let div_xpaths_child_type
-        =   div_xpaths_child.classList.contains("delete") ? "delete"
-        :   div_xpaths_child.classList.contains("add"   ) ? "add"
+        =   div_xpaths_child.classList.contains(config.CMD_DELETE) ? config.CMD_DELETE
+        :   div_xpaths_child.classList.contains(config.CMD_ADD   ) ? config.CMD_ADD
         :   div_xpaths_child.classList;
 
         page_wheel_warn(offset_el, "▲"+ parent_offset +" NODE IS A ["+div_xpaths_child_type+"] TARGET");
@@ -2286,7 +2293,7 @@ let page_wheel_lit_offset_el_bgnum = function(offset_el,parent_offset)
 {
 /*{{{*/
 let caller = "page_wheel_lit_offset_el_bgnum";
-let log_this = xpath_content_js.options.LOG5_XPATH;
+let log_this = xpath_content.options.LOG5_XPATH;
 
 if( log_this) logBIG(caller+"("+lib_util.get_id_or_tag(offset_el)+" , parent_offset=["+parent_offset+"])", 4);
 /*}}}*/
@@ -2310,7 +2317,7 @@ let page_wheel_clr_lit_nodes = function()
 {
 /*{{{*/
 let caller = "page_wheel_clr_lit_nodes";
-let log_this = xpath_content_js.options.LOG5_XPATH;
+let log_this = xpath_content.options.LOG5_XPATH;
 
 /*}}}*/
     let             el_array = document.querySelectorAll(".lit");
@@ -2329,7 +2336,7 @@ let page_wheel_clr_add_nodes = function()
 {
 /*{{{*/
 let caller = "page_wheel_clr_add_nodes";
-let log_this = xpath_content_js.options.LOG5_XPATH;
+let log_this = xpath_content.options.LOG5_XPATH;
 
 /*}}}*/
     let             el_array = document.querySelectorAll(".bg0,.bg1,.bg2,.bg3,.bg4,.bg5,.bg6,.bg7,.bg8,.bg9");
@@ -2367,7 +2374,7 @@ let add_or_delete_server_response_handler = function(response,message_object) //
 {
 /*{{{*/
 let caller = "add_or_delete_server_response_handler";
-let log_this = xpath_content_js.options.LOG3_SERVER;
+let log_this = xpath_content.options.LOG3_SERVER;
 
 if( log_this) logBIG(caller);
 if( log_this) console.log("response:");
@@ -2380,7 +2387,7 @@ if( log_this) console.log( message_object  );
     let data_num_xpath = data_num_xpath_get_xpath_entry( message_object.xpath );
     if(!data_num_xpath )
     {
-if(log_this || xpath_content_js.options.LOG3_SERVER) logBIG("SERVER ["+message_object.cmd+"] .. [data_num_xpath] NOT FOUND", 2);
+if(log_this || xpath_content.options.LOG3_SERVER) logBIG("SERVER ["+message_object.cmd+"] .. [data_num_xpath] NOT FOUND", 2);
 
         data_num_xpath_get_xpath_entry( message_object.xpath, log_this);
         return;
@@ -2422,7 +2429,7 @@ console.dir( div_xpaths.children  )
     /* [NOT FOUND] .. (client-server mismatch) {{{*/
     if( !div_xpaths_child )
     {
-if(log_this || xpath_content_js.options.LOG3_SERVER) logBIG("SERVER ["+message_object.cmd+"] RESPONSE: [div_xpaths_child] NOT FOUND", 3);
+if(log_this || xpath_content.options.LOG3_SERVER) logBIG("SERVER ["+message_object.cmd+"] RESPONSE: [div_xpaths_child] NOT FOUND", 3);
 
         return;
     }
@@ -2431,12 +2438,12 @@ if(log_this || xpath_content_js.options.LOG3_SERVER) logBIG("SERVER ["+message_o
     else {
         if(     prev_server_xpath == message_object.xpath)
         {
-if(log_this || xpath_content_js.options.LOG3_SERVER) logBIG("SERVER ["+message_object.cmd+"] prev_server_xpath", 5);
+if(log_this || xpath_content.options.LOG3_SERVER) logBIG("SERVER ["+message_object.cmd+"] prev_server_xpath", 5);
 
         }
         else if(user_offset_xpath == message_object.xpath)
         {
-if(log_this || xpath_content_js.options.LOG3_SERVER) logBIG("SERVER ["+message_object.cmd+"] user_offset_xpath", 4);
+if(log_this || xpath_content.options.LOG3_SERVER) logBIG("SERVER ["+message_object.cmd+"] user_offset_xpath", 4);
 
         }
     }
@@ -2444,9 +2451,9 @@ if(log_this || xpath_content_js.options.LOG3_SERVER) logBIG("SERVER ["+message_o
     /* DELETE FROM SERVER XPATH {{{*/
     let    consumed_by;
     if(    data_num_xpath.from_server
-       && (message_object.cmd == "delete")
+       && (message_object.cmd == config.CMD_DELETE)
       ) {
-if(log_this || xpath_content_js.options.LOG1_STEP) xpath_content_js.log_query_step("XPATH DELETED", message_object.xpath);
+if(log_this || xpath_content.options.LOG1_STEP) xpath_content.log_query_step("XPATH DELETED", message_object.xpath);
 
         outline_delete_xpath( div_xpaths_child.dataset.xpath );
 
@@ -2456,7 +2463,7 @@ if(log_this || xpath_content_js.options.LOG1_STEP) xpath_content_js.log_query_st
     }
     /*}}}*/
     /* ADD FROM SERVER XPATH {{{*/
-    else if(message_object.cmd == "add")
+    else if(message_object.cmd == config.CMD_ADD)
     {
         let description
             = (data_num_xpath.xpath         == message_object.xpath)
@@ -2470,7 +2477,7 @@ if(log_this || xpath_content_js.options.LOG1_STEP) xpath_content_js.log_query_st
 
         consumed_by = message_object.cmd;
 
-if(log_this || xpath_content_js.options.LOG1_STEP) xpath_content_js.log_query_step("XPATH ADDED", description);
+if(log_this || xpath_content.options.LOG1_STEP) xpath_content.log_query_step("XPATH ADDED", description);
     }
     /*}}}*/
     /* [DEFAULT] {{{*/
@@ -2493,14 +2500,15 @@ let outline_delete_xpath = function(xpath)
 // │ OPTIONS                                                                   │
 // └───────────────────────────────────────────────────────────────────────────┘
 /*{{{*/
-let get_option = function(key    ) { let val = xpath_content_js.get_option(key    ); return val; };
-let set_option = function(key,val) {           xpath_content_js.set_option(key,val);             };
+let get_option = function(key    ) { let val = xpath_content.get_option(key    ); return val; };
+let set_option = function(key,val) {           xpath_content.set_option(key,val);             };
 
 /*}}}*/
 
 /* EXPORT {{{*/
-    return { name : OUTLINE_JS_TAG
+    return { name : XPATH_OUTLINE_JS_TAG
 
+        ,    set_config
         //┌───────┐
         //│ EVENT │
         //└───────┘

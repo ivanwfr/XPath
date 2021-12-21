@@ -1,5 +1,5 @@
 // ┌───────────────────────────────────────────────────────────────────────────┐
-// │ [xpath_content_js] ................................. XPATH CONTENT SCRIPT │
+// │ [xpath_content] ................................. XPATH CONTENT SCRIPT │
 // └───────────────────────────────────────────────────────────────────────────┘
 /* jshint esversion: 9, laxbreak:true, laxcomma:true, boss:true {{{*/
 /* globals lib_log, lib_popup */
@@ -8,7 +8,7 @@
 /* globals console, window, document */
 /* globals setTimeout, clearTimeout */
 /* globals lib_util */
-/* globals outline */
+/* globals xpath_outline */
 /* globals simulate_send_message */
 /* globals config_js */
 /* globals xpath_js */
@@ -19,21 +19,16 @@
 
 /*}}}*/
 /*{{{*/
-const XPATH_CONTENT_SCRIPT_ID       = "xpath_content_js";
-const XPATH_CONTENT_SCRIPT_TAG      =  XPATH_CONTENT_SCRIPT_ID  +" (211217:15h:56)";
+const XPATH_CONTENT_SCRIPT_ID       = "xpath_content";
+const XPATH_CONTENT_SCRIPT_TAG      =  XPATH_CONTENT_SCRIPT_ID  +" (211221:02h:16)";
 /*}}}*/
-let   xpath_content_js = (function() {
+let   xpath_content = (function() {
 
     // ┌───────────────────────────────────────────────────────────────────────┐
     // │ LOG .. [console] .. [objects] ....................................... │
     // └───────────────────────────────────────────────────────────────────────┘
 /*{{{*/
 "use strict";
-
-let config = {
-        "SERVER_URL"   : "SERVER_URL" ,
-        "TEXT_LEN_MAX" :  96
-    };
 
 /* eslint-disable no-unused-vars */
 /*_ {{{*/
@@ -132,10 +127,31 @@ div_tools_require_lib_log();
 /*}}}*/
 
     // ┌───────────────────────────────────────────────────────────────────────┐
+    // │ CONFIG [config.json] ................................. chrome.runtime │
+    // └───────────────────────────────────────────────────────────────────────┘
+/*{{{*/
+     let config = { "SERVER_URL"   : "SERVER_URL"
+        ,          "TEXT_LEN_MAX" :  96
+
+        ,          "CMD_DOMAINS"  : "domains"
+        ,          "CMD_URLS"     : "urls"
+        ,          "CMD_XPATHS"   : "xpaths"
+        ,          "CMD_TAXONOMY" : "taxonomy"
+
+        ,          "CMD_ADD"      : "add"
+        ,          "CMD_DELETE"   : "delete"
+
+        ,       "ACTION_REPLACED" : "replaced"
+    };
+
+/*}}}*/
+
+    // ┌───────────────────────────────────────────────────────────────────────┐
     // │ LOAD                                                                  │
     // └───────────────────────────────────────────────────────────────────────┘
 /*➔ div_tools_init .. (listeners) {{{*/
 /*{{{*/
+const DIV_TOOLS_XY                = { x: 32 , y: 32 };
 let   CAPTURE_TRUE_PASSIVE_FALSE  = {capture:true, passive:false};
 
 let div_tools;
@@ -189,9 +205,17 @@ if(log_this) logBIG("➔ ADDING DIV_TOOLS HTML", 1);
 //  /*}}}*/
 
     div_tools = lib_util.get_tool("div_tools");
+    lib_util.add_el_class(div_tools, XPATH_CONTENT_SCRIPT_ID);
+
+    let      xy = lib_util.localStorage_getItem("div_tools_xy");
+    if( xy ) xy = JSON.parse( xy );
+if( log_this) console.log(XPATH_CONTENT_SCRIPT_ID+".xy:", xy);
+    div_tools.style.left = (xy ? xy.x : DIV_TOOLS_XY.x)+"px";
+    div_tools.style.top  = (xy ? xy.y : DIV_TOOLS_XY.y)+"px";
+
 
 //  let docked = true;
-//  outline.div_xpaths_sync_GUI( docked );
+//  xpath_outline.div_xpaths_sync_GUI( docked );
 //  div_tools_move_EL_XY(div_tools);
     div_tools_confine_to_viewport();
 
@@ -218,6 +242,7 @@ if(options.LOG3_SERVER) log_query_step("EMBEDDED", caller);
         shadow_host.style.display = "none";
     }
     /*}}}*/
+    xpath_outline.set_config( config );
 };
 /*}}}*/
 /*_ div_tools_init_add_listeners {{{*/
@@ -477,7 +502,7 @@ if( log_this) logBIG(caller+": ["+document.location.href+"] FIRST CHECK", 8);
 if( log_this) logBIG(caller+": ["+location_href_checked+"] UNCHANGED", 8);
 
 /*{{{
-        outline.outline_clear_all();
+        xpath_outline.outline_clear_all();
 }}}*/
         return;
     }
@@ -687,16 +712,10 @@ let div_tools_onScroll = function(e) // eslint-disable-line no-unused-vars
 /*}}}*/
 /* UNLOAD */
 /*_ div_tools_beforeunload {{{*/
-let div_tools_beforeunload = function(e)
+let div_tools_beforeunload = function()
 {
-/*{{{*/
-let   caller = "div_tools_beforeunload";
-let log_this = options.LOG5_DIV_TOOLS;
+    save_options_now("div_tools_beforeunload");
 
-if( log_this) log("%c"+caller+"%c"+e.type, lbb+lbL+lf2, lbb+lbR+lf3);
-/*}}}*/
-
-    save_options( caller );
 };
 /*}}}*/
 /*}}}*/
@@ -844,13 +863,31 @@ if( log_this)
 if(!moving_EL) return;
 /*}}}*/
 
-        div_tools_del_onmove_listener();
-        if( has_moved )
-        {
-            div_tools_confine_to_viewport();
-            save_options( caller );
-        }
+    div_tools_del_onmove_listener();
+    if( has_moved )
+    {
+        div_tools_confine_to_viewport();
 
+//      save_options( caller );
+        save_div_tools_xy(caller);
+    }
+
+};
+/*}}}*/
+/*➔ save_div_tools_xy {{{*/
+let save_div_tools_xy = function(_caller)
+{
+let caller = "save_div_tools_xy";
+let log_this = options.LOG5_DIV_TOOLS || options.LOG6_MOVE_TOOL;
+if( log_this) log(XPATH_CONTENT_SCRIPT_ID+"."+caller+"("+_caller+")");
+
+    div_tools = lib_util.get_tool("div_tools");
+    let    xy = { x: div_tools.offsetLeft , y: div_tools.offsetTop };
+if( log_this) log("xy",xy);
+
+    if( !xy.x && !xy.y) return;
+
+    lib_util.localStorage_setItem("div_tools_xy", JSON.stringify(xy));
 };
 /*}}}*/
 /*}}}*/
@@ -918,6 +955,7 @@ let div_tools_confine_to_viewport = function(el=div_tools,delay=DIV_TOOLS_CONFIN
 /*_ div_tools_move_EL_XY {{{*/
 let div_tools_move_EL_XY = function(el, x,y)
 {
+    if(!el) return; // may happen when both extension an embedded are running
     let caller = "div_tools_move_EL_XY"; // eslint-disable-line no-unused-vars
 /*{{{
 log(caller+"("+lib_util.get_id_or_tag(el)+") .. [position "+el.style.position+"] .. [xy "+x+" "+y+"]")
@@ -972,7 +1010,7 @@ log(caller+"("+lib_util.get_id_or_tag(el)+") .. [position "+el.style.position+"]
 
     /* APPLY URDL BORDER CAP .. f(docked state) */
     let docked = el.urdl.l/* && !el.urdl.r*/; /* Note: right folding defeats bordering condition when applied! */
-    outline.div_xpaths_sync_GUI( docked );
+    xpath_outline.div_xpaths_sync_GUI( docked );
 
 /*{{{
 log(caller+"("+lib_util.get_id_or_tag(el)+" .. XY=["+x+" "+y+"] .. WH=["+w+" "+h+"]) .. "+el.className)
@@ -1016,12 +1054,12 @@ let sel_clear = function(_caller)
 
 if(options.LOG2_MESSAGE) logBIG(_caller+" "+siblings.length+" SELECTION CLEARED");
 
-    /*  link_X.clear */
-    let link_X = from_parent.querySelector("#link_X");
-    if( link_X ) {
-        lib_util.add_el_class(link_X, "cleared");
+    /*  taxo_clear.clear */
+    let taxo_clear = from_parent.querySelector("#taxo_clear");
+    if( taxo_clear ) {
+        lib_util.add_el_class(taxo_clear, "cleared");
 
-        setTimeout(function() { lib_util.del_el_class(link_X, "cleared"); }, 300);
+        setTimeout(function() { lib_util.del_el_class(taxo_clear, "cleared"); }, 300);
     }
 };
 /*}}}*/
@@ -1067,7 +1105,7 @@ if( log_this) logBIG(caller+": ["+e_target.parentElement.tagName+"] e_target=["+
 /*}}}*/
     /* CANCEL PENDING EVENT {{{*/
     //lib_util.cancel_event(e);
-    outline.cancel_pending_event();
+    xpath_outline.cancel_pending_event();
 
     /*}}}*/
     /* GET DOMAINS .. [get_button_clicked] {{{*/
@@ -1102,7 +1140,7 @@ if( log_this) logBIG(caller+": ["+e_target.parentElement.tagName+"] e_target=["+
 
     if(domain_clicked)
     {
-      //div_urls.setAttribute("data-outline", JSON.stringify(data_outline));
+      //div_urls.setAttribute("data-xpath_outline", JSON.stringify(data_outline));
         div_urls.dataset.domain   = domain_clicked;
 
         if(div_urls.dataset.domain) div_urls.classList.remove("disabled");
@@ -1126,7 +1164,7 @@ if( log_this) logBIG(caller+": ["+e_target.parentElement.tagName+"]", 1);
 /*}}}*/
     /* CANCEL PENDING EVENT {{{*/
     //lib_util.cancel_event(e);
-    outline.cancel_pending_event();
+    xpath_outline.cancel_pending_event();
 
     /*}}}*/
     /* GET [domain] URLS .. [get_button_clicked] {{{*/
@@ -1261,7 +1299,7 @@ if(options.LOG3_SERVER) log_query_step(action+" ➔ ", cmd+" ["+xpath+"]");
     }
     /*}}}*/
     /* added xpath domain not yet registered .. should be inserted server-side ➔ calling query_domains {{{*/
-    if(    (cmd == "add")
+    if(    (cmd == config.CMD_ADD)
         && !is_location_domain_registered()
         && !lib_log.is_embedded(XPATH_CONTENT_SCRIPT_ID)
       ) {
@@ -1348,10 +1386,10 @@ let caller = "query_domains";
 
     if( lib_log.is_embedded(XPATH_CONTENT_SCRIPT_ID) )
     {
-        simulate_send_message_args({ cmd: "domains" }, caller);
+        simulate_send_message_args({ cmd: config.CMD_DOMAINS },  caller);
     }
     else {
-        send_message({ cmd: "domains" }, _caller);
+        send_message(              { cmd: config.CMD_DOMAINS }, _caller);
     }
 };
 /*}}}*/
@@ -1366,10 +1404,10 @@ let caller = "query_urls";
 
     if( lib_log.is_embedded(XPATH_CONTENT_SCRIPT_ID) )
     {
-        simulate_send_message_args({ cmd: "urls", domain }, caller);
+        simulate_send_message_args({ cmd: config.CMD_URLS, domain },  caller);
     }
     else {
-        send_message({ cmd: "urls", domain }, _caller);
+        send_message(              { cmd: config.CMD_URLS, domain }, _caller);
     }
 };
 /*}}}*/
@@ -1384,10 +1422,10 @@ let caller = "query_xpaths";
 
     if( lib_log.is_embedded(XPATH_CONTENT_SCRIPT_ID) )
     {
-        simulate_send_message_args({ cmd: "xpaths" , url }, caller);
+        simulate_send_message_args({ cmd: config.CMD_XPATHS , url },  caller);
     }
     else {
-        send_message({ cmd: "xpaths"   , url }, _caller);
+        send_message(              { cmd: config.CMD_XPATHS , url }, _caller);
     }
 };
 /*}}}*/
@@ -1504,7 +1542,7 @@ if( log_this) console.log("%c set_activated: ➔ %c activated "+request.activate
     }
 
     /* CLEAR PAGE HILIGHTED TARGETS */
-    outline.outline_clear_all(caller+"("+JSON.stringify(request)+")");
+    xpath_outline.outline_clear_all(caller+"("+JSON.stringify(request)+")");
 
     activated         = request.activated;
     shadow_host.style.display = activated ? "block" : "none";
@@ -1566,11 +1604,11 @@ if(log_this) log("%c"+response, lf4);
     {
         switch(response.cmd)
         {
-        case "domains" :                           get_domains_handler(response.domains        ); break;
-        case "urls"    :                              get_urls_handler(response.urls           ); break;
-        case "xpaths"  :                            get_xpaths_handler(response.xpaths         ); break;
-        case "add"     : outline.add_or_delete_server_response_handler(response, message_object); break;
-        case "delete"  : outline.add_or_delete_server_response_handler(response, message_object); break;
+        case config.CMD_DOMAINS :                           get_domains_handler(response.domains        ); break;
+        case config.CMD_URLS    :                              get_urls_handler(response.urls           ); break;
+        case config.CMD_XPATHS  :                            get_xpaths_handler(response.xpaths         ); break;
+        case config.CMD_ADD     : xpath_outline.add_or_delete_server_response_handler(response, message_object); break;
+        case config.CMD_DELETE  : xpath_outline.add_or_delete_server_response_handler(response, message_object); break;
         default:
 lib_log.log("%c"+caller+"%c cmd=["+response.cmd+"]", lbL,lbR);
         }
@@ -1781,7 +1819,7 @@ if(options.LOG3_SERVER) log_query_step("NEXTSTEP  ENABLE", "QUERY XPATHS");
     {
 if(options.LOG3_SERVER) log_query_step("CALLING query_xpaths", "ON ["+location_url+"]");
 
-        outline.data_num_xpath_load_array(); // START FROM SCRATCH
+        xpath_outline.data_num_xpath_load_array(); // START FROM SCRATCH
 
         query_xpaths(caller, location_url);
     }
@@ -1823,7 +1861,7 @@ if( log_this) lib_log.logBIG(caller+": XPATHS x"+xpaths.length);
 //console.dir( data_num_xpath_array  )
     /*}}}*/
     /* NEXTSTEP ENABLE XPATHS [add][delete] {{{*/
-    outline.data_num_xpath_load_array( data_num_xpath_array );
+    xpath_outline.data_num_xpath_load_array( data_num_xpath_array );
 
     /*}}}*/
 };
@@ -1839,7 +1877,7 @@ let check_script_loaded = function()
 /* [is_embedded] {{{*/
     let is_embedded = lib_log.is_embedded(XPATH_CONTENT_SCRIPT_ID);
 //if(options.LOG5_DIV_TOOLS)
-    logBIG("LOADING "+(is_embedded ? "EMBEDDED" : "EXTENSION")+" "+XPATH_CONTENT_SCRIPT_ID, lbB+lbH+lfX[is_embedded ? 5:2]);
+    logBIG("LOADING "+(is_embedded ? "EMBEDDED" : "EXTENSION")+" "+XPATH_CONTENT_SCRIPT_ID, lbB+lbH+lfX[is_embedded ? 5:4]);
 
 /*}}}*/
 /* chrome or browser {{{
@@ -1900,7 +1938,7 @@ if( log_this) logBIG(caller,1);
     selected     = !selected;
 
     /* update GUI */
-    outline.cancel_pending_event(e_target);
+    xpath_outline.cancel_pending_event(e_target);
     if( selected ) lib_util.add_el_class(e_target, CSS_SELECTED);
     else           lib_util.del_el_class(e_target, CSS_SELECTED);
 
@@ -1930,13 +1968,14 @@ let on_activated_load_options = function(request)
 let   caller = "on_activated_load_options";
 let log_this = options.LOG2_MESSAGE || options.LOG5_DIV_TOOLS;
 
+let tag_this = log_this || options.LOG5_DIV_TOOLS || options.LOG6_MOVE_TOOL;
 if(log_this) log_sep_top(caller+" ["+XPATH_CONTENT_SCRIPT_TAG+"]", 5);
 //console.trace()
 /*}}}*/
-    /* FROM BACKGROUND SCRIPT MESSAGE (activated and div_tools_xy) {{{*/
-    if(request && request.div_tools_xy)
+    /* FROM BACKGROUND SCRIPT MESSAGE (activated) {{{*/
+    if(request && typeof request.activated != "undefined")
     {
-if(log_this) log_key_val("FROM BACKGROUND SCRIPT MESSAGE (activated) request", request, 4);
+if(tag_this) log_key_val("FROM BACKGROUND SCRIPT MESSAGE (activated) request", request, 4);
 
         /* client controls all options, except [activated] .. (which is controled by browser_action_click) */
         Object.keys(request).forEach( function(k) { options[k] = request[k]; });
@@ -2011,22 +2050,21 @@ let save_options_handler = function(_caller,sendResponse)
 let   caller = "save_options";
 let log_this = options.LOG2_MESSAGE;
 
+let tag_this = log_this || options.LOG5_DIV_TOOLS || options.LOG6_MOVE_TOOL;
 /*}}}*/
     /* EXTENSION UNLOADED {{{*/
     if(!div_tools)
     {
-if(options.LOG1_STEP) lib_log.logBIG("EXTENSION UNLOADED");
+if( tag_this) lib_log.logBIG("EXTENSION UNLOADED");
 
         return false;
     }
     /*}}}*/
     /* [options] .. (updated current postion and location) {{{*/
 
-    options.div_tools_xy  = { x: div_tools.offsetLeft , y: div_tools.offsetTop };
-
     options.location_href = document.location.href;
 
-if(log_this) log_key_val_group(caller+"("+_caller+(sendResponse ? (", "+sendResponse.name) : "")+")", options, 5, true);
+if(tag_this) log_key_val_group(caller+"("+_caller+(sendResponse ? (", "+sendResponse.name) : "")+")", options, 5, false);
     /*}}}*/
     /* 1/2 - SAVE IN [BACKGROUND SCRIPT localStorage] {{{*/
     if( sendResponse )
@@ -2043,7 +2081,7 @@ if(log_this) log_key_val_group(caller+"("+_caller+(sendResponse ? (", "+sendResp
     }
     /*}}}*/
     /* 2/2 - SAVE IN [EMBEDDING PAGE DOMAIN localStorage] {{{*/
-    else {
+    {
         Object.keys(options).forEach( function(key) {
                                           let val  =                options[ key ];
                                           if(!val) {
@@ -2053,7 +2091,7 @@ if(log_this) log_key_val_group(caller+"("+_caller+(sendResponse ? (", "+sendResp
                                               let str =      JSON.stringify( val );
                                               lib_util.localStorage_setItem( key , str);
                                           }
-if(log_this && val) console.log("SAVING "+key+": "+val);
+if(log_this) console.log("...saving "+key+": ",val);
                                       }
                                     );
     }
@@ -2197,7 +2235,7 @@ return { check_script_loaded
 /*}}}*/
 })();
 /* ONLOAD {{{*/
-if( !xpath_content_js.check_script_loaded() ) xpath_content_js.div_tools_init();
+if( !xpath_content.check_script_loaded() ) xpath_content.div_tools_init();
 
 /*}}}*/
 

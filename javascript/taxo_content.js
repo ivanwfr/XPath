@@ -9,11 +9,11 @@
 
 /* exported TAXO_TREE_CONTENT_SCRIPT_TAG */
 
-/*  eslint-disable no-warning-comments */
+/* eslint-disable      no-warning-comments */
 
 /*}}}*/
 const TAXO_TREE_CONTENT_SCRIPT_ID   = "taxo_content";
-const TAXO_TREE_CONTENT_SCRIPT_TAG  =  TAXO_TREE_CONTENT_SCRIPT_ID  +" (211217:18h:29)";
+const TAXO_TREE_CONTENT_SCRIPT_TAG  =  TAXO_TREE_CONTENT_SCRIPT_ID  +" (211221:02h:16)";
 let   taxo_content = (function() {
 "use strict";
 
@@ -447,14 +447,17 @@ let log_this = TAXO_MENU_LOG;
 if(log_this) log(caller+"(_caller=["+_caller+"])");
 /*}}}*/
     let shadow_root      = document.getElementById( taxo_pods_html.SHADOW_HOST_ID );
-    unselect_under_parent( shadow_root.shadowRoot );
+    let cleared_selected_menu_EL_array_length = unselect_under_parent( shadow_root.shadowRoot );
 
-    /*  link_X.clear */
-    let link_X = shadow_root.shadowRoot.querySelector("#link_X");
-    if( link_X ) {
-        lib_util.add_el_class(link_X, "cleared");
+    /*  taxo_clear.clear */
+    if(cleared_selected_menu_EL_array_length)
+    {
+        let taxo_clear = shadow_root.shadowRoot.querySelector("#taxo_clear");
+        if( taxo_clear ) {
+            lib_util.add_el_class(taxo_clear, "cleared");
 
-        setTimeout(function() { lib_util.del_el_class(link_X, "cleared"); }, 300);
+            setTimeout(function() { lib_util.del_el_class(taxo_clear, "cleared"); }, 300);
+        }
     }
 };
 /*}}}*/
@@ -470,15 +473,15 @@ if(tag_this) log(         "%c-%c"+caller+" %c"+(menu_PARENT.id ? menu_PARENT.id 
                  ,lbb+lbH+lf2,lb0         ,lbH+lb0                                                     );
 /*}}}*/
     let menu_selector = "."+ CSS_SELECTED+"[data-menu]";
-    let menu_EL_array = menu_PARENT.querySelectorAll( menu_selector );
-    if( menu_EL_array )
+    let selected_menu_EL_array = menu_PARENT.querySelectorAll( menu_selector );
+    if( selected_menu_EL_array )
     {
-        for(let i=0; i<menu_EL_array.length; ++i)
+        for(let i=0; i<selected_menu_EL_array.length; ++i)
         {
-            let menu_EL = menu_EL_array[i];
+            let menu_EL = selected_menu_EL_array[i];
 /*{{{*/
 if(tag_this)
-    log_key_val_group(" menu_EL "+(i+1)+"/"+menu_EL_array.length+" .. #"+menu_EL.id+" ["+menu_EL.innerText+"]"
+    log_key_val_group(" menu_EL "+(i+1)+"/"+selected_menu_EL_array.length+" .. #"+menu_EL.id+" ["+menu_EL.innerText+"]"
                       ,{ id          : menu_EL.id
                        , innerText   : menu_EL.innerText
                        , title       : menu_EL.title
@@ -490,7 +493,9 @@ if(tag_this)
         }
     }
 
-if(TAXO_MENU_TAG) logBIG(caller+" "+menu_EL_array.length+" SELECTION CLEARED");
+if(TAXO_MENU_TAG) logBIG(caller+" "+selected_menu_EL_array.length+" SELECTION CLEARED");
+
+    return selected_menu_EL_array.length;
 };
 /*}}}*/
 
@@ -602,7 +607,215 @@ return { name : "taxo_menu"
 /*}}}*/
 
 // ┌─────────────┐ ┌───────────────────────────────────────────────────────────┐
-// │ [taxo_pods] │-│ EVENTS .. LAYOUT ........................................ │
+// │ [taxo_msg]  │-│ MESSAGE FROM BACKGROUND-SCRIPT .......................... │
+// └─────────────┘ └───────────────────────────────────────────────────────────┘
+/*{{{*/
+let   taxo_msg      = (function() {
+//"use strict";
+/*{{{*/
+const MESSAGE_LOG   = false;
+const MESSAGE_TAG   = false;
+
+/*}}}*/
+
+// ┌───────────────────────────────────────────────────────────────────────────┐
+// │ [activated] ............................................................. │
+// └───────────────────────────────────────────────────────────────────────────┘
+/*➔ is_activated {{{*/
+let    activated = false;
+let is_activated = function()
+{
+    return activated;
+};
+/*}}}*/
+/*➔ set_activated {{{*/
+let set_activated = function(state)
+{
+    state = (state == undefined) ? !activated : state; /* SET OR TOGGLE */
+
+log("%c set_activated: %c FROM "+activated     +" %c TO "+ state
+    ,lbL              ,lbC+lfX[  activated ? 4:2],lbR+lfX[ state ? 4:2]);
+
+    activated = (state != undefined) ? state : !activated ; /* SET OR TOGGLE */
+
+    let shadow_root = document.getElementById( taxo_pods_html.SHADOW_HOST_ID );
+    shadow_root.style.display = activated ? "block" : "none";
+
+    if( activated )
+    {
+//      taxo_pods.load_div_tools_xy();
+        taxo_pods.unhide_div_tools("onMessage");
+    }
+
+    taxo_pods.pods_fontSize = (2 * taxo_pods.BUTTONS_POD_FONT_SIZE_MIN)+"px";
+    taxo_pods.taxo_tree_display_cluster();
+
+};
+/*}}}*/
+/*➔ query_active_state {{{*/
+let query_active_state = function()
+{
+    /* 1/2 [EXTENSION] .. [QUERY BACKGROUND SCRIPT ACTIVE STATE]  */
+    if(   (typeof chrome            != "undefined")
+       && (typeof chrome.runtime    != "undefined")
+       && (       chrome.runtime.id !=  undefined )
+      ) {
+        chrome.runtime.sendMessage({ activated : "undefined" }, read_response);
+    }
+    /* 2/2 [EMBEDDED] .. [AUTO-ACTIVATE] */
+    else {
+        setTimeout(function() { taxo_msg . set_activated(true); },   0);
+        setTimeout(function() { taxo_pods. unhide_div_tools();  }, 500);
+    }
+};
+/*}}}*/
+
+// ┌───────────────────────────────────────────────────────────────────────────┐
+// │ MESSAGE TO BACKGROUND-SCRIPT ............................................ │
+// └───────────────────────────────────────────────────────────────────────────┘
+/*{{{*/
+let config = { "CMD_TAXONOMY" : "taxonomy" };
+
+/*}}}*/
+/*▲▲▲▲ send_selected_state_message .. chrome.runtime.sendMessage {{{*/
+let send_selected_state_message = function(selected_state,menu_id,taxo_id)
+{
+/*{{{*/
+let caller = "send_selected_state_message";
+let log_this = MESSAGE_LOG;
+let tag_this = MESSAGE_TAG || log_this;
+
+if(log_this) log(caller+"("+taxo_id+")");
+/*}}}*/
+    /* FORWARD SELECTION TO BROWSER EXTENSION BACKGROUND SCRIPT {{{*/
+    let message
+        = { cmd      : config.CMD_TAXONOMY
+          , menu_id
+          , taxo_id
+          , selected : selected_state
+          , href     : document.location.href
+        };
+
+    if(   (typeof chrome            != "undefined")
+       && (typeof chrome.runtime    != "undefined")
+       && (       chrome.runtime.id !=  undefined ))
+    {
+if(tag_this) log_key_val_group(caller, message, 4, false);
+
+        try {
+            chrome.runtime.sendMessage(message, read_response);
+        } catch(ex) { if(log_this) log(ex); }
+
+    }
+    /*}}}*/
+    else if( tag_this )
+    {
+        log_key_val_group(caller+" (NOT RUNNING AS AN EXTENSION) ➔ MESSAGE NOT SENT)", message, 8, false);
+    }
+};
+/*}}}*/
+/*▼▼▼▼ read_response {{{*/
+let read_response = function(response)
+{
+/*{{{*/
+let caller = "read_response";
+let log_this = MESSAGE_LOG;
+//t tag_this = MESSAGE_TAG || log_this;
+
+if(log_this) log(caller+": %c RECEIVING ANSWER FROM BACKGROUND SCRIPT:", lb4);
+if(log_this) log("%c"+response, lf4);
+/*}}}*/
+    /* response.multiple_choice_state {{{*/
+    if(typeof response.multiple_choice_state != "undefined")
+    {
+        taxo_pods.set_multiple_choice_state(response.multiple_choice_state, caller);
+
+    }
+    /*}}}*/
+    /* response.clear {{{*/
+    if(typeof response.clear     != "undefined")
+    {
+        taxo_menu.sel_clear("response.clear "+response.clear);
+    }
+/*}}}*/
+    /* response.activated {{{*/
+    if(typeof response.activated != "undefined")
+    {
+        set_activated(response.activated);
+    }
+    /*}}}*/
+};
+/*}}}*/
+
+// ┌───────────────────────────────────────────────────────────────────────────┐
+// │ RESPONSE FROM BACKGROUND-SCRIPT ......................................... │
+// └───────────────────────────────────────────────────────────────────────────┘
+/*_ add_message_listener {{{*/
+let add_message_listener = function()
+{
+   if(   (typeof chrome            != "undefined")
+      && (typeof chrome.runtime    != "undefined")
+      && (       chrome.runtime.id !=  undefined ))
+    {
+if(MESSAGE_LOG) console.log("%c LISTENING TO MESSAGE FROM BACKGROUND SCRIPT...", "color:#AFA");
+        chrome.runtime.onMessage.addListener( onMessage_listener );
+    }
+};
+/*}}}*/
+/*_ onMessage_listener {{{*/
+let onMessage_listener = function(request, sender, sendResponse)
+{
+let caller = "onMessage_listener";
+if(MESSAGE_LOG) {
+console.log("%c MESSAGE FROM BACKGROUND SCRIPT...", "color:#AFA");
+console.trace();
+//console.log( request )
+//console.dir( request )
+}
+
+    if(typeof request.activated != "undefined")
+    {
+console.log("%c➔ Extension %c activated "+activated+" ", "color:#AFA", "background-color:"+(request.activated ? "#0A0" : "#00A"));
+
+        // ┌───────────────────────────────────────────────────────────────┐
+        // │ ACTIVATED ON-OFF                                              │
+        // └───────────────────────────────────────────────────────────────┘
+        //{{{
+if(MESSAGE_LOG)
+    log_key_val_group(caller+": request"
+                      , { activated    : request.activated
+                      }, 4, false);
+
+//      if( !request.activated && request.save_layout)
+//          taxo_pods.save_div_tools_xy(caller, sendResponse);
+
+        taxo_msg.set_activated( request.activated );
+
+        sendResponse({ ack: JSON.stringify( request ) });
+        //}}}
+    }
+};
+/*}}}*/
+
+/* EXPORT */
+/*{{{*/
+return { name : "taxo_msg"
+    ,    is_activated
+    ,    set_activated
+    ,    send_selected_state_message
+    ,    add_message_listener
+    ,    query_active_state
+};
+/*}}}*/
+}());
+/*}}}*/
+
+
+
+
+
+// ┌─────────────┐ ┌───────────────────────────────────────────────────────────┐
+// │ [taxo_pods] │-│ EVENTS .. LAYOUT [div_tools] ............................ │
 // └─────────────┘ └───────────────────────────────────────────────────────────┘
 /*{{{*/
 let   taxo_pods     = (function() {
@@ -618,6 +831,7 @@ const TAXO_PODS_TAG = false;
 
 const CSS_CLICKED                 = "clicked";
 const CSS_SELECTED                = "selected";
+const CSS_COLLECTED               = "collected";
 
 const BUTTONS_POD_FONT_SIZE       = 64;
 const BUTTONS_POD_FONT_SIZE_MIN   =  6;
@@ -655,6 +869,7 @@ if(log_this) log(caller+"%c ➔ ADDING PODS HTML", lf7);
 //console.log("%c taxo_pods_html_fragment:");
 //console.dir(    taxo_pods_html_fragment  );
 
+    taxo_pods.load_div_tools_xy();
     /*}}}*/
     /* ADD EVENT LISTENERS {{{*/
     taxo_pods_init_add_listeners();
@@ -674,8 +889,8 @@ if(log_this) log(caller+"%c ➔ ADDING PODS HTML", lf7);
         return;
     }
     /* adjust initial [pods_fontSize] */
-    let link_URDL = taxo_pods_html_fragment.getElementById("link_URDL");
-    if( link_URDL ) div_tools_move_RESCALE( link_URDL );
+    div_tools_move_RESCALE();
+
 //  taxo_tree_move_cluster();
     setTimeout(taxo_tree_move_cluster   , 500);
     setTimeout(taxo_tree_display_cluster,1000);
@@ -743,9 +958,9 @@ let check_script_loaded = function()
         && (       chrome.runtime.id !=  undefined )
     ;
 
-    logBIG("LOADING "+(in_extension ? "EXTENSION" : "EMBEDDED")+" "+TAXO_TREE_CONTENT_SCRIPT_ID, lbB+lbH+lfX[in_extension ? 2:5]);
+    logBIG("LOADING "+(in_extension ? "EXTENSION" : "EMBEDDED")+" "+TAXO_TREE_CONTENT_SCRIPT_ID, lbB+lbH+lfX[in_extension ? 4:5]);
     /*}}}*/
-    /* taxo_content_script_js {{{*/
+    /*  taxo_content_script_js {{{*/
     let taxo_content_script_js = document.getElementById("taxo_content_script_js");
     let script_loaded          = in_extension && taxo_content_script_js;
     if( script_loaded )          logBIG("EXTENSION NOT STARTED FROM AN EMBEDDING PAGE", lf2);
@@ -755,7 +970,7 @@ let check_script_loaded = function()
 };
 /*}}}*/
 /*➔ load_div_tools_xy {{{*/
-let load_div_tools_xy = function(div_tools_xy)
+let load_div_tools_xy = function()
 {
 /*{{{*/
 let   caller = "load_div_tools_xy";
@@ -763,94 +978,49 @@ let log_this = TAXO_PODS_LOG;
 
 if(log_this) console.log(caller);
 /*}}}*/
-    /* LAYOUT [link_URDL] {{{*/
-    let link_URDL = taxo_pods_html_fragment.getElementById("link_URDL");
-    if(!link_URDL) return;
+    /* LAYOUT [div_tools] {{{*/
+    let div_tools = taxo_pods_html_fragment.getElementById("div_tools");
+    lib_util.add_el_class(div_tools, TAXO_TREE_CONTENT_SCRIPT_ID);
+    if(!div_tools) return;
 
     /*}}}*/
-    /* FROM BACKGROUND SCRIPT (as an all-tabs location) {{{*/
-    let running_extension
-        = (   (typeof chrome            != "undefined")
-           && (typeof chrome.runtime    != "undefined")
-           && (       chrome.runtime.id !=  undefined )
-          );
-    if(div_tools_xy || running_extension)
-    {
-        let xy
-            = {   x: div_tools_xy ? div_tools_xy.x : link_URDL.offsetLeft
-                , y: div_tools_xy ? div_tools_xy.y : link_URDL.offsetTop
-            };
+//    /* FROM BACKGROUND SCRIPT (as an all-tabs location) {{{*/
+//    let running_extension
+//        = (   (typeof  chrome            != "undefined")
+//           && (typeof  chrome.runtime    != "undefined")
+//           && (        chrome.runtime.id !=  undefined )
+//          );
+//
+//    /*}}}*/
+    let      xy = localStorage.getItem("taxo_div_tools_xy");
+    if( xy ) xy = JSON.parse(xy);
+if( log_this) log(TAXO_TREE_CONTENT_SCRIPT_ID+".xy:", xy);
+    if(!xy ) xy = { x:12 , y:12 };
 
-        if(   (xy.x < 12)
-           || (xy.y < 12)
-           || (xy.x > window.innerWidth -64)
-           || (xy.y > window.innerHeight-64)
-          ) {
-            xy.x            = Math.min(xy.x, window.innerWidth -64);
-            xy.y            = Math.min(xy.y, window.innerHeight-64);
-            xy.x            = Math.max(xy.x, 12);
-            xy.y            = Math.max(xy.y, 12);
-        }
+    xy.x = Math.max(xy.x, 12);
+    xy.x = Math.min(xy.x, window.innerWidth  - 64);
 
-        link_URDL.style.left = xy.x+"px";
-        link_URDL.style.top  = xy.y+"px";
-    }
-    /*}}}*/
-    /* 2/2 - Load from localStorage {{{*/
-    else {
-        let xy      = localStorage.getItem("div_tools_xy");
-        if(!xy      ) return;
+    xy.y = Math.max(xy.y, 12);
+    xy.y = Math.min(xy.y, window.innerHeight - 64);
 
-        if( xy ) xy = JSON.parse(xy);
-        if(!xy ) xy = { x:12 , y:12 };
-
-        xy.x = Math.min(xy.x , window.innerWidth  / 2);
-        xy.y = Math.min(xy.y , window.innerHeight / 2);
-
-        link_URDL.style.left = xy.x+"px";
-        link_URDL.style.top  = xy.y+"px";
-    }
-    /*}}}*/
+    div_tools.style.left = xy.x+"px";
+    div_tools.style.top  = xy.y+"px";
 };
 /*}}}*/
-/*➔ save_link_URDL_xy {{{*/
-let save_link_URDL_xy = function(sendResponse)
+/*➔ save_div_tools_xy {{{*/
+let save_div_tools_xy = function(_caller)
 {
-    /* PANEL [xy] {{{*/
-    let link_URDL = taxo_pods_html_fragment.getElementById("link_URDL");
-    if(!link_URDL) return;
+let caller = "save_div_tools_xy";
+let log_this = TAXO_PODS_LOG;
+if( log_this) log(TAXO_TREE_CONTENT_SCRIPT_ID+"."+caller+"("+_caller+")");
 
-    let        xy = { x: link_URDL.offsetLeft , y: link_URDL.offsetTop };
+    let div_tools = taxo_pods_html_fragment.getElementById("div_tools");
+    let        xy = { x: div_tools.offsetLeft , y: div_tools.offsetTop };
+if( log_this) log("xy", xy);
 
     if( !xy.x && !xy.y) return;
 
-    /*}}}*/
-    /* 1/2 - Save in background script context {{{*/
-    if( sendResponse )
-    {
-log("%c… sendResponse xy=["+xy.x+" "+xy.y+"]", lf8);
-        sendResponse(                  { div_tools_xy : xy });
-    }
-    else if(   (typeof chrome            != "undefined")
-            && (typeof chrome.runtime    != "undefined")
-            && (       chrome.runtime.id !=  undefined ))
-    {
-        try {
-            chrome.runtime.sendMessage({ div_tools_xy : xy });
-log("%c➔ sendMessage xy=["+xy.x+" "+xy.y+"]", lbH+lf6);
-        }
-        catch( ex ) {
-log("EXTENSION RE-INSTALLED .. cannot reach current background-script");
-log("%c➔ wont save menu location before unload: xy=["+xy.x+" "+xy.y+"]", lbH+lf8);
-        }
-    }
-    /*}}}*/
-    /* 2/2 - Save in embedding page localStorage {{{*/
-    else
-    {
-        localStorage.setItem("div_tools_xy", JSON.stringify(xy));
-    }
-    /*}}}*/
+    localStorage.setItem("taxo_div_tools_xy", JSON.stringify(xy));
 };
 /*}}}*/
 /*}}}*/
@@ -899,11 +1069,12 @@ let unhide_div_tools = function(_caller, e) // eslint-disable-line no-unused-var
 /*}}}*/
 let   div_tools_move_RESCALE = function(el)
 {
-    requestAnimationFrame(() => { div_tools_move_RESCALE_handler(el); });
-    lib_util.add_el_class(el,"rescaling");
-//  let pods = taxo_menu.get_taxo_pods();
-//  for(let i=0; i<pods.length; ++i)
-//      lib_util.add_el_class(pods[i],"rescaling");
+    let div_tools = el || taxo_pods_html_fragment.getElementById("div_tools");
+    if(!div_tools ) return;
+
+    requestAnimationFrame(() => { div_tools_move_RESCALE_handler(div_tools); });
+
+    lib_util.add_el_class(div_tools,"rescaling");
 };
 /*}}}*/
 /*_ div_tools_move_RESCALE_handler {{{*/
@@ -1254,8 +1425,8 @@ if( log_this) log(caller+": %c("+e.type+" ON "+lib_util.get_id_or_tag_and_classN
     }
     /*}}}*/
     /* [moving_target] {{{*/
-    let link_URDL = taxo_pods_html_fragment.getElementById("link_URDL");
-    let moving_target = div_tools_onDown_moving_target(e, link_URDL);
+    let div_tools = taxo_pods_html_fragment.getElementById("div_tools");
+    let moving_target = div_tools_onDown_moving_target(e,   div_tools);
     if( moving_target )
     {
         div_tools_add_onmove_listener( moving_target );
@@ -1283,6 +1454,14 @@ if( log_this) log(caller+": %c("+e.type+" ON "+lib_util.get_id_or_tag_and_classN
     if(!lib_util.is_el_child_of_id(e_target, moving_target.id) )
     {
 if( log_this) log("NOT A CHILD OF ["+moving_target.id+"]");
+
+        return null;
+    }
+    /*}}}*/
+    /* NOT A CHILD OF [taxonomy] {{{*/
+    if(!lib_util.is_el_or_child_of_class(e_target, TAXO_TREE_CONTENT_SCRIPT_ID))
+    {
+if( log_this) log("NOT A CHILD OF CLASS [taxonomy]: "+lib_util.get_id_or_tag_and_className(e_target));
 
         return null;
     }
@@ -1454,6 +1633,8 @@ if( log_this) log("taxo_tree_onUp");
         setTimeout(function() { taxo_tree_move_cluster(last_moving_EL); }, 0); // FINISH THE JOB
 
         taxo_tree_del_onmove_listener();
+
+        save_div_tools_xy(caller);
     }
 
     if(!has_moved)
@@ -1493,19 +1674,17 @@ if( log_this && !has_moved) log("%c...!has_moved .. onDown_EL.id=["+ (onDown_EL 
     if(!hiding_menu && has_moved) return;
     /*}}}*/
 
-if(typeof xpath_content_js != "undefined")
+if(typeof xpath_content != "undefined")
 {
-//TODO .. XPH=[div_tools] to override "link_URDL"
-let link_URDL = taxo_pods_html_fragment.getElementById("link_URDL");
-//console.log("➔ %c link_URDL=["+ lib_util.get_id_or_tag_and_className(link_URDL) +"]", "color:black; background-color: #AAF");//FIXME
+let div_tools = xpath_content.get_div_tools(); /* eslint-disable-line no-undef */
+//console.log("[xpath_content] ➔ %c div_tools=["+ lib_util.get_id_or_tag_and_className(div_tools) +"]", "color:black; background-color: #FAD")
 
-let div_tools = xpath_content_js.get_div_tools(); /* eslint-disable-line no-undef */
-//console.log("➔ %c div_tools=["+ lib_util.get_id_or_tag_and_className(div_tools) +"]", "color:black; background-color: #FAD");//FIXME
-//TODO
+/**/div_tools = taxo_pods_html_fragment.getElementById("div_tools");
+//console.log("[taxo_pods_html_fragment] ➔ %c div_tools=["+ lib_util.get_id_or_tag_and_className(div_tools) +"]", "color:black; background-color: #AAF")
 }
 
-    /* TOOLS=[link_URDL] ➔ [unhide .. clear .. multiple_choice_state] {{{*/
-    if( e_target.parentElement.id == "link_URDL")
+    /* TOOLS=[div_tools] ➔ [unhide .. clear .. multiple_choice_state] {{{*/
+    if( e_target.parentElement.id == "div_tools")
     {
         /* UNHIDE HIDDEN MENU */
         if( hiding_menu ) {
@@ -1514,9 +1693,9 @@ if(log_this) log("%c HIDING: CLICKED %c"+e_target.id, lbL+lf5, lbR+lf7);
         }
         /* BUTTON: [MULTIPLE_CHOICE ON-OFF] .. [CLEAR SELECTED] */
         else {
-            if(e_target.id == "link_X") taxo_menu.sel_clear(e_target.id);
-            if(e_target.id == "link_D") set_multiple_choice_state( true, e_target.id);
-            if(e_target.id == "link_U") set_multiple_choice_state(false, e_target.id);
+            if(e_target.id == "taxo_clear") taxo_menu.sel_clear(e_target.id);
+            if(e_target.id == "taxo_multi") set_multiple_choice_state( true, e_target.id);
+            if(e_target.id == "taxo_single") set_multiple_choice_state(false, e_target.id);
         }
     }
     /*}}}*/
@@ -1540,8 +1719,13 @@ if(tag_this) log("%c CLICKED %c"+(menu_id || "NO menu_id")+"%c"+(taxo_id || "NO 
             taxo_tree_display_cluster    (         );
         }
         /*}}}*/
-        /* OR SELECT MENU-ITEM */
+        /* OR SELECT LEAF {{{*/
         if( is_a_leaf ) {
+
+let menu_from_el = taxo_pods_html_fragment.getElementById(menu_id);
+//console.log("menu_id=["+menu_id+"] .. menu_from_el=["+lib_util.get_id_or_tag_and_className(menu_from_el)+"]")
+uncollect_e_target( menu_from_el );
+
             // [selected_leaf_array] OF CURRENTLY SELECTED MENU-ITEMS {{{
             let selected_leaf_array
                 = multiple_choice_state ?  get_selected_leaf_array() :  [];
@@ -1627,14 +1811,75 @@ if(log_this)
             taxo_msg.send_selected_state_message(selected_state, menu_id, taxo_id);
             /*}}}*/
         }
+        /*}}}*/
+        /* OR SELECT MENU {{{*/
         else {
-            Array.from( e_target.parentElement.querySelectorAll("."+CSS_CLICKED) )
-                .forEach( (el) => { lib_util.del_el_class(el, CSS_CLICKED); });
+            let   clicked_state = e_target.classList.contains( CSS_CLICKED   );
+            let collected_state = e_target.classList.contains( CSS_COLLECTED );
 
-            lib_util.add_el_class(e_target, CSS_CLICKED);
+//console.log("%c"+e_target.id+" ["+e_target.className+"] .. menu_id=["+menu_id+"]", lbR+lf7)
+//console.log(".....clicked_state=["+ clicked_state   +"]")
+//console.log("...collected_state=["+ collected_state +"]")
+
+            /* [UNCOLLECT] ➔ DEL [CSS_COLLECTED] ➔ ADD [CSS_CLICKED SINGLETON] */
+            if( collected_state )
+            {
+                uncollect_e_target( e_target );
+
+                /* UNSELECT SUB MENU ITEMS */
+                unselect_sub_menu_id("menu_"+e_target.id);
+
+                Array.from( e_target.parentElement.querySelectorAll("."+CSS_CLICKED) )
+                    .forEach( (el) => {       lib_util.del_el_class(el, CSS_CLICKED); });
+                lib_util.add_el_class(e_target, CSS_CLICKED);
+            }
+            /* [COLLECT] ➔ DEL [CSS_CLICKED] ➔ ADD [CSS_COLLECTED]*/
+            else if( clicked_state )
+            {
+                /* UNSELECT SUB MENU ITEMS */
+                unselect_sub_menu_id("menu_"+e_target.id);
+
+                Array.from( e_target.parentElement.querySelectorAll("."+CSS_CLICKED) )
+                    .forEach( (el) => {       lib_util.del_el_class(el, CSS_CLICKED); });
+                lib_util.add_el_class(e_target, CSS_CLICKED  );
+                lib_util.add_el_class(e_target, CSS_COLLECTED);
+            }
+            /* [CLICKED] ➔ ADD [CSS_CLICKED SINGLETON] */
+            else
+            {
+                /* ADD [CSS_CLICKED SINGLETON] */
+                Array.from( e_target.parentElement.querySelectorAll("."+CSS_CLICKED) )
+                    .forEach( (el) => {       lib_util.del_el_class(el, CSS_CLICKED); });
+                lib_util.add_el_class(e_target, CSS_CLICKED);
+            }
+            /*}}}*/
         }
+        /*}}}*/
     }
     /*}}}*/
+};
+/*}}}*/
+/*_ uncollect_e_target {{{*/
+let uncollect_e_target = function(e_target)
+{
+//console.log("%c uncollect_e_target("+e_target.id+" ["+e_target.className+"]", lbR+lf7)
+
+    /* DEL CSS_COLLECTED */
+    lib_util.del_el_class(e_target, CSS_COLLECTED);
+    lib_util.del_el_class(e_target, CSS_SELECTED );
+
+};
+/*}}}*/
+/*_ unselect_sub_menu_id {{{*/
+let unselect_sub_menu_id = function(sub_menu_id)
+{
+//console.log("%c unselect_sub_menu_id("+sub_menu_id+")", lbR+lf7)
+
+    let sub_menu = taxo_pods_html_fragment.getElementById(sub_menu_id);
+
+//console.log("sub_menu=["+lib_util.get_id_or_tag_and_className(sub_menu)+"]")
+
+    taxo_menu.unselect_under_parent( sub_menu );
 };
 /*}}}*/
 /*_ set_multiple_choice_state {{{*/
@@ -1652,20 +1897,16 @@ let tag_this = TAXO_PODS_TAG || log_this;
 if(tag_this) log("%c"+caller+": "+_caller+"%c multiple_choice_state "+multiple_choice_state
                  ,lbL+lf3                 ,lbC+lf4                                         );
 
-    let link_U = taxo_pods_html_fragment.getElementById("link_U");
-    let link_D = taxo_pods_html_fragment.getElementById("link_D");
-    let link_X = taxo_pods_html_fragment.getElementById("link_X");
-    let link_L = taxo_pods_html_fragment.getElementById("link_L");
-    let link_R = taxo_pods_html_fragment.getElementById("link_R");
+    let taxo_single = taxo_pods_html_fragment.getElementById("taxo_single");
+    let taxo_multi = taxo_pods_html_fragment.getElementById("taxo_multi");
+    let taxo_clear = taxo_pods_html_fragment.getElementById("taxo_clear");
 
-    link_U.title = "Allowing ONLY ONE selection  for a page";
-    link_X.title = "CLEAR all page selections";
-    link_D.title = "Allowing MULTIPLE selections for a page";
-    link_L.title = "Previous URL";
-    link_R.title = "Next URL";
+    taxo_single.title = "Allowing ONLY ONE selection  for a page";   // TAXO_SINGLE_BUTTON .. javascript/taxo_pods_html.js
+    taxo_clear.title = "CLEAR all page selections";                 // TAXO_CLEAR_BUTTON
+    taxo_multi.title = "Allowing MULTIPLE selections for a page";   // TAXO_MULTI_BUTTON
 
-    lib_util.set_el_class_on_off(link_U, CSS_SELECTED, !state);
-    lib_util.set_el_class_on_off(link_D, CSS_SELECTED,  state);
+    lib_util.set_el_class_on_off(taxo_single, CSS_SELECTED, !state);
+    lib_util.set_el_class_on_off(taxo_multi , CSS_SELECTED,  state);
 
     if( !multiple_choice_state ) taxo_menu.sel_clear(_caller);
 };
@@ -1850,14 +2091,7 @@ if( log_this) logBIG("taxo_tree_onScroll");
 /*_ taxo_tree_onbeforeunload {{{*/
 let taxo_tree_onbeforeunload = function(e)
 {
-/*{{{*/
-let   caller = "taxo_tree_onbeforeunload";
-let log_this = TAXO_PODS_LOG;
-
-if( log_this) log("%c"+caller+"%c"+e.type, lbb+lbL+lf2, lbb+lbR+lf3);
-/*}}}*/
-
-    save_link_URDL_xy();
+//  save_div_tools_xy("taxo_tree_onbeforeunload");
 };
 /*}}}*/
 /*}}}*/
@@ -1867,7 +2101,6 @@ if( log_this) log("%c"+caller+"%c"+e.type, lbb+lbL+lf2, lbb+lbR+lf3);
 return { name : "taxo_pods"
     ,    taxo_pods_init
     ,    load_div_tools_xy
-    ,    save_link_URDL_xy
     ,    taxo_tree_display_cluster
     ,    taxo_tree_move_cluster
     ,    unhide_div_tools
@@ -1878,214 +2111,24 @@ return { name : "taxo_pods"
 }());
 /*}}}*/
 
-// ┌─────────────┐ ┌───────────────────────────────────────────────────────────┐
-// │ [taxo_msg]  │-│ MESSAGE FROM BACKGROUND-SCRIPT .......................... │
-// └─────────────┘ └───────────────────────────────────────────────────────────┘
-/*{{{*/
-let   taxo_msg      = (function() {
-//"use strict";
-/*{{{*/
-const MESSAGE_LOG   = false;
-const MESSAGE_TAG   = false;
 
-/*}}}*/
 
-// ┌───────────────────────────────────────────────────────────────────────────┐
-// │ [activated] ............................................................. │
-// └───────────────────────────────────────────────────────────────────────────┘
-/*➔ is_activated {{{*/
-let    activated = false;
-let is_activated = function()
-{
-    return activated;
-};
-/*}}}*/
-/*➔ set_activated {{{*/
-let set_activated = function(state, div_tools_xy)
-{
-    state = (state == undefined) ? !activated : state; /* SET OR TOGGLE */
 
-log("%c set_activated: %c FROM "+activated     +" %c TO "+ state
-    ,lbL              ,lbC+lfX[  activated ? 4:2],lbR+lfX[ state ? 4:2]);
-
-    activated = (state != undefined) ? state : !activated ; /* SET OR TOGGLE */
-
-    let shadow_root = document.getElementById( taxo_pods_html.SHADOW_HOST_ID );
-    shadow_root.style.display = activated ? "block" : "none";
-
-    if( activated )
-    {
-        taxo_pods.load_div_tools_xy(div_tools_xy);
-        taxo_pods.unhide_div_tools("onMessage");
-    }
-
-    taxo_pods.pods_fontSize = (2 * taxo_pods.BUTTONS_POD_FONT_SIZE_MIN)+"px";
-    taxo_pods.taxo_tree_display_cluster();
-
-};
-/*}}}*/
-/*➔ query_active_state {{{*/
-let query_active_state = function()
-{
-    /* 1/2 [EXTENSION] .. [QUERY BACKGROUND SCRIPT ACTIVE STATE]  */
-    if(   (typeof chrome            != "undefined")
-       && (typeof chrome.runtime    != "undefined")
-       && (       chrome.runtime.id !=  undefined )
-      ) {
-        chrome.runtime.sendMessage({ activated : "undefined" }, read_response);
-    }
-    /* 2/2 [EMBEDDED] .. [AUTO-ACTIVATE] */
-    else {
-        setTimeout(function() { taxo_msg . set_activated(true); },   0);
-        setTimeout(function() { taxo_pods. unhide_div_tools();  }, 500);
-    }
-};
-/*}}}*/
-
-// ┌───────────────────────────────────────────────────────────────────────────┐
-// │ MESSAGE TO BACKGROUND-SCRIPT ............................................ │
-// └───────────────────────────────────────────────────────────────────────────┘
-/*▲▲▲▲ send_selected_state_message .. chrome.runtime.sendMessage {{{*/
-let send_selected_state_message = function(selected_state,menu_id,taxo_id)
-{
-/*{{{*/
-let caller = "send_selected_state_message";
-let log_this = MESSAGE_LOG;
-let tag_this = MESSAGE_TAG || log_this;
-
-if(log_this) log(caller+"("+taxo_id+")");
-/*}}}*/
-    /* FORWARD SELECTION TO BROWSER EXTENSION BACKGROUND SCRIPT {{{*/
-    let message = { selected_state, menu_id, taxo_id , href:document.location.href };
-
-    if(   (typeof chrome            != "undefined")
-       && (typeof chrome.runtime    != "undefined")
-       && (       chrome.runtime.id !=  undefined ))
-    {
-if(tag_this) log_key_val_group(caller, message, 4, false);
-
-        try {
-            chrome.runtime.sendMessage(message, read_response);
-        } catch(ex) { if(log_this) log(ex); }
-
-    }
-    /*}}}*/
-    else if( tag_this )
-    {
-        log_key_val_group(caller+" (NOT RUNNING AS AN EXTENSION) ➔ MESSAGE NOT SENT)", message, 8, false);
-    }
-};
-/*}}}*/
-/*▼▼▼▼ read_response {{{*/
-let read_response = function(response)
-{
-/*{{{*/
-let caller = "read_response";
-let log_this = MESSAGE_LOG;
-//t tag_this = MESSAGE_TAG || log_this;
-
-if(log_this) log(caller+": %c RECEIVING ANSWER FROM BACKGROUND SCRIPT:", lb4);
-if(log_this) log("%c"+response, lf4);
-/*}}}*/
-    /* response.multiple_choice_state {{{*/
-    if(typeof response.multiple_choice_state != "undefined")
-    {
-        taxo_pods.set_multiple_choice_state(response.multiple_choice_state, caller);
-
-    }
-    /*}}}*/
-    /* response.clear {{{*/
-    if(typeof response.clear     != "undefined")
-    {
-        taxo_menu.sel_clear("response.clear "+response.clear);
-    }
-/*}}}*/
-    /* response.activated {{{*/
-    if(typeof response.activated != "undefined")
-    {
-        set_activated(response.activated , response.div_tools_xy);
-    }
-    /*}}}*/
-//TODO: read last selections for current document.location.href .. f(db content)
-};
-/*}}}*/
-
-// ┌───────────────────────────────────────────────────────────────────────────┐
-// │ RESPONSE FROM BACKGROUND-SCRIPT ......................................... │
-// └───────────────────────────────────────────────────────────────────────────┘
-/*_ add_message_listener {{{*/
-let add_message_listener = function()
-{
-   if(   (typeof chrome            != "undefined")
-      && (typeof chrome.runtime    != "undefined")
-      && (       chrome.runtime.id !=  undefined ))
-    {
-if(MESSAGE_LOG) console.log("%c LISTENING TO MESSAGE FROM BACKGROUND SCRIPT...", "color:#AFA");
-        chrome.runtime.onMessage.addListener( onMessage_listener );
-    }
-};
-/*}}}*/
-/*_ onMessage_listener {{{*/
-let onMessage_listener = function(request, sender, sendResponse)
-{
-if(MESSAGE_LOG) {
-console.log("%c MESSAGE FROM BACKGROUND SCRIPT...", "color:#AFA");
-console.trace();
-//console.log( request )
-//console.dir( request )
-}
-
-    if(typeof request.activated != "undefined")
-    {
-console.log("%c➔ Extension %c activated "+activated+" ", "color:#AFA", "background-color:"+(request.activated ? "#0A0" : "#00A"));
-
-        // ┌───────────────────────────────────────────────────────────────┐
-        // │ ACTIVATED ON-OFF                                              │
-        // └───────────────────────────────────────────────────────────────┘
-        //{{{
-if(MESSAGE_LOG)
-    log_key_val_group("onMessage_listener .. request"
-                      , { activated    : request.activated
-                        , save_layout  : request.save_layout
-                        , div_tools_xy : request.div_tools_xy
-                      }, 4, false);
-
-        if( !request.activated && request.save_layout)
-            taxo_pods.save_link_URDL_xy( sendResponse );
-
-        taxo_msg.set_activated( request.activated, request.div_tools_xy);
-
-        sendResponse({ ack: JSON.stringify( request ) });
-        //}}}
-    }
-};
-/*}}}*/
-
-/* EXPORT */
-/*{{{*/
-return { name : "taxo_msg"
-    ,    is_activated
-    ,    set_activated
-    ,    send_selected_state_message
-    ,    add_message_listener
-    ,    query_active_state
-};
-/*}}}*/
-}());
-/*}}}*/
 
 /* EXPORT {{{*/
 /*{{{*/
 return { taxo_pods_init        : taxo_pods.taxo_pods_init
     ,    set_activated         : taxo_msg.set_activated
     // DEBUG {{{
-    ,  activate                : taxo_msg.set_activated
-    ,  get_selected_leaf_array : taxo_pods.get_selected_leaf_array
-    ,  check_taxo_json         : taxo_menu.check_taxo_json
-    ,  log_taxo_id             : taxo_menu.log_taxo_id
-    ,  search_id_from_node     : taxo_menu.search_id_from_node
-    ,  iterate           : () => taxo_menu.iterate(taxo_json,0)
-    ,  taxo_tree_move_cluster  : taxo_pods.taxo_tree_move_cluster
+    , activate                : taxo_msg.set_activated
+    , get_selected_leaf_array : taxo_pods.get_selected_leaf_array
+    , check_taxo_json         : taxo_menu.check_taxo_json
+    , log_taxo_id             : taxo_menu.log_taxo_id
+    , search_id_from_node     : taxo_menu.search_id_from_node
+    , iterate           : () => taxo_menu.iterate(taxo_json,0)
+    , taxo_tree_move_cluster  : taxo_pods.taxo_tree_move_cluster
+    , unselect_under_parent   : taxo_menu.unselect_under_parent
+    , load_div_tools_xy       : taxo_pods.load_div_tools_xy
     //}}}
 };
 /*}}}*/
@@ -2110,16 +2153,7 @@ taxo_content.taxo_pods_init();
  * vim: sw=4 foldmethod=marker
  *
  *///}}}
-/* TODO {{{
-
-[integration with XPH]
-    $APROJECTS/XPH/javascript/xpath_content.js
-
-[selection]
-    select parent-menu entry when selecting a leaf after a "clear all" has been called
-
-[activated]:
-    at load time with a request to BACKGROUND-SCRIPT
+/*{{{
 
 [scroll]
     :!start explorer "https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollTo"
