@@ -8,7 +8,7 @@
 /*}}}*/
 /*{{{*/
 const CONFIG_JS_ID   = "config_js";
-const CONFIG_JS_TAG  =  CONFIG_JS_ID  +" (210611:15h:26)";
+const CONFIG_JS_TAG  =  CONFIG_JS_ID  +" (211221:00h:28)";
 
 /*}}}*/
 let config_js = (function() {
@@ -39,7 +39,6 @@ const OPTION_KEYS
         /* PAGE */
         , "location_href"
         , "details_options_open"
-        , "div_tools_xy"
     ];
 
     return { OPTION_KEYS
