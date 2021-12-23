@@ -1,5 +1,5 @@
 //┌────────────────────────────────────────────────────────────────────────────┐
-//│ [server_sql] .. [SELECT] [DELETE] [INSERT] [GENERATE] _TAG (211021:02h:46) │
+//│ [server_sql] .. [SELECT] [DELETE] [INSERT] [GENERATE] _TAG (211222:05h:51) │
 //└────────────────────────────────────────────────────────────────────────────┘
 /* jshint esversion 9, laxbreak:true, laxcomma:true, boss:true */ /*{{{*/
 /* globals  module */
@@ -35,6 +35,14 @@ let SELECT_xpaths               = function(config, args) /* eslint-disable-line 
 
     return `SELECT xpath FROM ${config.XPATH_TABLE} WHERE url = ${args_url};`;
 }; //}}}
+let SELECT_taxonomy             = function(config, args) /* eslint-disable-line no-unused-vars */ //{{{
+{
+    if(config.LOG_MORE) console.log("SELECT_taxonomy");
+
+    let args_url   = "$$"+ args.url   +"$$";
+
+    return `SELECT selected,collected FROM ${config.TAXONOMY_TABLE} WHERE url = ${args_url};`;
+}; //}}}
 
 
 //┌────────────────────────────────────────────────────────────────────────────┐
@@ -54,6 +62,34 @@ let SELECT_xpath_update         = function(config, args) /* eslint-disable-line 
             sql += "\n"+
 `INSERT INTO    ${config.XPATH_TABLE}
         values( ${args_url}, ${args_xpath}, ${args_text});`;
+
+    return sql;
+}; //}}}
+let SELECT_taxonomy_update         = function(config, args) /* eslint-disable-line no-unused-vars */ //{{{
+{
+    if(config.LOG_MORE) console.log("SELECT_taxonomy_update");
+
+        let args_url       = "$$"+ args.url       +"$$";
+        let args_selected  = "$$"+ args.selected  +"$$";
+        let args_collected = "$$"+ args.collected +"$$";
+
+        let sql =
+`DELETE FROM    ${config.TAXONOMY_TABLE} WHERE url = ${args_url};`;
+
+//console.log("(typeof args.selected  != 'undefined')=["+(typeof  args.selected  != "undefined")+"]");
+//console.log("(typeof args.collected != 'undefined')=["+(typeof  args.collected != "undefined")+"]");
+//console.log(" Sring( args.selected                )=["+ String( args.selected )               +"]");
+//console.log(" Sring( args.collected               )=["+ String( args.collected)               +"]");
+
+        let updating
+            =  (String( args.selected  ).length > 0)
+            || (String( args.collected ).length > 0)
+        ;
+
+        if( updating )
+            sql += "\n"+
+`INSERT INTO    ${config.TAXONOMY_TABLE}
+        values( ${args_url}, ${args_selected}, ${args_collected});`;
 
     return sql;
 }; //}}}
@@ -100,9 +136,11 @@ return { get_table_names
     ,    SELECT_domains
     ,    SELECT_urls
     ,    SELECT_xpaths
+    ,    SELECT_taxonomy
 
     //   DELETE // INSERT // APPEND
     ,    SELECT_xpath_update
+    ,    SELECT_taxonomy_update
 
 
 

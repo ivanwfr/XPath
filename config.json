@@ -13,6 +13,7 @@
 
 ,         "I18N_TABLE" : "i18n"
 ,        "XPATH_TABLE" : "site_XPATH"
+,     "TAXONOMY_TABLE" : "site_TAXONOMY"
 ,    "SITE_TREE_TABLE" : "site_TREE"
 
 , "I18N_SELECT_i18n"   : "SELECT * FROM i18n      ORDER BY key"

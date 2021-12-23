@@ -1,5 +1,5 @@
 // ┌───────────────────────────────────────────────────────────────────────────┐
-// │ taxo_pods_html.js ==== CONTENT SCRIPT ========== _TAG (211221:02h:23) === │
+// │ taxo_pods_html.js ==== CONTENT SCRIPT ========== _TAG (211222:13h:59) === │
 // └───────────────────────────────────────────────────────────────────────────┘
 /* jshint esversion: 9, laxbreak:true, laxcomma:true, boss:true */ /*{{{*/
 
@@ -24,7 +24,7 @@ const log_this = false;
 let buttons_pod_css_data ="data:text/css,"+ escape(`
 /*INLINE{{{*/
 
-   #buttons_pod_css_tag { content: "buttons_pod_css (211220:18h:40)";       }
+   #buttons_pod_css_tag { content: "buttons_pod_css (211222:00h:47)";       }
 
 button                 { font-size : unset; }
                        .buttons_pod                { display               : grid;        }
@@ -74,7 +74,6 @@ button                 { font-size : unset; }
 .buttons_pod.movable   { z-index : 2147483647; }
 .buttons_pod           { z-index : 2147483601; }
 .buttons_pod.hidden    { display    : none !important; }
-
 .buttons_pod          { white-space      : nowrap;                              }
 .buttons_pod          { user-select      : none;                                }
 .buttons_pod>*>*      { pointer-events   : none;                                }

@@ -24,11 +24,12 @@
                 ,          "javascript/xpath_outline.js"
                 ,          "javascript/div_tools_html.js"
                 ,          "javascript/xpath.js"
-                ,          "javascript/xpath_content.js"
 
                 ,          "javascript/taxo_json_211211.js"
                 ,          "javascript/taxo_pods_html.js"
+
                 ,          "javascript/taxo_content.js"
+                ,          "javascript/xpath_content.js"
             ],
             "css"      : [ "stylesheet/dom_host.css" ]
         }

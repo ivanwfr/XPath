@@ -14,7 +14,7 @@
 /* eslint-disable no-warning-comments */
 
 const XPATH_BACKGROUND_SCRIPT_ID    = "xpath_background";
-const XPATH_BACKGROUND_SCRIPT_TAG   =  XPATH_BACKGROUND_SCRIPT_ID  +" (211221:02h:11)";
+const XPATH_BACKGROUND_SCRIPT_TAG   =  XPATH_BACKGROUND_SCRIPT_ID  +" (211222:15h:13)";
 /*}}}*/
 let xpath_background    = (function() {
 "use strict";
@@ -594,8 +594,19 @@ if(log_this) log(         response  );
         sendResponse(     response  );
     }
     /*}}}*/
+    if( request.options )
+    {
+        for(let i=0; i   < config_js.OPTION_KEYS.length; ++i) {
+            let key      = config_js.OPTION_KEYS[i];
+            if(typeof request.options[key] != "undefined")
+                options              [key]  =   request.options[key];
+        }
+        save_localStorage();
+
+    }
     /* 2. CONTENT-SCRIPT REQUEST FORWARDED TO SERVER .. (Cross-Site-Scripting FREE FROM BG SCRIPT) {{{*/
-    else {
+    else if(typeof request.activated == "undefined")
+    {
         send_XMLHttpRequest(request, sendResponse); // FORWARD SERVER RESPONSE
 
     }
@@ -625,9 +636,9 @@ if( log_this) log_key_val_group(caller, args);
     case config.CMD_DOMAINS  : url = config.SERVER_URL+"/domains" ; break;
     case config.CMD_URLS     : url = config.SERVER_URL+"/urls"    ; break;
     case config.CMD_XPATHS   : url = config.SERVER_URL+"/xpaths"  ; break;
+    case config.CMD_TAXONOMY : url = config.SERVER_URL+"/taxonomy"; break;
     case config.CMD_ADD      : url = config.SERVER_URL+"/xpaths"  ; break;
     case config.CMD_DELETE   : url = config.SERVER_URL+"/xpaths"  ; break;
-    case config.CMD_TAXONOMY : url = config.SERVER_URL+"/taxonomy"; break;
     default                  :
     {
         let msg = caller+": unsupported cmd=["+args.cmd+"]";
@@ -679,11 +690,12 @@ if( log_this) logBIG("RESPONSE TO ["+args.cmd+"]:", 5);
             try {
                 switch( args.cmd )
                 {
-                case config.CMD_DOMAINS : get_domains_reply_handler(args, xhr, sendResponse); break;
-                case config.CMD_URLS    :    get_urls_reply_handler(args, xhr, sendResponse); break;
-                case config.CMD_XPATHS  : // fall-throught
-                case config.CMD_ADD     : // fall-throught
-                case config.CMD_DELETE  :  get_xpaths_reply_handler(args, xhr, sendResponse); break;
+                case config.CMD_DOMAINS  :  get_domains_reply_handler(args, xhr, sendResponse); break;
+                case config.CMD_URLS     :     get_urls_reply_handler(args, xhr, sendResponse); break;
+                case config.CMD_TAXONOMY : get_taxonomy_reply_handler(args, xhr, sendResponse); break;
+                case config.CMD_XPATHS   : // fall-throught
+                case config.CMD_ADD      : // fall-throught
+                case config.CMD_DELETE   :   get_xpaths_reply_handler(args, xhr, sendResponse); break;
                 default: { logBIG("send_XMLHttpRequest: unsupported cmd=["+args.cmd+"]"); return; }
                 }
             }
@@ -712,6 +724,8 @@ if( log_this) logBIG("RESPONSE TO ["+args.cmd+"]:", 5);
     try {
 
         let server_args = JSON.parse( JSON.stringify(args) ); /* DEEP COPY */
+if( log_this) log_key_val_group(caller+" server_args", { server_args }, lf7, false);
+if(!log_this) log("\nREQUEST"                          ,   server_args              );
 
         if((args.cmd == "domains") || (args.cmd == "urls"))
             delete server_args.cmd;
@@ -747,9 +761,9 @@ let get_domains_reply_handler = function(args,xhr,sendResponse)
 let   caller = "get_domains_reply_handler";
 let log_this = options.LOG4_XHR;
 
-if( log_this) log_sep_top("DOMAINS", 3);
+if( log_this) log_sep_top(args.cmd, 3);
 
-/* TODO: expect a JSON url_array .. Amaël {{{
+/* TODO: expect a JSON url_array {{{
 
     - récupération des noms de domaines à récupérer:
     POST https://clustering.iwintoo.io/domains
@@ -786,6 +800,7 @@ if(log_this) console.table(domains);
 
     /*}}}*/
 if( log_this) log_sep_bot(caller, 3);
+if(!log_this) log("%c➔ domains\n", lbH+lf3,domains);
 //  return sendResponse ? true : false; // i.e. ASYNC / SYNC usage of sendResponse
     return false;
 };
@@ -796,9 +811,9 @@ let get_urls_reply_handler = function(args,xhr,sendResponse)
 /*{{{*/
 let   caller = "get_urls_reply_handler";
 let log_this = options.LOG4_XHR;
-if( log_this) log_sep_top("URLS", 4);
+if( log_this) log_sep_top(args.cmd, 4);
 
-/* TODO: expect a JSON url_array .. Amaël {{{
+/* TODO: expect a JSON url_array {{{
 
     - récupération des urls d'un nom de domaine:
     POST https://clustering.iwintoo.io/urls
@@ -835,6 +850,7 @@ if( log_this) console.table(urls);
 
     /*}}}*/
 if( log_this) log_sep_bot(caller, 4);
+if(!log_this) log("%c➔ urls\n", lbH+lf4, urls);
     return sendResponse ? true : false; // i.e. ASYNC / SYNC usage of sendResponse
 };
 /*}}}*/
@@ -845,10 +861,10 @@ let get_xpaths_reply_handler = function(args,xhr,sendResponse)
 let   caller = "get_xpaths_reply_handler";
 let log_this = options.LOG4_XHR;
 
-if( log_this) log_sep_top("XPATHS", 5);
+if( log_this) log_sep_top(args.cmd, 5);
 if( log_this) log( args  );
 
-/* TODO: expect a JSON url_array .. Amaël {{{
+/* TODO: expect a JSON url_array {{{
 
     - transmission d'une liste de XPath liés à l'url:
     POST https://clustering.iwintoo.io/xpaths
@@ -871,14 +887,10 @@ if( log_this) log( args  );
     try {
         items = JSON.parse(xhr_response);
     }
-    catch(ex) {
-        log("catch(ex):");
-        console.dir(ex);
-    }
+    catch(ex) { log("catch(ex):"); console.dir(ex); }
 
-if( log_this) log( items );
+if( log_this) log("items:", items);
     /*}}}*/
-
     /* [xpaths] {{{*/
     let xpaths = [];
     for(let i=0; i<items.length; ++i)
@@ -895,11 +907,73 @@ if( log_this) console.table(xpaths);
     /*}}}*/
     /* [answer] {{{*/
     let parsed_object = { xpaths , err: (items.err || "no error") };
-    send_parsed_object_to_content_script(parsed_object,args,xhr,sendResponse);
 
+    send_parsed_object_to_content_script(parsed_object,args,xhr,sendResponse);
     /*}}}*/
 if( log_this) log_sep_bot(caller, 5);
-    //return sendResponse ? true : false; // i.e. ASYNC / SYNC usage of sendResponse
+if(!log_this) log("%c➔ xpaths\n", lbH+lf5, xpaths);
+    return false;
+};
+/*}}}*/
+/*_ get_taxonomy_reply_handler {{{*/
+let get_taxonomy_reply_handler = function(args,xhr,sendResponse)
+{
+/*{{{*/
+let   caller = "get_taxonomy_reply_handler";
+let log_this = options.LOG4_XHR;
+
+if( log_this) log_sep_top(args.cmd, 6);
+if( log_this) log( args  );
+
+/* TODO: expect a JSON url_array {{{
+
+    - transmission d'une liste de selected,collected taxo_id liés à l'url:
+    POST https://clustering.iwintoo.io/taxonomy
+    - Params IN: JSON: { "cmd": "taxonomy", "url": "https://www.lemonde.fr/gfhrz", selected: [taxo_id1, taxo_id2], collected: [taxo_id1, taxo_id2]}
+    - Params OUT: aucun
+    A l'attention de Samuel:
+    si cmd==taxonomy , selected=[non-vide] || collected=[non-vide]: on remplace l'ensemble [selected , collected] en table
+    si cmd==taxonomy , selected=[    vide] && collected=[    vide]: on supprime l'ensemble [selected , collected] en table
+
+}}}*/
+/*}}}*/
+    /* [items] {{{*/
+    /* Answer could be embedded in multi-line Javascript comment as a null statement */
+    let    xhr_response
+        =  xhr.response.replace(/^\W*\/\*(.*)\*\/\W*$/,"$1");
+//log("%c"+xhr.response, lf9);
+//log("%c"+xhr_response, lf8);
+
+    let items = {};
+    try {
+        items = JSON.parse(xhr_response);
+    }
+    catch(ex) { log("catch(ex):"); console.dir(ex); }
+
+if( log_this) log("items:", items);
+    /*}}}*/
+    /* [selected , collected] {{{*/
+    let selected  = [];
+    let collected = [];
+    for(let i=0; i<items.length; ++i)
+    {
+        let             item = items[i];
+        if(item.selected ) selected .push( item.selected  );
+        if(item.collected) collected.push( item.collected );
+    }
+
+if( log_this) console.log("....selected:", selected);
+if( log_this) console.log("...collected:", collected);
+
+    /*}}}*/
+    /* [answer] {{{*/
+    let parsed_object = { selected, collected, err: (items.err || "no error") };
+
+    send_parsed_object_to_content_script(parsed_object,args,xhr,sendResponse);
+    /*}}}*/
+if( log_this) log_sep_bot(caller, 6);
+if(!log_this) log("%c➔  selected\n", lbH+lf6,  selected);
+if(!log_this) log("%c➔ collected\n", lbH+lf6, collected);
     return false;
 };
 /*}}}*/

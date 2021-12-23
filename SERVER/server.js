@@ -7,7 +7,7 @@
 /* eslint-disable no-warning-comments */
 
 const SERVER_JS_ID  = "server";
-const SERVER_JS_TAG = SERVER_JS_ID  +" (211029:23h:52)";
+const SERVER_JS_TAG = SERVER_JS_ID  +" (211222:14h:02)";
 /*}}}*/
 let server = (function() {
 "use strict";
@@ -507,7 +507,7 @@ let parse_url = function(url)
             ,   path : url_match[4]
             ,  query : url_match[5]
         };
-//console.dir(args)//FIXME
+//console.dir(args)
 
     return  args;
 };
@@ -533,6 +533,7 @@ const REQUEST_URL_ARRAY
     = [   "/domains"
         , "/urls"
         , "/xpaths"
+        , "/taxonomy"
     ];
 
 /*}}}*/
@@ -997,9 +998,9 @@ if(config.LOG_MORE) console.log("handle_request("+request.url+")");
     /* XPATH {{{*/
     if(       !consumed_by
        &&      config.XPATH_TABLE
-       && (   (request.url == "/domains")
-           || (request.url == "/urls"   )
-           || (request.url == "/xpaths" ))
+       && (   (request.url == "/domains" )
+           || (request.url == "/urls"    )
+           || (request.url == "/xpaths"  ))
       ) {
         body      = body.replace(/""/g,'"'); // eslint-disable-line quotes
 //console.log("body=["+body+"]")
@@ -1008,6 +1009,20 @@ if(config.LOG_MORE) console.log("handle_request("+request.url+")");
         handle_request_xpath(request, response, args);
 
         consumed_by = "xpaths";
+    }
+    /*}}}*/
+    /* TAXONOMY {{{*/
+    if(       !consumed_by
+       &&      config.TAXONOMY_TABLE
+       && (   (request.url == "/taxonomy"))
+      ) {
+        body      = body.replace(/""/g,'"'); // eslint-disable-line quotes
+//console.log("body=["+body+"]")
+        let  args = JSON.parse(body);
+
+        handle_request_taxonomy(request, response, args);
+
+        consumed_by = "taxonomy";
     }
     /*}}}*/
 
@@ -1046,7 +1061,42 @@ log_Y( "  ┌──────────────────────�
     else if((request.url == "/xpaths" ) && !(args.xpath) && (args.url)) sql = server_sql.SELECT_xpaths      (config, args);
     else if((request.url == "/xpaths" ) &&  (args.xpath)              ) sql = server_sql.SELECT_xpath_update(config, args);
 
-    console.log("sql=["+sql+"]");//FIXME
+//console.log("sql=["+sql+"]")
+
+    response.writeHead(200, "OK", {"Content-Type": "text/html; charset=UTF-8"});
+    lib_postgres.sql_query(response, sql, request.url);
+};
+/*}}}*/
+/*_ handle_request_taxonomy {{{*/
+let handle_request_taxonomy = function(request,response,args)
+{
+//console.log("handle_request_taxonomy: config.TAXONOMY_TABLE=["+config.TAXONOMY_TABLE+"]")
+log_Y( "  ┌─────────────────────────────────────────────────────────────────┐\n"
+     + "  │ handle_request: request=["+request.url                        +"]\n"
+     + "  │ .         cmd=[" + args.cmd                                   +"]\n"
+     + "➔ │ .         url=[" + args.url                                   +"]\n"
+     + "  │ .    selected=[" + args.selected                              +"]\n"
+     + "  │ .   collected=[" + args.collected                             +"]\n"
+     + "  └─────────────────────────────────────────────────────────────────┘");
+
+    /* NORMALIZE SYNTAX {{{*/
+    if( args.selected ) args.selected = String(args.selected).replace( /;/g,",,");
+    if( args.url      ) args.url      = String(args.url     ).replace( /;/g,",,");
+
+    let sql;
+    /*}}}*/
+
+    //┌────────────────────────────────────────────────────────────────────────┐
+    //│ TAXONOMY_TABLE [url, selected, text] .. USR/server_index.html          │
+    //└────────────────────────────────────────────────────────────────────────┘
+    let updating
+        =  (typeof args.selected  != "undefined")
+        && (typeof args.collected != "undefined")
+    ;
+    if     ((request.url == "/taxonomy" ) && !updating && (args.url)) sql = server_sql.SELECT_taxonomy       (config, args);
+    else if((request.url == "/taxonomy" )              && (args.url)) sql = server_sql.SELECT_taxonomy_update(config, args);
+
+console.log("sql=["+sql+"]");//FIXME
 
     response.writeHead(200, "OK", {"Content-Type": "text/html; charset=UTF-8"});
     lib_postgres.sql_query(response, sql, request.url);

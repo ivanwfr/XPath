@@ -12,6 +12,7 @@
 /* globals simulate_send_message */
 /* globals config_js */
 /* globals xpath_js */
+/* globals taxo_content */
 
 /* exported XPATH_CONTENT_SCRIPT_TAG */
 
@@ -20,7 +21,7 @@
 /*}}}*/
 /*{{{*/
 const XPATH_CONTENT_SCRIPT_ID       = "xpath_content";
-const XPATH_CONTENT_SCRIPT_TAG      =  XPATH_CONTENT_SCRIPT_ID  +" (211221:02h:16)";
+const XPATH_CONTENT_SCRIPT_TAG      =  XPATH_CONTENT_SCRIPT_ID  +" (211222:14h:03)";
 /*}}}*/
 let   xpath_content = (function() {
 
@@ -1240,7 +1241,7 @@ if( log_this) console.log("...url_clicked=["+  url_clicked+"]");
             return false;
         }
 
-        query_xpaths(caller, url_clicked);
+        query_xpaths  (caller, url_clicked);
     }
     /*}}}*/
     /*  BROWSER EXTENSION FEATURE {{{*/
@@ -1337,7 +1338,6 @@ let log_this = options.LOG2_MESSAGE;
 
 let  title = (message_object.cmd || _caller);
 if( log_this) log("%c send_message %c"+title, lbb+lbL+lf4, lbb+lbR+lf7);
-//console.log(message_object)
 /*}}}*/
     /* EMBEDDED {{{*/
     let is_embedded = lib_log.is_embedded(XPATH_CONTENT_SCRIPT_ID);
@@ -1426,6 +1426,24 @@ let caller = "query_xpaths";
     }
     else {
         send_message(              { cmd: config.CMD_XPATHS , url }, _caller);
+    }
+};
+/*}}}*/
+/*_ query_taxonomy {{{*/
+let query_taxonomy    = function(_caller, url)
+{
+/*{{{*/
+let caller = "query_taxonomy";
+//logBIG(caller+"("+_caller+")")
+
+/*}}}*/
+
+    if( lib_log.is_embedded(XPATH_CONTENT_SCRIPT_ID) )
+    {
+        simulate_send_message_args({ cmd: config.CMD_TAXONOMY , url },  caller);
+    }
+    else {
+        send_message(              { cmd: config.CMD_TAXONOMY , url }, _caller);
     }
 };
 /*}}}*/
@@ -1562,7 +1580,7 @@ if( log_this) console.log("%c set_activated: ➔ %c activated "+request.activate
 let read_response = function(response,message_object) // eslint-disable-line complexity
 {
 /*{{{*/
-let caller = "read_response";
+let caller = XPATH_CONTENT_SCRIPT_ID+".read_response";
 let log_this = options.LOG2_MESSAGE;
 
 let details
@@ -1578,8 +1596,7 @@ if(log_this) logBIG("NO RESPONSE", 2);
 
         return;
     }
-if(log_this) log("response:");
-if(log_this) log("%c"+response, lf4);
+if(log_this) log_key_val("response", response);
 /*}}}*/
     if(JSON.stringify( response ).indexOf("onerror") >= 0)
     {
@@ -1604,9 +1621,10 @@ if(log_this) log("%c"+response, lf4);
     {
         switch(response.cmd)
         {
-        case config.CMD_DOMAINS :                           get_domains_handler(response.domains        ); break;
-        case config.CMD_URLS    :                              get_urls_handler(response.urls           ); break;
-        case config.CMD_XPATHS  :                            get_xpaths_handler(response.xpaths         ); break;
+        case config.CMD_DOMAINS : get_domains_handler (response.domains                      );                  break;
+        case config.CMD_URLS    : get_urls_handler    (response.urls                         );                  break;
+        case config.CMD_TAXONOMY: get_taxonomy_handler(response                              );                  break;
+        case config.CMD_XPATHS  : get_xpaths_handler  (response.xpaths                       );                  break;
         case config.CMD_ADD     : xpath_outline.add_or_delete_server_response_handler(response, message_object); break;
         case config.CMD_DELETE  : xpath_outline.add_or_delete_server_response_handler(response, message_object); break;
         default:
@@ -1817,10 +1835,9 @@ if(options.LOG3_SERVER) log_query_step("NEXTSTEP  ENABLE", "QUERY XPATHS");
 //console.log("location_url_is_registered=["+location_url_is_registered+"]")
     if( location_url_is_registered || lib_log.is_embedded(XPATH_CONTENT_SCRIPT_ID))
     {
-if(options.LOG3_SERVER) log_query_step("CALLING query_xpaths", "ON ["+location_url+"]");
-
         xpath_outline.data_num_xpath_load_array(); // START FROM SCRATCH
 
+if(options.LOG3_SERVER) log_query_step("CALLING query_xpaths", "ON ["+location_url+"]");
         query_xpaths(caller, location_url);
     }
     /*}}}*/
@@ -1840,9 +1857,11 @@ let log_this = options.LOG2_MESSAGE;
 if( log_this) lib_log.logBIG(caller+": XPATHS x"+xpaths.length);
 //console.table(xpaths)
 /*}}}*/
+    /* [div_reload] animation end {{{*/
     let div_reload = lib_util.get_tool("div_reload");
     div_reload.classList.remove("waiting_animation");
 
+    /*}}}*/
     /* COLLECT XPATHS .. f(xpaths) {{{*/
     let data_num_xpath_array = [];
 
@@ -1862,6 +1881,38 @@ if( log_this) lib_log.logBIG(caller+": XPATHS x"+xpaths.length);
     /*}}}*/
     /* NEXTSTEP ENABLE XPATHS [add][delete] {{{*/
     xpath_outline.data_num_xpath_load_array( data_num_xpath_array );
+
+    let location_url    = document.location.href;
+
+if(options.LOG3_SERVER) log_query_step("CALLING query_taxonomy", "ON ["+location_url+"]");
+    query_taxonomy(caller, location_url);
+    /*}}}*/
+};
+/*}}}*/
+    // ┌───────────────────────────────────────────────────────────────────────┐
+    // │ RESPONSE  TAXONOMY .. NEXTSTEP ➔ [select..collect] taxo_id .......... │
+    // └───────────────────────────────────────────────────────────────────────┘
+/*_ get_taxonomy_handler {{{*/
+let get_taxonomy_handler = function(response)
+{
+/*{{{*/
+let caller = "get_taxonomy_handler";
+let log_this = options.LOG2_MESSAGE;
+
+if( log_this) lib_log.logBIG(caller+": [selected,collected]");
+//log("response", response)
+/*}}}*/
+    /* COLLECT TAXONOMY [selected , collected] {{{*/
+    let { selected , collected } = response;
+
+    if( !selected)  selected = [];
+    if(!collected) collected = [];
+
+if( log_this) log(".selected: ",  selected);
+if( log_this) log("collected: ", collected);
+    /*}}}*/
+    /* NEXTSTEP ENABLE TAXONOMY [select / collect] {{{*/
+    taxo_content.load_taxo_id_array(selected, collected);
 
     /*}}}*/
 };
@@ -1914,7 +1965,7 @@ let log_feature = function(_caller, msg)
     setTimeout(function() {
         lib_popup.log_popup_warn(  msg +"\n\n"
                                + "➔ this is a browser extension feature\n"
-                               + "… which is not avalable\n"
+                               + "… which is not available\n"
                                + "… while running an enbedded script"
                               );
     }, 0);
@@ -2074,9 +2125,7 @@ if(tag_this) log_key_val_group(caller+"("+_caller+(sendResponse ? (", "+sendResp
     }
     else if(!lib_log.is_embedded(XPATH_CONTENT_SCRIPT_ID) )
     {
-        send_message({ caller : _caller
-                     ,       ...options
-        }, caller);
+        send_message({ caller : _caller , options }, caller);
 
     }
     /*}}}*/
