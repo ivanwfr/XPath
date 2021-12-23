@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <!-- ┌─────────────────────────────────────────────────────────────────────┐ -->
-<!-- │ [index.html]                                   _TAG (211019:19h:39) │ -->
+<!-- │ [index.html]                                   _TAG (211223:16h:51) │ -->
 <!-- └─────────────────────────────────────────────────────────────────────┘ -->
 <html>
  <head>
  <!--{{{-->
   <meta charset="utf-8"/>
+  <base href="file:///C:/LOCAL/DATA/ANDROID/PROJECTS/">
   <title>index</title>
   <!-- style {{{-->
   <style>
@@ -16,15 +17,14 @@
    h1          { text-align    :  right; }
    h1          { align-self    : center; }
 
-   div         { box-shadow    : 2px 2px 2px #888; }
-   div         { border        : 1px solid   #DDD; }
-   div         { border-radius : 1em;              }
-   div         { padding       : 1em;              }
-   div         { margin        : 1em;              }
+   div, pre    { box-shadow    : 2px 2px 2px #888; }
+   div, pre    { border        : 1px solid   #DDD; }
+   div, pre    { border-radius : 1em;              }
+   div, pre    { padding       : 1em;              }
+   div, pre    { margin        : 1em;              }
 
             #div_online  { display: grid; grid-template-columns: 1fr 1fr; }
             #div_offline { display: grid; grid-template-columns: 1fr 1fr; }
-
 
    .offline #div_offline { visibility            : visible !important;         }
             #div_offline { visibility            : hidden            ;         }
@@ -60,14 +60,14 @@
     /*_ set_body_style_f_location {{{*/
     let set_body_style_f_location = function()
     {
-     let className
+     let body_className
      = (location.protocol == "file:")
       ?  "offline"
-      :  "online"
+      :   "online"
       ;
-     document.body.className = className;
+     document.body.className = body_className;
 
-console.log("set_body_style_f_location:\n PROTOCOL=["+location.protocol+"] ➔ "+className);
+console.log("set_body_style_f_location:\n PROTOCOL=["+location.protocol+"] ➔ "+body_className);
     };
     /*}}}*/
    /*_ replace_localhost_with_location_hostname {{{*/
@@ -102,6 +102,7 @@ console.log("└─────────────────────�
  </head>
  <body onload='set_body_style_f_location(); replace_localhost_with_location_hostname();'>
   <h1>index</h1>
+
   <div id="div_offline">
    <!-- HTTPS URL {{{-->
    <div>
@@ -124,6 +125,7 @@ console.log("└─────────────────────�
    </div>
    <!--}}}-->
   </div>
+
   <div id="div_online">
     <!-- HTTPS SERVER DASHBOARD {{{-->
    <div class="div_https">
@@ -146,6 +148,107 @@ console.log("└─────────────────────�
    </div>
    <!--}}}-->
   </div>
+
+<!-- [details_modules] {{{-->
+<details id="details_modules"> <summary><b>my dev workspace...</b></summary>
+<div class="details_modules"> <!--{{{-->
+<pre class="GITHUB"><b>GITHUB/XPH:</b> <!--{{{-->
+ <a href="GITHUB/XPH/index.html">GITHUB/XPH/index.html</a>
+ <a href="GITHUB/XPH/server_index.html">GITHUB/XPH/server_index.html</a>
+ <a href="GITHUB/XPH/xpath_embedded.html">GITHUB/XPH/xpath_embedded.html</a>
+</pre>
+<!--}}}-->
+<pre class="GITHUB"><b>GITHUB/I18N:</b> <!--{{{-->
+ <a href="GITHUB/I18N/CLIENT/index_client.html">GITHUB/I18N/CLIENT/index_client.html</a>
+ <a href="GITHUB/I18N/CLIENT/user_feedback.html">GITHUB/I18N/CLIENT/user_feedback.html</a>
+ <a href="GITHUB/I18N/CLIENT/user_feedback_dev.html">GITHUB/I18N/CLIENT/user_feedback_dev.html</a>
+ <a href="GITHUB/I18N/CONTROL/index_control.html">GITHUB/I18N/CONTROL/index_control.html</a>
+ <a href="GITHUB/I18N/I18N/i18n_populate.html">GITHUB/I18N/I18N/i18n_populate.html</a>
+ <a href="GITHUB/I18N/index.html">GITHUB/I18N/index.html</a>
+ <a href="GITHUB/I18N/server_index.html">GITHUB/I18N/server_index.html</a>
+</pre>
+<!--}}}-->
+<pre class="GITHUB"><b>GITHUB/dom_load:</b> <!--{{{-->
+ <a href="GITHUB/dom_load/dom_details.html">GITHUB/dom_load/dom_details.html</a>
+ <a href="GITHUB/dom_load/dom_find.html">GITHUB/dom_load/dom_find.html</a>
+ <a href="GITHUB/dom_load/dom_hide.html">GITHUB/dom_load/dom_hide.html</a>
+ <a href="GITHUB/dom_load/dom_ondown.html">GITHUB/dom_load/dom_ondown.html</a>
+ <a href="GITHUB/dom_load/dom_prop.html">GITHUB/dom_load/dom_prop.html</a>
+ <a href="GITHUB/dom_load/dom_sentence.html">GITHUB/dom_load/dom_sentence.html</a>
+ <a href="GITHUB/dom_load/dom_sticky.html">GITHUB/dom_load/dom_sticky.html</a>
+</pre>
+<!--}}}-->
+<pre class="GITHUB"><b>GITHUB RTabs:</b> <!--{{{-->
+ <a href="GITHUB/dom_load/index.html">GITHUB/dom_load/index.html</a>
+ <a href="GITHUB/dom_load/intro.html">GITHUB/dom_load/intro.html</a>
+ <a href="GITHUB/dom_load/screenshots.html">GITHUB/dom_load/screenshots.html</a>
+ <a href="GITHUB/dom_load/playground.html">GITHUB/dom_load/playground.html</a>
+ <a href="GITHUB/dom_load/screenshot/index.html">GITHUB/dom_load/screenshot/index.html</a>
+</pre>
+<!--}}}-->
+
+<pre class="APROJECTS"><b>APROJECTS XPH:</b> <!--{{{-->
+ <a href="XPH/index.html">XPH/index.html</a>
+ <a href="XPH/server_index.html">XPH/server_index.html</a>
+ <a href="XPH/xpath_embedded.html">XPH/xpath_embedded.html</a>
+</pre>
+<!--}}}-->
+<pre class="APROJECTS"><b>APROJECTS I18N:</b> <!--{{{-->
+ <a href="I18N/index.html">I18N/index.html</a>
+ <a href="I18N/server_index.html">I18N/server_index.html</a>
+</pre>
+<!--}}}-->
+<pre class="APROJECTS"><b>RTabsDoc:</b> <!--{{{-->
+ <a href="RTabsDoc/RTabs/index.html">RTabsDoc/RTabs/index.html</a>
+</pre>
+<!--}}}-->
+<pre class="GITLAB"><b>GITLAB:</b> <!--{{{-->
+ <a href="GITLAB/labeling/extension/xpath_embedded.html">GITLAB/labeling/extension/xpath_embedded.html</a>
+ <a href="GITLAB/user_feedback/doc/index.html">GITLAB/user_feedback/doc/index.html</a>
+ <a href="GITLAB/user_feedback/index.html">GITLAB/user_feedback/index.html</a>
+ <a href="GITLAB/user_feedback/server_index.html">GITLAB/user_feedback/server_index.html</a>
+</pre>
+<!--}}}-->
+</div>
+<!--}}}-->
+</details>
+<!-- style  [details_modules] {{{-->
+<style>
+  .details_modules { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; }
+   summary     { cursor        : pointer; }
+   summary     { opacity       : 0.5;     }
+   .APROJECTS  { background-color: rgba(255,255,204,0.5); }
+   .GITHUB     { background-color: rgba(204,204,255,0.5); }
+   .GITLAB     { background-color: rgba(255,204,204,0.5); }
+   B           { line-height     : 1.5em; }
+   B           { text-shadow     : 1px 1px rgba(000,000,000,0.3); }
+</style>
+<!--}}}-->
+ <!-- script [onload ontoggle] {{{-->
+  <script>
+
+  let on_details_onload    = function(e) {
+   let     details_modules = document.getElementById("details_modules");
+   let                 key = details_modules.id+"_open";
+   let                item = localStorage.getItem(key);
+   let                 val = item;
+   details_modules.open    = JSON.parse(val);
+
+   details_modules.addEventListener("toggle", on_details_ontoggle);
+  };
+
+  let on_details_ontoggle = function() { let     key = event.target.id+"_open";
+   if(event.target.open) localStorage.setItem   (key , true);
+   else                  localStorage.removeItem(key);
+  };
+
+  setTimeout(on_details_onload, 0);
+
+  </script>
+   <!--}}}-->
+<!--}}}-->
+
  </body>
+
 </html>
 
