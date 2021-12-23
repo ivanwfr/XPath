@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<!-- ┌─────────────────────────────────────────────────────────────────────┐ -->
+<!-- │ [index_control.html]                           _TAG (211222:05h:02) │ -->
+<!-- └─────────────────────────────────────────────────────────────────────┘ -->
+<html lang="FR">
+ <head> <!--{{{-->
+  <meta charset="utf-8"/>
+  <title>CONTROL index</title>
+<!-- ┌─────────────────────────────────────────────────────────────────────┐ -->
+<!-- │ STYLE                                                               │ -->
+<!-- └─────────────────────────────────────────────────────────────────────┘ -->
+ <!--{{{-->
+<style>
+/* COLORS */
+/* COLOR-CODED {{{ */
+
+/* ECC #964B00 #FF0000 #FFA500 #FFFF00 #9ACD32 #6495ED #EE82EE #A0A0A0 #FFFFFF #CFB53B #C0C0C0 */
+/*      111111  222222  333333  444444  555555  666666  777777  888888  999999  000000  111111 */
+.cc1 { color: #FFF; background-color:#964B00 !important; padding: 0 0.2em; }
+.cc2 { color: #FFF; background-color:#FF0000 !important; padding: 0 0.2em; }
+.cc3 { color: #000; background-color:#FFA500 !important; padding: 0 0.2em; }
+.cc4 { color: #000; background-color:#FFFF00 !important; padding: 0 0.2em; }
+.cc5 { color: #000; background-color:#9ACD32 !important; padding: 0 0.2em; }
+.cc6 { color: #000; background-color:#6495ED !important; padding: 0 0.2em; }
+.cc7 { color: #000; background-color:#EE82EE !important; padding: 0 0.2em; }
+.cc8 { color: #000; background-color:#A0A0A0 !important; padding: 0 0.2em; }
+.cc9 { color: #000; background-color:#FFFFFF !important; padding: 0 0.2em; }
+.cc0 { color: #FFF; background-color:#202020 !important; padding: 0 0.2em; }
+
+.bg1 { background-color : rgba(150,  75,   0, .9); color : black; }
+.bg2 { background-color : rgba(255,   0,   0, .9); color : black; }
+.bg3 { background-color : rgba(255, 165,   0, .9); color : black; }
+.bg4 { background-color : rgba(255, 255,   0, .9); color : black; }
+.bg5 { background-color : rgba(154, 205,  50, .9); color : black; }
+.bg6 { background-color : rgba(100, 149, 237, .9); color : black; }
+.bg7 { background-color : rgba(238, 130, 238, .9); color : black; }
+.bg8 { background-color : rgba(160, 160, 160, .9); color : black; }
+.bg9 { background-color : rgba(255, 255, 255, .9); color : black; }
+.bg0 { background-color : rgba(128, 128, 128, .9); color : black; }
+
+.fg1 {            color : rgba(150,  75,   0, 1) !important; text-shadow : 0px 1px 1px #222; } /* overrides [ccX] color */
+.fg2 {            color : rgba(255,   0,   0, 1) !important; text-shadow : 0px 1px 1px #222; }
+.fg3 {            color : rgba(255, 165,   0, 1) !important; text-shadow : 0px 1px 1px #222; }
+.fg4 {            color : rgba(255, 255,   0, 1) !important; text-shadow : 0px 1px 1px #222; }
+.fg5 {            color : rgba(154, 205,  50, 1) !important; text-shadow : 0px 1px 1px #222; }
+.fg6 {            color : rgba(100, 149, 237, 1) !important; text-shadow : 0px 1px 1px #222; }
+.fg7 {            color : rgba(238, 130, 238, 1) !important; text-shadow : 0px 1px 1px #222; }
+.fg8 {            color : rgba(160, 160, 160, 1) !important; text-shadow : 0px 1px 1px #222; }
+.fg9 {            color : rgba(255, 255, 255, 1) !important; text-shadow : 0px 1px 1px #222; }
+.fg0 {            color : rgba(  0,   0,   0, 1) !important; text-shadow : 0px 1px 1px #222; }
+
+/* }}} */
+
+/* LAYOUT */
+/* :disabled {{{*/
+:disabled {
+    border  : dashed 5px black;
+    opacity : 50%;
+}
+/*}}}*/
+/* display {{{*/
+#query_div   { display : grid;         }
+/*
+FORM>ol  { display : grid;         }
+*/
+#user_id_div { display : inline-block; }
+#lang_div    { display : inline-block; }
+
+/*}}}*/
+/* #query_iframe {{{*/
+
+   #query_iframe { width  : -webkit-fill-available; }    /* Chrome  */
+   #query_iframe { width  :         -moz-available; }    /* Firefox */
+/* #query_iframe { height : 30em;                   } */
+
+/*}}}*/
+/* textarea {{{*/
+           textarea      { min-width   :  32em; }
+           textarea      { min-height  :   2em; }
+           textarea      { padding     : 0.5em; }
+
+#query_div textarea      { max-height  : 250px; }
+
+/*}}}*/
+/* margin {{{*/
+
+ body > *     { margin      : 0.5em;        }
+ table        { margin      : 0.5em;        }
+ textarea     { margin      : 0.2em;        }
+ p            { margin-left : 1.0em;        }
+#query_div    { margin      : 1.0em;        }
+#query_iframe { margin      : 1.0em;        }
+FORM>ol       { margin      : 1.0em;        }
+.missing      { margin-left : 2.0em;        }
+
+/* left-right only */
+ button       { margin      : 0.1em  1.0em; }
+ label        { margin      : 0.1em  1.0em; }
+#lang_div     { margin      : 0.1em  1.0em; }
+#user_id_div  { margin      : 0.1em  1.0em; }
+/*}}}*/
+/* transition {{{*/
+#user_id_div { transition       : all 250ms ease-out; }
+
+/*}}}*/
+/* float {{{*/
+.float_R { float : right; }
+
+/*}}}*/
+ /* details {{{*/
+ details[open]>details { margin-left: 1em; }
+
+ details      >summary { cursor  : zoom-in; }
+ details[open]>summary { cursor  : zoom-out; }
+ details[open]>summary { width  : fit-content; min-width: 2em; }
+
+         details[open]>summary { padding : 1.0em; }
+ details details[open]>summary { padding : 0.5em; }
+
+                                 details[open]>summary { background-color : rgba(150,  75,   0, .9); color : black; }
+                         details details[open]>summary { background-color : rgba(255,   0,   0, .9); color : black; }
+                 details details details[open]>summary { background-color : rgba(255, 165,   0, .9); color : black; }
+         details details details details[open]>summary { background-color : rgba(255, 255,   0, .9); color : black; }
+ details details details details details[open]>summary { background-color : rgba(154, 205,  50, .9); color : black; }
+ /*}}}*/
+ button       { max-height  :  10em; }
+ button       { overflow    :  auto; }
+/*
+ button       { line-height : 1.5em; }
+*/
+ button       {  min-height : 2.0em; }
+
+/* FRAMING */
+/* border-radius {{{*/
+ #query_iframe div   { border-radius : 0.5em; }
+ body>*       { border-radius : 0.5em; }
+ button       { border-radius : 0.5em; }
+ div          { border-radius : 0.3em; }
+ table        { border-radius : 0.5em; }
+#lang_div     { border-radius : 1.0em; }
+#query_div    { border-radius : 0.5em; }
+#query_iframe { border-radius : 0.5em; }
+FORM>ol    { border-radius : 0.5em; }
+#user_id_div  { border-radius : 1.0em; }
+.user_id      { border-radius : 0.2em; }
+.lang         { border-radius : 0.2em; }
+
+/*}}}*/
+/* border-color {{{*/
+ body,
+ button,
+ div,
+ em,
+ iframe       { border-color : #FFF #CCC; }
+
+/*}}}*/
+/* border {{{*/
+ button       { border-width  : 1px; }
+ label        { border        : 1px outset;       }
+#lang_div     { border        : double 1px;   }
+#user_id_div  { border        : double 1px;   }
+.missing      { border        : 2px dashed;   }
+
+/*}}}*/
+/*  box-shadow {{{*/
+ button       { box-shadow : 1px 1px 3px 2px #888       ; } /* x y blur spread */
+ button:hover { box-shadow : 0px 0px 0px 3px #F00       ; }
+ button:active{ box-shadow : 0px 0px 1em 9em rgba(000,000,000,0.3) inset; }
+ div          { box-shadow : 2px 2px 5px     #888       ; }
+ table        { box-shadow : 1px 1px 3px     #888  inset; }
+#query_form>* { box-shadow : 1px 1px 3px     #888       ; }
+.user_id      { box-shadow : 1px 1px 3px     #888       ; }
+.lang         { box-shadow : 1px 1px 3px     #888       ; }
+
+/*}}}*/
+
+/* CONTENT */
+/* padding {{{*/
+ body > *    { padding : 0.5em;       }
+ div         { padding : 0.3em;       }
+ button      { padding : 0.1em 1.0em; }
+ label       { padding : 0.1em 1.0em; }
+#query_div   { padding : 0.5em;       }
+FORM>ol   { padding : 0.5em;       }
+#user_id_div { padding : 0.1em 1.0em; }
+.lang        { padding : 0 0.5em;     }
+.user_id     { padding : 0 0.5em;     }
+#user_id_div { padding : 0 1.0em;     }
+#lang_div    { padding : 0 1.0em;     }
+
+/*}}}*/
+/* background {{{*/
+ #query_iframe * div   { background-color : #DDD !important;                  }
+ body         { background-color : #DDD;                  }
+
+ div, table   { background : linear-gradient(to bottom right, rgba(128,128,128,0.1), rgba(128,128,128,0.5)); }
+
+#query_div    { background-color : rgba(128,192,192,0.3); }
+#query_iframe { background-color : #DDD;                  }
+
+.missing      { background-color : red;                   }
+#clr_user_id  { background-color : rgba(255,000,000,0.3); }
+#clr_lang     { background-color : rgba(255,000,000,0.3); }
+.lang         { background-color : rgba(000,255,000,0.3); }
+.user_id      { background-color : rgba(255,255,000,0.3); }
+
+ details      { background       : linear-gradient(to bottom right, #DDD, rgba(034,034,034,0.5)); }
+/*}}}*/
+/* flag {{{*/
+BUTTON.lang.selected { box-shadow: 0 0 0 3px red; }
+
+.flag {
+ display               : inline-block;
+ box-shadow            : none;
+ width                 : 5em;
+ height                : 2em;
+}
+.lang.flag {
+ background-position   : center;
+ background-position-x : 2.2em;
+ font-weight           : bolder;
+ text-shadow           : 1px 1px white;
+ padding-right         : 3em !important;
+}
+.bg_FR { background-repeat: no-repeat;  background-image:  url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAEQklEQVR4nL2XvY5bVRSFv73P8fXPTJJRFKIUQUJCoqGCHkXi5wGAhgcA8QTkBVKloKeip0T0SLSIEiSkpEtSZKKghMnA+NpnL4pzrm0yScaDZtjS1bWv7bPXXvtnbcNxsxc8Oys7drZt3AV4e6929+d/8B8sXuA8Bp95w/ngeBNIcDZmLwFS33z2yXcXAh+5DDnmGKowDKCfL3nvxht88eW77OzmE70tbn/F/NuvIaXBnWqIAoWE28Xfy2OA/OGNWzcPDg9uX7myg1lgcvD19wGyF/b3H7GzK548efJK5763x7N791hOL2A7F1uYavELzNHBU+68+YyfF/mt/PDR3Y8+/fh9rr8+4++jqIArBuQVwWIRXLu2C4zY29s7kYHpO2+z1D42nbUnLbMmiMAvXYbvf+DW3cMPcs45Hv9xxMP9p5gZbkJevzuUQt8X5n8tTnQ8WH/nN+KXn7DZLmCgqAAEQcEVjBMIJ5uBIbouAYEs4WxUiiBGhqWt/WO5Q6MJ6hoD0aJXYApkAUc9Rk8GrwRFYGZYiPAaeytELE7bDAakFoSte0DWPjNwA4cMoIGiFrHaZd5okzDpBY5eYmrOtDFGrNVBMXBvRem10dSQqYiCoAgRFBlFRsgop/CPrFYxQNh6AkSjojQi0JqBiKjMCCQ19PUQKdajahv/855y0GPRt46ygWtwxxSrIstuoCLChZeWJhchrZArWk62tUVg8yU2KjXwaPRLEAVPQ3A2MKBKv7XGK8JNrNpB0C+W2wMASC3/ZthQewLkaFnqjDHIGBQJSThQXCSDaNNr0RcOD3v6/oxkwSqoIafZAJU6rIsLL46SKH3QL0rtFrdz0+gMhiQC4QFBsJiX1oZ+rstBA9BqABGCUqpU+yBI/w+AOmwUAe6rFt4U8XMFEAqWpRYf2pTiYQ609tzWnDr/seOrznC1OszuTkoJKLX1zEmmNg8cJEoROZ8CgVUQGtp4tYAN+IR5bYacUmIydpbLRDJDSVhdi3BVaXZg3J28Ca38O1U9BwVNbORSmDmehDvkUXIm444YASYSIHdcWi0nCWMy2l6PLTmewYaNkxZ9oY7iCNwCN8jdKDMbj4kiLFWO3L3qCTX/yQqT8SkAZPAOrOPf9BtA3QkMJznklDMXZpl56UhU6kw1R8N+3GdjPOlOwUCL3oEUTZoBH17XwlgxMJ1O6ZZVLZPXHNWT6i17MBmfpgaE54KlUistmspZ3S9o4pQc8nQyS9PpiOWitOp3zMBsPYaWKZh1lYETRdHAk9W9MgOUNvDbHkBZpWWawvODB7/ev3r5Jkfzp7ip6URjoRGx6IOrr+3U87foxnxpTO4E3aCgjfq0sW4hfvwzPzB3rkfwefLk5jX7yQyZkGy9GyJSGrT9FeYJK6rLT6t4MycUbbYpUPhSo0cXZ+mbk8M5Z3ue0PUedn42nL/5n/SYnbUKv/S8fwDq7hPokwZEwwAAAABJRU5ErkJggg=="); }
+.bg_EN { background-repeat: no-repeat;  background-image:  url("data:image/png;base64,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"); }
+.bg_DE { background-repeat: no-repeat;  background-image:  url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAADQ0lEQVR4nK2XMW5kNwyGP1LyOIvAxcJwYSCVm1S+QoogZcokVcrcIVfIETa3MJAzpNluyzlAtgkCF7M24DcjMoXEN3pvZrzrGRMgniRz+P8iKUqGXZE9a68he/1K93VA29w7G+U0sT14Fpi5Aw/gnsjcwTHS79xm8zo5Ozu7KKWciQgiMhq04UkpcXfvxrEkZvYfgCwWi9+HYfjj+voaVcXdA5iOy0kSHNwdVeX+/p6HhwcuLi6+zcMw/HB7e8vNzQ2Pj48ApJRG424DR4mI4O6Y2fi9urri7u6O1Wr1fVZVWy6XLJdLVJWUEsAIrnpaDQawiFBKAaCUQks32d05Pz+vk5zHCLxWGtx9omZGKYX1eo27k4PJHDRCF9+XRMLMDhIPrM1mA0AOliEBFKA9mS8lsc/ObHuaA09VyXHwQ4sZmhJJFXNH205chGK7LeG5FAVxB0QVM8Pa3AFzrwQ+Tem3vxq0gtz2RZl2BZFq517VbLvW+zNv7c6rz00BqVHKf4nwo9L1QwNNzZGDenUSgO6wXtdvKeDyTKtysLIlGArghV8R8sdmaN7ADJAwssrUrGoAB6HP1YR5JT1ZM8QMcedRWhGOoB07aOFfF1hvmiOtt0R/czwnwm73Fxmj3S4d2eYvDLzlcT10+ZIpuHYgsJuGg8GZ3nV5wiwiUErbrWxDGHWlTO9H79bC7wvuzzxWZ0TBW97UwGYh7x3vG8/XDj5BSkdgzGcjEeH2CLl9vtgOSUSlrxWn+m5FkCkGD96s08xa2FbSS0nsC0GEaIuR5SeF7wQ27erV1Hbf1cSE/pdIAPu2n9Cia46g8JUhfzpZfxb4JfY336XOnL7kZtTZeGzAzY+ifytZPu37cUgf+mMeJgE2/xbAkQFytPvD4Ke8SfsmMT6ER78p9X1gwlg5vvj2+QsSu+e5i0CcgjlwOYHEzvlrWkmpQn7zpjZ9j7O59/AWjpPeZ2yskhCBxQLR9+/9HwARayrdONSP1LlPGRXgwwc+Cnz9TUrDbyKiIsTL1d1FVR3302qgvoow9xr3lBKqJsOQ/337Vt+d4Px1ZFKil5eX+vT05P1r+JRnef8fkYigqrJareII9MfiWXKvIQd9/Q+68tQwG7tyKwAAAABJRU5ErkJggg=="); }
+.bg_GR { background-repeat: no-repeat;  background-image:  url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAEVklEQVR4nO2W24tVdRTHP2v9fnuf4zjNRWUkh8RLRjchg4JSujAlFJGYKERG0YPVP2AEWYQPGfQcRQQ9lAgm+tCL0O0lih6UppciU8kYx3EuZy7nvvdv9bDPmTPazKgzmS9+YP84e/NjrfVbv/Vd68BNbjACsGzNe0tC0DgkxtL2HO+8+SivvryJ0UKFvW9/w6Ev+4njKNu8QC8hAATEBEDGzu0tAPj2lXveqBSLB3p7u1A1BgYLbFibJ01KLOtq48TJU/Qsd8S5BbsHwIKBKIIwPl6hY9U+0uqpO3y1eP6JzX1bWb++m2K5xppCmZ6VPTjfBsCDD29ktFAlF2nLmBkjY5V5HQZoZSxAEEMChGDct6KdI0f6SSZ+7/PO+3DmrwlOnxtFxLhwscxYoQQsB+DEyQEGL5aIY5fZCkaSpHz0wVZGxspzBiAAwVoBCVkAAmbCjqc2cGD/V3gFnFNcpICQjxXVVrqjSMjFSi7KvqUB0sR4um/tVSR+fo4cXIEvFcoMDE7gfIqKMDlcolxKpjeNjJQZHJoi18hAGoxqJZnL5jUhIvi39vXx/IsvUa9UCBj1Wspddy6f3nT402dJ04A0sqIiiCpP7jhEZ2f+yk7IFGBmmJE9IiQ1+Pn70/jb13Vz94YOoGNWAxvv6Zn1+9ffnWXd2q7MxSwCkcYSGnWQpoAF0kYA5anA2GgJ39mRu+IpZmWsyFB7TBpSLA2kwQjBMAtgmQoUQBTVRjSayTBBsGIKdcPv3nOMVe/XwBKcCMOFIkc/e44tD60G4LFnPufCcJE4dpgIIQkUi1XM9lOp1rEA0jzuJcdvYPzrxTlHFCnbtv2IT+qByWIVpwHBmByvkc6QT6lSZ6qU4Eo1arWEej2hVM6KMJ+LFpa9BlHk8c4rXgWnggLqBdVW00nrKbVyhXzeE0WKcxHBFtcVm+RixcOMChXDmvfYIEkSVAXJ8oxzQtsSj3S8e3Vemsk0y5qISfZbYqj149M0UKsHnNZRU6rVhDS0AkhTo54EVNNL7K7qnV01MwmN+gjTErSsORqEEDF+3uGdU3KRIqaIQqR2SeHkc544dkSNRnRNNAaChcyxWcBMCGaIeCqxg2NHvzhuN4jdL+x6TQuFuQfK9aZaTfB/nB7l19/GqFUqGIY0BWDKZSJeBNkotMaVqCm5pW0MDZcRbtl+nGVbtmIJ4gQxQ1QRAZFmADq9XikkIbv65grZ+J2+/9CIQmK48MnrPurOk7+tEwlVEEFEUSwLAG0O9gWeXMHAaBYfIEaaGuLzTE3k8I9sXs0Dj2+inlSnT481/C72FlrpyMxIwIIAQpxv4/CH3fg92+9l1877F+Fl4Zz5tgcN6ZU3Xi/MwB88Mej+vPUs9XI5axqALvwP+JwErGXVIN/VRf9QSfzxn374+5ctOwmTKWLGdN3NQFAWgl1WvE0ZmihaqXCuv39AgF7gFQSH/WfCnx8VJdhFnP/4f/F3k/n4B5BCcsrnPhfRAAAAAElFTkSuQmCC"); }
+.bg_ES { background-repeat: no-repeat;  background-image:  url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAFGElEQVR4nK2XXWwUVRSAv3tndku73W35KbTRQFuDEC2UACrhoRhDYpTEYNQoEQlBHwwP/sQHjCbEFw2JDxoiYAwPxAfxB1Ni0ER8MSEoiUgsiCXUQAxtRWnptrPbdmZ27vVh5u7Mli2Rtie5e//OPf/n7Bm4FUSVs7mAqnRFYtaAjPY6gSOZHagq/JThaSeYG8ZJQaYSmAkkNVdT9uHmTCqVTQVBSgiBECJGCJezc4nWOrFGg0ZrsVapYQBxKJ3es9zz9tW0tICUCK0N43ieLRgZtEZLSTAyglsscjGbXWFf8bzNW1atwmpvJxgfDxEtK3wkZfx4piBESEOp8pxuamLk+HEOOM4jti2E8nov4fZeQlsWSCs0+lxZQetwCAFBEFo4UKQEjAB2SWv8ksDDgpKJPQsRSjE75qEE6HJsW0CARKLxEYB934l7WLllLXHgJxnPVUkwAiQTboymHWew/UEfKEbSJQUQUwjcaTlIZpwRoJz+wCSqqAxVBQTRxdQ5+cjsQ4F6el2uDthU1i0DUwU2OEG812BXIhhmQUTAPFJlnOGRNBP1kpv9Ad7fUBge5JzbwqIWl0Y/IJfzqLRe0rUyGrF17JihHc3WFI1JELC4eCFP86az/LlBkikI5JDH6LLfqT0b0P/bGjZ2VLOIsZpRxOCIpAWCiImRrlIL35nE9Sbo6kpx7L0F5K+PEyyWuHmF96/L1Wfm83iHzeiEpqHWorKCG2saxfyyZWSl+U0sBAmpXWCc7g9/5av3e6CgeHhJlsLPLv/sG6LJfxp7/RNsfG03kOPwzlOc/KSPOKirQaycjLVPzgIoEWZHCfBYvnUr7c9vZ+z0ED0vXqZhA2wq+NTs3ktnsJUTB9bgsoB1r7/Coo3rAe9OBDBRb4SYjDSXZbNlRhuo+3GSoe/H8B+sZ8VbKQKgvqme0pjDvZ2t9H83wPzTinljmdswrwQZ+8WY34/WcfQ6Vyfo29WD07AEPaFZkC3wx9GlfL22ix92vcz45gcoiToUNpPNLZx/8iyqFEzD0igcgh0fJNNQViBn2+pof+cuBt/+lpqLTVzrGGXpl+f4Yt2bBMN5Hju4jbyXoe4NTf+r3aw6fD/SvvF/LQBxAFav/54zybXuGlou7CWtC2RagIca2VPczwdXjpBfNExutIcaZ4zWvoP0vnuTMHamwq3NkdTlOqCrjPA8nU2xcn+aUu8plC+RKkAEmtJyTapBUetqtEyRSqdxzp9gfXcTsWuno60QCKQlkik43dAcOlLks5N5mhsXo1ttvOE8fnY7NzqeIv3TEErWkulayqfdl/j8WA2VqWzoUHEmhMYWIul7M8yfjygT2vZcEa0l4PPo0dUUSq1cGQDsLK0fPUuOAfxSgRd25LClk9De0DaM42InhMa26xOhUK5YVgIZIMXqtmvROryrt/tYvUwlzixStqaz7a/onZ24UwmasXIyLbAL39xksjDBuAcI82cRpclc9IS6/BPOWiPQNGagdLmIXbrs4NcV8XwRMdSRIKKCxp10A7f03ijQEW0d3nrzFIxo7FyzsOa1SQIv8r8GpOkHZ6JyFdCRG5QMlVSKmqyk9pdA2D3jDOzsLNHoiIhhoh2by47MuME0qBnNhetiUCDr77aE+5JMSQmawA9AogVChsiz+TILTa8FSoQFB8u2QCvhufaN+Tn58ayVmy1UfJwuXLhQuq6rtdYIITDzTMF8lRk6UkrhOI7J3WSLfFvh5gKmpfUflaNFmxscKN0AAAAASUVORK5CYII="); }
+.bg_IT { background-repeat: no-repeat;  background-image:  url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAEWUlEQVR4nLWXz25bRRTGf9+Z8bXdxnGqKIJGVQUUCQnBAhU2rBBCLBBizQMgHgH6CCxZIvUluuAhQOxYIFWCTStaqggSElIltmcOi5lr36Ru4oRyLGs81/fO+c53/l54VrTk2ouQpeeqszpgde+de4z/JnmJvtzqjB3lreIukNMHXEa6ludT+7LpffneKBk9AcIEDmbIYZqmurV1g28//4pP33p/jvIsbX73LrpzB/b2wGxxu3t53F3K+U+A2Hz25teTfw6/ub55HZPh7sgADOGA+O3XX/j41rvs7R8wS+lse8dj6PeJ+/v49nZXcVnN0O4ujw8P+WE0eiNOnux+9PYHn/Day6/y9OgpmBHccQzDcYON3Vdohg3NsFnNHzdvYrffgWubIBXFOS/WrS24d4/vDw4+jBZDvv/XE+7vPMYcgglUlWMYsL/zcE59Pov/6oP86A/ijz+h9fWFYgkqe0oJJHYkomP0DURDFCARXNUNjhD7sVnF7oX0agwPh0V595tzATKdEtyrTneCvERkBllGWThWgOiCieBW8khLUl+CEGA2AyBi4F79JDAHXLiE4ajuK7urIgDsJIDcMaINSjOsOC0BCZKTSeCOecJb2tJ5jn/GzFpJOgBsST1zJ84BZy9Uu4BEziUQswBfnnrLHFNun8Asw+S4XtTCcukEM1EIecI9kkmEHMgSwZyMV5fkucJldfVZy+ra1oxuEKZU2KhgItV4ywlJZGUCwrPKM0GQvZakS3Sq04FoVkDUOIioIPDsOAJBMhFqEKWjCRz8fVG1K4sJcE+1wKRqpcjTGZOnh+Q8XR5Al5VajluJ7UV5Kgx4Ik0nmGek8OIUP0ciCPfigizwlItXzLCLZt8q0inJFQAlBtzxlDGEzEqwaYXafzkUtKlSXZDIyTGVBjyvVG3MXxTE6fHGva65WuTz/yNRWDBMpRQHhBRw+XwioNGJselcCZRKOKhFJwvkkKwDzmEmYuiLeNWwnEEBuSOBmeFuJU3W7GIkNMA14JrN+whtv3EvgMhwDDH2A/1RwJMIHpA5cps3I8dgFC/GQD/AlmCzV6toONWWKR1xz4hxYDTjgE8DQSoMWBnNjFDCIJW8XRWAhoKXQmFAoXRCefG/e2nXjaOHRgxXRLPRQ0cZmZALUUC0MvRwwnVnawcGwHYP1nuFaoXa7Dos9B0GIvaGxmAjkI9a64URWvIBoxdi/bVaUcxXArYd8FEo9FO7bAsiO6yBXTVibxzDYBzIjSifwrVs0UT6IS6a0AoM2MBgO8CVWklzqFNVjSR3WDfCyBRnD/Z/H99eY7Y7o002x7AO1xuTq/PfcZV2+Poa3B6ipt+5WM9TZWEU+PnB7JEGNDdSyF8omAmR0hSQu2Tte0HyGYFAyun8QGwHDkEdKME9o9KXQzBE1uzIdjbGve9WMOf/lRMvp5ubm3Z8fOzujlSalJZNtiuKVze255iZDg4O2qHq3NLyIl/Tn3vWvxwSA5o9eTy5AAAAAElFTkSuQmCC"); }
+.bg_PT { background-repeat: no-repeat;  background-image:  url("data:image/png;base64,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"); }
+/*}}}*/
+/* text-align {{{*/
+FORM>ol button { text-align :   left; }
+#query_div  button { text-align :   left; }
+#query_div  label  { text-align :   left; }
+
+/*}}}*/
+/* white-space {{{*/
+/*
+ details    button { white-space : pre-line; }
+*/
+ details    button { white-space : pre;      }
+FORM>ol>button { white-space : nowrap;   }
+ button.info       { white-space : nowrap;   }
+ button.delete     { white-space : nowrap;   }
+
+/*}}}*/
+/* placeholder {{{*/
+ textarea::placeholder { color       : #CCC;    }
+ textarea::placeholder { font-style  : oblique; }
+ textarea::placeholder { font-family : cursive; }
+ textarea::placeholder { font-weight : 900;     }
+
+/*}}}*/
+/* user-select {{{*/
+button  { user-select : none; }
+summary { user-select : none; }
+
+/*}}}*/
+/* cursor {{{*/
+summary         { cursor : pointer; }
+#lang_div       { cursor : pointer; }
+#user_id_div    { cursor : pointer; }
+
+/*}}}*/
+/* warn info postgres {{{*/
+
+/* HORIZONTAL OFFSET */
+.create       { margin-left      : 5em; }
+.delete       { margin-left      : 3em; }
+.drop         { margin-left      : 5em; }
+
+/* STAND OUT */
+.insert       { border           : 0.2em outset    ; border-radius: 1em; color: #444; }
+
+.dynamic             { background-color : navy                 ; color : white; }
+.dynamic.i18n_active { background-color : rgba(255,128,000,0.8); color : black; }
+
+
+.create              { background-color : #88F                 ; color : black; }
+.delete              { background-color : #F66                 ; color : black; }
+.drop                { background-color : #F00                 ; color : black; }
+.info                { background-color : rgba(000,255,000,0.4); color : black; }
+.insert              { background-color : #DDD                 ; color : black; }
+
+.insert       { font-size        : 75% !important; }
+
+details button { font-family : monospace; }
+details button { overflow    : auto;      }
+/*
+details button { width            : 30em;      }
+*/
+
+/* warn {{{
+.warn         { background : linear-gradient(to right
+, #F00      , #F00 0.3em
+, #FF0 0.4em, #FF0 0.7em
+, #222 0.8em, #222
+); }
+}}}*/
+.warn         {
+    color            : red;
+    background-color : #DDD;
+    font-weight      : bolder;
+}
+button.warn::before {
+    display          : inline-block;
+    box-shadow       : 1px 1px 2px gray;
+    width            : 1.2em;
+    background-color : #FA0;
+    color            : black;
+    content          : "\26A0";
+    text-align       : center;
+    vertical-align   : sub;
+    font-weight      : bolder;
+    font-size        : 120%;
+    line-height      : 1.2em;
+}
+
+/*}}}*/
+
+/* GRID */
+/* grid .. align {{{*/
+#query_div>button   { align-self : center; }
+#query_div>label    { align-self : center; }
+#query_div>button   { align-self : center; }
+#query_div>label    { align-self : center; }
+
+/*
+#query_div>*        { vertical-align        :  middle; }
+*/
+/*}}}*/
+/* grid-template-columns {{{*/
+/*
+FORM>ol         { grid-template-columns : 1fr 1fr 1fr; }
+*/
+#query_div          { grid-template-columns : 10em 5fr; }
+
+/*}}}*/
+/* grid start..end {{{*/
+#query_div>button   { grid-column-start : 1;                   }
+#query_div>label    { grid-column-start : 1;                   }
+#query_div>textarea { grid-column-start : 2;                   }
+#query_div>textarea { grid-row-start    : 1; grid-row-end : 4; }
+
+/*}}}*/
+/* grid gap {{{*/
+FORM>ol          { grid-gap              : 1em; }
+/*
+*/
+/*}}}*/
+
+</style>
+<!--}}}-->
+ </head> <!--}}}-->
+ <body onload='tag_page();'>
+
+<!-- ┌─────────────────────────────────────────────────────────────────────┐ -->
+<!-- │ DYNAMIC HTML                                  [SERVER_INDEX_JS_TAG] │ -->
+<!-- └─────────────────────────────────────────────────────────────────────┘ -->
+<!--  CLEAR .. server_control.js .. check_cookies {{{-->
+<!-- CLEAR server console {{{-->
+<button
+ title   = "CLEAR RESPONSE&#x000D;(and server console)"
+ style   = "position:fixed; right:1em; background-color: rgba(000,255,000,0.3);"
+ onclick = 'document.getElementById("submit_clear").click();'
+
+>CLEAR server console </button>
+<!--}}}-->
+<script src="server_control.js"></script>
+<script> /* (inlining) {{{*/
+
+    let disableAfterSubmit    = server_control.disableAfterSubmit;
+    let qtext_add             = server_control.qtext_add;
+    let qtext_clear           = server_control.qtext_clear;
+    let qtext_onkeyup         = server_control.qtext_onkeyup;
+    let qtext_submit          = server_control.qtext_submit;
+
+    let tag_page              = server_control.tag_page;
+
+    let query_iframe_onsubmit = server_control.query_iframe_onsubmit;
+
+/*}}}*/
+</script>
+<!--}}}-->
+
+<!-- ┌─────────────────────────────────────────────────────────────────────┐ -->
+<!-- │ SERVER-SIDE SQL QUERIES             [QUERY FORM]..[RESPONSE IFRAME] │ -->
+<!-- └─────────────────────────────────────────────────────────────────────┘ -->
+<div>
+<!-- CONTROL FORM {{{-->
+<form id  = "query_form"
+ method   = "GET"
+ target   = "query_iframe"
+ onsubmit = 'query_iframe_onsubmit(event)'
+ >
+   <input type="hidden" name="as_html" value="true" /> <!-- as query parameter for sql_query response format -->
+   <ol>
+<!-- TABLES -->
+<!-- DROP CREATE INSERT {{{-->
+<li>
+<details id="tables" onclick='if(event.target.tagName == "BUTTON") return qtext_add(event.target.innerText);'>
+  <summary><b>TABLES … <em class="fg3">DROP</em> … <em class="fg4">CREATE</em> … <em class="fg5">INSERT</em></b></summary>
+ <button type = "submit" formaction="/dump_TABLES" class="info">dump_TABLES <em>(site_TREE site_XPATH site_TAXONOMY)</em> </button>
+<ol>
+
+
+
+
+<!-- TABLE site_TREE {{{-->
+<li>
+ <details id="table_site_TREE">
+  <summary class="warn">TABLE site_TREE</summary>
+  <button  class="info"    > SELECT COUNT(*) FROM site_TREE WHERE site_URL LIKE '%'                                       </button><br>
+  <button  class="info"    > SELECT       *  FROM site_TREE WHERE site_URL LIKE '%'                                       </button><br>
+  <button  class="info"    > SELECT site_URL FROM site_TREE ,REGEXP_MATCHES(site_URL, '.*'              ) ORDER BY site_URL</button><br>
+  <button  class="info"    > SELECT site_URL FROM site_TREE ,REGEXP_MATCHES(site_URL, 'walmart.*(ca|fr)') ORDER BY site_URL</button><br>
+
+  <button  class="delete"  > DELETE          FROM site_TREE WHERE site_URL LIKE '%'                           </button><br>
+  <button  class="drop"    > DROP           TABLE site_TREE                                                   </button><br>
+  <button  class="create"  > CREATE         TABLE site_TREE  <em>(site_URL  varchar, site_TREE  varchar)</em> </button><br>
+
+  <button  class="insert">
+   INSERT into site_TREE values('https://remotetabs.com/dev/iwintoo/TEST/test_index.html' , '[{""label"":""H3""},{""label"":""A""},{""label"":""BR""},{""label"":""A""},{""label"":""BR""},{""label"":""A""},{""label"":""BR""},{""label"":""A""},{""label"":""BR""},{""label"":""A""},{""label"":""BR""},{""label"":""HR""},{""label"":""DIV""},{""label"":""HR""},{""label"":""SCRIPT""}]');
+  </button>
+</details>
+</li>
+<!--}}}-->
+<!-- TABLE site_XPATH {{{-->
+<li>
+ <details id="table_site_XPATH">
+  <summary class="warn">TABLE site_XPATH</summary>
+
+ <div onclick='if(event.target.tagName == "BUTTON") return qtext_add(event.target.innerText);'>
+<!-- DROP CREATE {{{-->
+  <button  class="drop"    > DROP           TABLE site_XPATH                                                      </button><br>
+  <button  class="create"  > CREATE         TABLE site_XPATH  <em>(url varchar, xpath varchar, text varchar, UNIQUE(url,xpath))</em> </button><br>
+<!--}}}-->
+  <hr>
+ <!-- INSERT {{{-->
+ <details id="table_site_XPATH_INSERT">
+  <summary class="warn">INSERT into site_XPATH</summary>
+ <div onclick='if(event.target.tagName == "BUTTON") return qtext_add(event.target.innerText);'>
+  <em style="font-size:150%">x4 ➔ goout.net patricia janeckova </em><br> <!--{{{-->
+  <button class="insert">
+   INSERT into site_XPATH values( 'https://goout.net/en/patricia-janeckova/pzmjquf/', '/html/body/div[10]/div/div[2]/div/div/div'             , 'Patricia Janečková');
+   INSERT into site_XPATH values( 'https://goout.net/en/patricia-janeckova/pzmjquf/', '/html/body/div[10]/div/div[2]/div/div[2]/div/h2'       , 'Upcoming concerts');
+   INSERT into site_XPATH values( 'https://goout.net/en/patricia-janeckova/pzmjquf/', '/html/body/div[10]/div/div[2]/div/div[3]/div/h2'       , 'Past concerts');
+   INSERT into site_XPATH values( 'https://goout.net/en/patricia-janeckova/pzmjquf/', '/html/body/div[10]/div/div[2]/div/div[6]/div/div/a[2]' , 'https://goout.net/i/075/753165-800.jpg');
+  </button><br>
+<!--}}}-->
+  <em style="font-size:150%">x4 ➔ remotetabs jslint wikipedia</em><br> <!--{{{-->
+  <button class="insert">
+   INSERT into site_XPATH values( 'https://remotetabs.com/'                    , '/html[1]/body[1]/div[5]/header[1]/h1[1]/a[1]' , 'RTabs');
+   INSERT into site_XPATH values( 'https://remotetabs.com/dev/rtabs/index.html', ''                                             , '');
+   INSERT into site_XPATH values( 'https://www.jslint.com/help.html'           , '/html[1]/body[1]/blockquote[2]'               , 'If a feature is sometimes useful and sometimes dangerous and if there is a better option then…'                                                                                  );
+   INSERT into site_XPATH values( 'https://wikipedia.org'                      , ''                                             , '');
+  </button><br>
+<!--}}}-->
+  <em style="font-size:150%">x4 ➔ amazon jslint</em><br> <!--{{{-->
+  <button class="insert">
+   INSERT into site_XPATH values( 'https://www.amazon.com/s?i=fashion-luggage' , ''                                             ,      '');
+   INSERT into site_XPATH values( 'https://www.amazon.com/s?i=industrial'      , ''                                             ,      '');
+   INSERT into site_XPATH values( 'https://www.amazon.com/s?i=mi'              , ''                                             ,      '');
+   INSERT into site_XPATH values( 'https://www.amazon.com/s?i=stripbooks'      , ''                                             ,      '');
+  </button><br>
+<!--}}}-->
+  <em style="font-size:150%">+7 ➔ remotetabs</em><br> <!--{{{-->
+  <button class="insert">
+   INSERT into site_XPATH values( 'https://remotetabs.com/' , '/html[1]/body[1]/div[5]/section[1]/p[1]'                      , 'Android and Windows… can communicate over a Wifi connection but ,in order to get something ou…' );
+   INSERT into site_XPATH values( 'https://remotetabs.com/' , '/html[1]/body[1]/div[5]/section[1]/p[1]/a[1]'                 , 'Android and Windows…'                                                                           );
+   INSERT into site_XPATH values( 'https://remotetabs.com/' , '/html[1]/body[1]/div[5]/section[1]/p[1]/span[1]/a[1]/span[1]' , 'some related links…'                                                                            );
+   INSERT into site_XPATH values( 'https://remotetabs.com/' , '/html[1]/body[1]/div[5]/section[1]/p[2]'                      , 'This Tabs introduction… should clarify the idea ,with the help of a growing list of screensho…' );
+   INSERT into site_XPATH values( 'https://remotetabs.com/' , '/html[1]/body[1]/div[5]/section[1]/p[4]/a[3]/em[1]'           , 'Custom profiles'                                                                                );
+   INSERT into site_XPATH values( 'https://remotetabs.com/' , 'Control your PC with your Android devices'                    , '/html[1]/body[1]/div[5]/section[1]/h3[1]'                                                       );
+   INSERT into site_XPATH values( 'https://remotetabs.com/' , 'Screenshots'                                                  , '/html[1]/body[1]/div[5]/header[1]/ul[1]/li[1]/a[1]'                                             );
+  </button><br>
+<!--}}}-->
+  <em style="font-size:150%">+7 remotetabs/index</em><br> <!--{{{-->
+  <button class="insert">
+   INSERT into site_XPATH values( 'https://remotetabs.com/dev/rtabs/index.html' , '/html[1]/body[1]/h1[1]'      , 'RTabs DEV 210226 19h40'                          );
+   INSERT into site_XPATH values( 'https://remotetabs.com/dev/rtabs/index.html' , 'Git - Book'                  , '/html[1]/body[1]/div[2]/div[6]/ul[2]/li[1]/a[1]' );
+   INSERT into site_XPATH values( 'https://remotetabs.com/dev/rtabs/index.html' , 'Git'                         , '/html[1]/body[1]/div[2]/div[6]/h2[2]'            );
+   INSERT into site_XPATH values( 'https://remotetabs.com/dev/rtabs/index.html' , 'GitHub_Guide_Flow'           , '/html[1]/body[1]/div[2]/div[3]/ul[2]/li[5]/a[1]' );
+   INSERT into site_XPATH values( 'https://remotetabs.com/dev/rtabs/index.html' , 'LOCAL .. (when downloaded)'  , '/html[1]/body[1]/div[2]/div[3]/h2[1]'            );
+   INSERT into site_XPATH values( 'https://remotetabs.com/dev/rtabs/index.html' , 'ONLINE .. (https)'           , '/html[1]/body[1]/div[2]/div[2]/h2[1]'            );
+   INSERT into site_XPATH values( 'https://remotetabs.com/dev/rtabs/index.html' , 'Snipets'                     , '/html[1]/body[1]/div[2]/div[4]/h2[4]'            );
+  </button><br>
+<!--}}}-->
+  <em style="font-size:150%">+7 remotetabs index</em><br> <!--{{{-->
+  <button class="insert">
+   INSERT into site_XPATH values( 'https://remotetabs.com/dev/rtabs/index.html' , 'The JavaScript Encyclopedia' , '/html[1]/body[1]/div[2]/div[3]/ul[2]/li[4]/a[1]' );
+   INSERT into site_XPATH values( 'https://remotetabs.com/dev/rtabs/index.html' , 'Vim help'                    , '/html[1]/body[1]/div[2]/div[6]/ul[1]/li[2]/a[1]' );
+   INSERT into site_XPATH values( 'https://remotetabs.com/dev/rtabs/index.html' , 'Vim'                         , '/html[1]/body[1]/div[2]/div[6]/h2[1]'            );
+   INSERT into site_XPATH values( 'https://remotetabs.com/dev/rtabs/index.html' , 'ftp .. (nas1)'               , '/html[1]/body[1]/div[2]/div[4]/h2[1]'            );
+   INSERT into site_XPATH values( 'https://remotetabs.com/dev/rtabs/index.html' , 'jsftp.js'                    , '/html[1]/body[1]/div[2]/div[4]/ul[4]/li[1]/a[1]' );
+   INSERT into site_XPATH values( 'https://remotetabs.com/dev/rtabs/index.html' , 'truly_ergonomic file'        , '/html[1]/body[1]/div[2]/div[5]/ul[1]/li[2]/a[1]' );
+   INSERT into site_XPATH values( 'https://remotetabs.com/dev/rtabs/index.html' , 'truly_ergonomic online'      , '/html[1]/body[1]/div[2]/div[5]/ul[1]/li[1]/a[1]' );
+  </button><br>
+<!--}}}-->
+ </div>
+ </details>
+<!--}}}-->
+  <hr>
+<!-- DELETE {{{-->
+  <button  class="delete"  > DELETE          FROM site_XPATH                                </button><br>
+  <button  class="delete"  > DELETE          FROM site_XPATH  WHERE url ~ 'goout'           </button><br>
+  <button  class="delete"  > DELETE          FROM site_XPATH  WHERE          url  ~    '.*' </button><br>
+  <button  class="delete"  > DELETE          FROM site_XPATH  WHERE          url LIKE '%'   </button><br>
+  <button  class="delete"  > DELETE          FROM site_XPATH  WHERE          url ~ 'https://en.wikipedia.org/wiki/Richard_Smith_(English_guitarist)'</button><br>
+  <button  class="delete"  > DELETE          FROM site_XPATH  WHERE          url ~ 'https://en.wikipedia.org/wiki/Patricia_Janečková'               </button><br>
+<!--}}}-->
+  <hr>
+<!-- SELECT {{{-->
+  <button  class="info"    > SELECT COUNT(*) FROM site_XPATH ,REGEXP_MATCHES(url      ,'.*'    )                  </button><br>
+  <button  class="info"    > SELECT       *  FROM site_XPATH                                                      </button><br>
+  <button  class="info"    > SELECT       *  FROM site_XPATH WHERE url ~ 'goout' ORDER BY url                     </button><br>
+  <button  class="info"    > SELECT       *  FROM site_XPATH ,REGEXP_MATCHES(url      ,'.*'    ) ORDER BY url     </button><br>
+  <button  class="info"    > SELECT       *  FROM site_XPATH ,REGEXP_MATCHES(xpath    ,'.*'    ) ORDER BY xpath   </button><br>
+  <button  class="info"    > SELECT       *  FROM site_XPATH ,REGEXP_MATCHES(text     ,'.*'    ) ORDER BY text    </button><br>
+  <button  class="info"    > SELECT       *  FROM site_XPATH ,REGEXP_MATCHES(url,  'Richard_Smith') ORDER BY url  </button><br>
+  <button  class="info"    > SELECT       *  FROM site_XPATH ,REGEXP_MATCHES(url,  'Patricia') ORDER BY url  </button><br>
+<!--}}}-->
+ </div>
+
+</details>
+</li>
+<!--}}}-->
+<!-- TABLE site_TAXONOMY {{{-->
+<li>
+ <details id="table_site_TAXONOMY">
+  <summary class="warn">TABLE site_TAXONOMY</summary>
+
+ <div onclick='if(event.target.tagName == "BUTTON") return qtext_add(event.target.innerText);'>
+<!-- DROP CREATE {{{-->
+  <button  class="drop"    > DROP           TABLE site_TAXONOMY                                                      </button><br>
+  <button  class="create"  > CREATE         TABLE site_TAXONOMY  <em>(url varchar, selected varchar, collected varchar, UNIQUE(url,selected))</em> </button><br>
+<!--}}}-->
+  <hr>
+  <hr>
+<!-- DELETE {{{-->
+  <button  class="delete"  > DELETE          FROM site_TAXONOMY                                </button><br>
+  <button  class="delete"  > DELETE          FROM site_TAXONOMY  WHERE url ~ 'goout'           </button><br>
+  <button  class="delete"  > DELETE          FROM site_TAXONOMY  WHERE          url  ~    '.*' </button><br>
+  <button  class="delete"  > DELETE          FROM site_TAXONOMY  WHERE          url LIKE '%'   </button><br>
+  <button  class="delete"  > DELETE          FROM site_TAXONOMY  WHERE          url ~ 'https://en.wikipedia.org/wiki/Richard_Smith_(English_guitarist)'</button><br>
+  <button  class="delete"  > DELETE          FROM site_TAXONOMY  WHERE          url ~ 'https://en.wikipedia.org/wiki/Patricia_Janečková'               </button><br>
+<!--}}}-->
+  <hr>
+<!-- SELECT {{{-->
+  <button  class="info"    > SELECT COUNT(*) FROM site_TAXONOMY ,REGEXP_MATCHES(url      ,'.*'    )                          </button><br>
+  <button  class="info"    > SELECT       *  FROM site_TAXONOMY                                                              </button><br>
+  <button  class="info"    > SELECT       *  FROM site_TAXONOMY WHERE url ~ 'goout' ORDER BY url                             </button><br>
+  <button  class="info"    > SELECT       *  FROM site_TAXONOMY ,REGEXP_MATCHES(url      ,'.*'           ) ORDER BY url      </button><br>
+  <button  class="info"    > SELECT       *  FROM site_TAXONOMY ,REGEXP_MATCHES(selected ,'.*'           ) ORDER BY selected </button><br>
+  <button  class="info"    > SELECT       *  FROM site_TAXONOMY ,REGEXP_MATCHES(collected,'.*'           ) ORDER BY collected</button><br>
+  <button  class="info"    > SELECT       *  FROM site_TAXONOMY ,REGEXP_MATCHES(url      ,'Richard_Smith') ORDER BY url      </button><br>
+  <button  class="info"    > SELECT       *  FROM site_TAXONOMY ,REGEXP_MATCHES(url      ,'Patricia'     ) ORDER BY url      </button><br>
+<!--}}}-->
+ </div>
+
+</details>
+</li>
+<!--}}}-->
+</ol>
+</details>
+</li>
+<!--}}}-->
+
+
+
+
+<!-- DYNAMIC -->
+
+   </ol>
+<!-- [query_div] -->
+   <!-- {{{-->
+   <div id     = "query_div">
+      <label
+          for     = "qtext"
+          style   = "background-color: rgba(000,000,000,0.3);"
+          onclick = 'qtext_clear  (this.control, event);'
+          >CLEAR</label>
+      <pre style  ="white-space:pre-line; text-align:end;">
+       <label
+        for       = "append"
+        style     = "background-color: rgba(255,000,255,0.3);"
+        onclick   = 'qtext_submit (this.control, event)'
+        >append-only</label><input type="checkbox" id="append" />
+        <i>(no submit)</i></pre>
+
+      <label
+          for     = "qtext"
+          style   = "background-color: rgba(255,000,255,0.3);"
+          onclick = 'qtext_submit (this.control, event)'
+          >SUBMIT</label>
+      <textarea
+          name    = "qtext"
+          id      = "qtext"
+          cols    = "80"
+          rows    =  "4"
+          placeholder = "SQL query …or… /file URI"
+          onchange = '/*qtext_submit (this, event);*/'
+          onkeyup  = 'qtext_onkeyup(this, event);'
+          ></textarea>
+<!--{{{
+:!start explorer "https://www.postgresqltutorial.com/postgresql-show-tables/"
+}}}-->
+    </div>
+    <!--}}}-->
+    <!-- jshint.com {{{-->
+    <a href="https://jshint.com/"
+     target="jshint"
+     style="float:right;"
+     >jshint.com</a>
+    <!--}}}-->
+    <!-- SHUTDOWN SERVER {{{-->
+    <button type = "submit"
+     name        = "exit"
+     formaction  = "/exit"
+     class       = "warn"
+     style       = "float:right;"
+     onclick     = 'disableAfterSubmit(event);'
+     >shutdown server</button>
+    <!--}}}-->
+
+    <!-- LOG_MORE {{{-->
+    <button type = "submit" id="submit_LOG_MORE"
+     name        = "log_more"
+     formaction  ="/log_more"
+     style       = "background-color: rgba(128,128,128,0.3); font-weight:900;"
+     >LOG_MORE</button>
+
+    <!--}}}-->
+    <!-- POSTGRES TABLES XPH {{{-->
+    <button type = "submit" id = "submit_pg_tables_i18n"
+     onclick     = 'return qtext_add("SELECT * FROM pg_catalog.pg_tables ,REGEXP_MATCHES(tablename,\"site_tree|site_xpath|site_taxonomy\")");'
+     style       = "background-color: rgba(192,128,192,0.3); font-weight:900;"
+    >PG CATALOG <sup><i style="color:gray;">XPH</i></sup></button>
+    <!--}}}-->
+    <!-- POSTGRES TABLES {{{-->
+    <button type = "submit" id = "submit_pg_tables"
+     onclick     = 'return qtext_add("SELECT * FROM pg_catalog.pg_tables WHERE schemaname=\"public\" ORDER BY tablename");'
+     style       = "background-color: rgba(128,128,128,0.3); font-weight:900;"
+    >PG CATALOG</button>
+    <!--}}}-->
+    <br>
+    <!-- CLEAR RESPONSE {{{-->
+    <button type = "submit" id="submit_clear"
+     name        = "clear"
+     formaction  ="/clear"
+     style       = "background-color: rgba(000,255,000,0.3); font-weight:900;"
+     title       = "CLEAR RESPONSE&#x000D;(and server console)"
+     >&#x274C; CLEAR</button>
+
+    <!--}}}-->
+    <!-- SERVER STATUS {{{-->
+    <button type = "submit"
+     id          = "status"
+     name        = "status"
+     formaction  ="/status"
+     style       = "background-color: rgba(000,255,000,0.3); font-weight:900;"
+     >&#x24D8; STATUS</button>
+
+    <!--}}}-->
+</form>
+<!--}}}-->
+<!-- QUERY IFRAME {{{-->
+<!-- query iframe SCRIPT {{{-->
+<script>
+/*_ iframe_on_load {{{*/
+let config = {};
+let iframe_on_load = function(event)
+{
+//console.log("iframe.onload");
+//console.dir("event:");
+//console.dir( event  );
+
+    query_format.query_format_invalidate();
+
+        /* [iframe] [body] [contentEditable] {{{*/
+        let iframe = event.path[0];
+        if(!iframe) return;
+//      console.dir("iframe:");
+//      console.dir( iframe  );
+
+        let body = iframe.contentDocument.body;
+        if(!body) return;
+//      console.dir("body:");
+//      console.dir( body  );
+
+        body.contentEditable = true;
+//      console.log("iframe.onload: body.contentEditable=["+body.contentEditable+"]");
+
+        /*}}}*/
+        /* TEXT #LINES {{{*/
+        let textContent = body.textContent;
+//console.log( "textContent=["+textContent+"]")
+
+        let line_count            = 1.2 * textContent.replace(/.*/g,"").length;
+//console.log("➔ line_count=["+line_count+"]")
+
+        line_count                = Math.max(10, line_count);
+        line_count                = Math.min(30, line_count);
+//console.log("➔ line_count=["+line_count+"]")
+
+        /*}}}*/
+        /* CLIPBOARD {{{*/
+        query_format.query_format_copy_to_CLIPBOARD( textContent );
+
+        /*}}}*/
+        /* BIG [info] PRE {{{*/
+        if( body.firstElementChild.classList.contains("info") )
+        {
+            iframe.style.height = "35rem";
+
+            query_format.query_format_load_config(config, textContent);
+        }
+        /*}}}*/
+        /* JSON REPLY {{{*/
+        else {
+//console.log("CONVERTING TO TEXTAREA");
+            /* [nodeName #text] {{{*/
+//          if(body.firstChild.nodeName == "#text") body.removeChild( body.firstChild );
+
+            /*}}}*/
+            /* [TEXTAREA] .. (➔ cannot use window.selection from textArea.value) {{{*/
+//          let textArea = document.createElement("TEXTAREA");
+//          textArea.value            = textContent;
+//          textArea.style.width      = "100%";
+//          textArea.style.height     = "100%";
+//          textArea.style.whiteSpace = "nowrap";
+//          textArea.style.height     = line_count+"rem";
+
+//          body.removeChild( body.firstElemenChild );
+//          body.appendChild( extArea );
+            /*}}}*/
+            /* [iframe height] .. f(line_count) {{{*/
+            iframe.style  .height     = line_count+"rem";
+
+            /*}}}*/
+        }
+        /*}}}*/
+};
+/*}}}*/
+</script>
+<!--}}}-->
+    <iframe id = "query_iframe"
+     name      = "query_iframe"
+     onload    = 'setTimeout(() => { iframe_on_load(event); }, 500);'
+    >
+    </iframe>
+<!--}}}-->
+<!-- QUERY FORMAT {{{-->
+<!-- query format STYLE {{{-->
+<style>
+/* selected {{{*/
+  .selected { transform        : rotate(3deg);                     }
+  .selected { border           : 5px dashed  black;                }
+  .selected { background-color : rgba(255,128,000,0.8) !important; }
+
+/*
+       .obsolete { filter : sepia(1.0); }
+*/
+     DIV.obsolete {            filter : sepia(1.0);      }
+    SPAN.obsolete {            color  : #EEC !important; }
+  BUTTON.obsolete { background-color  : #EEC !important; }
+
+/*}}}*/
+/* error {{{*/
+  .error    { color            : red;                              }
+em.error    { border-radius    : 1em    !important;                }
+em.error    { background-color : rgba(255,0,0,0.4); color: white;  }
+em.error    { padding          : 0 1em  !important;                }
+em.error    { font-size        : 18px;                             }
+em.error    { text-shadow      : 1px 1px 1px #222;                 }
+
+/*}}}*/
+/* submit {{{*/
+
+
+#submit_LOG_MORE::after             { content : " \2714"; font-weight: 900; font-family: "system-ui"; color: gray; vertical-align: super; } /* ✔ */
+#submit_LOG_MORE.selected::after    { content : " \2718"; font-weight: 900; font-family: "system-ui"; color:  red; vertical-align: super; } /* ✘ */
+#submit_pg_tables::after            { content : " all"  ; font-weight: 900; font-family: "system-ui"; color: gray; vertical-align: super; } /* ✔ */
+
+/*}}}*/
+/* magnified {{{*/
+/*
+    @see mirror/mirror_dashboard.js
+*/
+div.magnified       { background-color : black;                       }
+div.magnified       { position   : fixed; left: 0.0em; top   : 0.0em; }
+
+div.magnified       {     width  : -webkit-fill-available !important; }
+div.magnified       { max-width  : -webkit-fill-available !important; }
+div.magnified       { min-width  : -webkit-fill-available !important; }
+
+div.magnified       {     height : 80%                    !important; }
+div.magnified       { min-height : 80%                    !important; }
+div.magnified       { max-height : 80%                    !important; }
+
+div.magnified div   {     height : 98%                    !important; }
+div.magnified div   { min-height : 98%                    !important; }
+div.magnified div   { max-height : 98%                    !important; }
+
+div.magnified table {     height : 92%                    !important; }
+div.magnified table { min-height : 92%                    !important; }
+div.magnified table { max-height : 92%                    !important; }
+
+           .magnify_button                  { background-color : rgba(000,192,255,0.7); }
+           .magnify_button                  { vertical-align   : top;                   }
+           .magnify_button                  { margin           :   0;                   }
+           .magnify_button::after           { text-shadow      : 1px 1px 3px #888;      }
+           .magnify_button::after           { content          : "☐"; font-size: 24px; font-weight: 900; font-family: "system-ui";              } /* ☐ */
+           .magnify_button.magnified::after { content          : "✘"; font-size: 24px; font-weight: 900; font-family: "system-ui";              } /* ✘ */
+.collapsed .magnify_button                  { display          : none;                  }
+
+/*}}}*/
+/* query_format_div {{{*/
+#query_format_div                     { width      : 100%; }
+#query_format_div.magnified.collapsed { display    : none; }
+
+/*{{{
+#query_format_div                     { transition : height 500ms; }
+#query_format_div.collapsed           { overflow   : hidden;                  }
+#query_format_div.collapsed           { height     : 1px;                     }
+}}} */
+
+#query_format_button { background-color : rgba(000,192,255,0.3); }
+#query_format_button { margin-right     : 0;                     }
+
+/*{{{
+}}} */
+/*{{{
+.collapsed {
+ animation-duration        :          500ms;
+ animation-delay           :          500ms;
+ animation-name            : collapse_animation;
+ animation-timing-function :       ease-out;
+ animation-fill-mode       :           both;
+}
+@keyframes collapse_animation {
+    to   { height :   1px; }
+}
+}}} */
+/*{{{
+.collapsed #query_format_div         { display          : none;                    }
+.collapsed #query_format_div         { visibility       : hidden;                  }
+}}} */
+
+           #query_format_div         { white-space      : pre;                     }
+           #query_format_div         { background-color : #DDD;                    }
+           #query_format_div         { font-family      : monospace;               }
+           #query_format_div         { min-height       :  1rem;                   }
+           #query_format_div         { min-width        : 20rem;                   }
+           #query_format_div         { max-height       : 20rem;                   }
+           #query_format_div         { overflow         : auto;                    }
+
+           #query_format_div         { transition       : height 500ms;            }
+.collapsed #query_format_div         { padding          : 0 0;                     }
+.collapsed #query_format_div         { margin           : 0 0;                     }
+.collapsed #query_format_div         { min-height       : 0;                       }
+.collapsed #query_format_div         { height           : 0;                       }
+.collapsed #query_format_div         { overflow         : hidden;                  }
+
+           #query_format_div .s_04   { background-color : #FAA !important; }
+           #query_format_div .s_08   { background-color : #AFA !important; }
+           #query_format_div .s_12   { background-color : #AAF !important; }
+           #query_format_div .s_16   { background-color : #FFA !important; }
+           #query_format_div .s_20   { background-color : #FAF !important; }
+
+#query_format_collapse { background-color : rgba(000,192,255,0.7); }
+#query_format_collapse { vertical-align   :    top; }
+#query_format_collapse { margin           :      0; }
+
+#query_format_collapse::before           { content : "JSON HIDE"; }
+#query_format_collapse.collapsed::before { content : "JSON SHOW"; }
+
+/*}}}*/
+</style>
+<!--}}}-->
+<!-- query format BUTTONS {{{-->
+
+ <button id =  "query_format_button"
+  onclick   =  'query_format.query_format_event(event); return false;'
+  title     =  "SELECT TEXT BELLOW"
+  >JSON.parse</button>
+
+ <button id = "query_format_collapse"
+  onclick   = 'query_format.query_format_collapse_toggle();'
+  ></button>
+
+<!--}}}-->
+<!-- query format DIV {{{-->
+ <div        id="query_format_div_parent">
+  <button class="magnify_button"           onclick='query_format.query_format_magnify_toggle ();'></button>
+  <div       id="query_format_div"></div>
+  <button class="magnify_button"           onclick='query_format.query_format_magnify_toggle ();'></button>
+ </div>
+<!--}}}-->
+<!-- QUERY SCRIPT {{{-->
+  <script src="query_format.js"></script> 
+
+<!--}}}-->
+<!--}}}-->
+</div>
+
+<!--
+-->
+  <script src="/lib/t_details.js"></script> 
+  <script> t_details.details_onload(); </script>
+
+ </body>
+</html>
+<!--
+vim: sw=4
+-->
