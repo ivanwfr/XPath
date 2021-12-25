@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <!-- ┌─────────────────────────────────────────────────────────────────────┐ -->
-<!-- │ [index.html]                                   _TAG (211223:16h:51) │ -->
+<!-- │ [index.html]                                   _TAG (211223:18h:35) │ -->
 <!-- └─────────────────────────────────────────────────────────────────────┘ -->
 <html>
- <head>
  <!--{{{-->
+ <head>
   <meta charset="utf-8"/>
   <base href="file:///C:/LOCAL/DATA/ANDROID/PROJECTS/">
   <title>index</title>
@@ -67,13 +67,13 @@
       ;
      document.body.className = body_className;
 
-console.log("set_body_style_f_location:\n PROTOCOL=["+location.protocol+"] ➔ "+body_className);
+//console.log("set_body_style_f_location:\n PROTOCOL=["+location.protocol+"] ➔ "+body_className);
     };
     /*}}}*/
    /*_ replace_localhost_with_location_hostname {{{*/
    let replace_localhost_with_location_hostname = function()
    {
-console.log("%c replace_localhost_with_location_hostname ["+location.hostname+"]", "background:#00B;");
+//console.log("%c replace_localhost_with_location_hostname ["+location.hostname+"]", "background:#00B;");
     if(!location.hostname || (location.hostname == "localhost"))
     {
         console.log("...have no substitute for [localhost] yet...");
@@ -84,23 +84,25 @@ console.log("%c replace_localhost_with_location_hostname ["+location.hostname+"]
 
      for(let i=0; i<a_array.length; ++i)
      {
-      //let a_innerText = a_array[i].innerText;
+      //let a_innerText    = a_array[i].innerText;
       a_array[i].href      = a_array[i].href     .replace(/localhost/gm, location.hostname);
-      a_array[i].innerHTML = a_array[i].innerHTML.replace(/localhost/gm, location.hostname);
+//    a_array[i].innerText = a_array[i].innerText.replace(/localhost/gm, location.hostname);
 
-console.log("┌──────────────────────────────────────┐");
-console.log(  a_array[i].innerText                    );
-console.log(  a_array[i] );
-console.log("└──────────────────────────────────────┘");
+//console.log("┌──────────────────────────────────────┐");
+//console.log(  a_array[i].innerText                    );
+//console.log(  a_array[i] );
+//console.log("└──────────────────────────────────────┘");
 
      }
    };
    /*}}}*/
   </script>
   <!--}}}-->
- <!--}}}-->
  </head>
+ <!--}}}-->
+
  <body onload='set_body_style_f_location(); replace_localhost_with_location_hostname();'>
+
   <h1>index</h1>
 
   <div id="div_offline">
@@ -227,7 +229,9 @@ console.log("└─────────────────────�
  <!-- script [onload ontoggle] {{{-->
   <script>
 
-  let on_details_onload    = function(e) {
+   let on_details_onload   = function(e)
+   {
+   try {
    let     details_modules = document.getElementById("details_modules");
    let                 key = details_modules.id+"_open";
    let                item = localStorage.getItem(key);
@@ -235,6 +239,7 @@ console.log("└─────────────────────�
    details_modules.open    = JSON.parse(val);
 
    details_modules.addEventListener("toggle", on_details_ontoggle);
+   } catch(ex) {}
   };
 
   let on_details_ontoggle = function() { let     key = event.target.id+"_open";
