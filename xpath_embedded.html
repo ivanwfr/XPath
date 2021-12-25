@@ -166,7 +166,6 @@
   <script id="xpath_outline_js"         src="javascript/xpath_outline.js"   ></script>
   <script id="div_tools_html_js"        src="javascript/div_tools_html.js"  ></script>
   <script id="xpath_js"                 src="javascript/xpath.js"           ></script>
-  <script id="xpath_content_js"         src="javascript/xpath_content.js"   ></script>
 <!--}}}-->
 <!-- SCRIPT taxo {{{-->
 
@@ -175,9 +174,10 @@
 -->
   <script id="taxo_json_211211_js"      src="javascript/taxo_json_211211.js"></script>
   <script id="taxo_pods_html_js"        src="javascript/taxo_pods_html.js"  ></script>
-  <script id="taxo_content_js"          src="javascript/taxo_content.js"    ></script>
 
 <!--}}}-->
+  <script id="xpath_content_js"         src="javascript/xpath_content.js"   ></script>
+  <script id="taxo_content_js"          src="javascript/taxo_content.js"    ></script>
 <!-- SCRIPT simulate_send_message {{{-->
  <script>
 /*_ simulate_send_message {{{*/
@@ -827,7 +827,7 @@ let onload = function()
 //console.log("onload") // Note: No localStorage for file:// protocol
 
  title_to_h1();
- xpath_content.div_tools_init();
+ //xpath_content.div_tools_init();
  t_details.details_onload();
 };
 /*}}}*/
