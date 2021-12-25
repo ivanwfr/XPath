@@ -964,7 +964,7 @@ console.dir(response_200_header);
         }
         else {
             if(net_address && DEFAULT_URI_PATH.includes(file_name))
-                response.write(String(data).replace(/(127.0.0.1|localhost)/gm, net_address));
+                response.write(String(data).replace(/\b(127.0.0.1|localhost)\b/gm, net_address));
             else
                 response.write(       data);
         }
