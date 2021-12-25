@@ -22,7 +22,7 @@
 /* eslint-disable no-mixed-operators  */
 
 const DIV_TOOLS_HTML_JS_ID     = "div_tools_html_js";
-const DIV_TOOLS_HTML_JS_TAG    =  DIV_TOOLS_HTML_JS_ID  +" (211222:13h:59)";
+const DIV_TOOLS_HTML_JS_TAG    =  DIV_TOOLS_HTML_JS_ID  +" (211225:04h:12)";
 /*}}}*/
 let       div_tools_html_js = (function() {
 "use strict";
@@ -426,7 +426,7 @@ let load_onerror = function(e)
 {
     console.log("%c "+DIV_TOOLS_HTML_JS_TAG      +" %c * load_onerror #"+(++load_onerror_count)
                 ,"background-color:#111",  "background-color:#500"                    );
-    console.dir( e  );
+    console.dir( e );
 
     if( e.error          ) try { console.log("e.error..."+ e.error  ); } catch(ex) { console.log(ex); }
     if( e.message        ) try { console.log("e.message."+ e.message); } catch(ex) { console.log(ex); }
@@ -707,8 +707,8 @@ let log_this = xpath_content.options.LOG5_DIV_TOOLS;
     tools.loaded = false;
 
     /* [html_fragment] .. [shadow_host] .. [shadowRoot] {{{*/
-    let html_fragment;
-    let shadow_host = document.getElementById( lib_util.SHADOW_HOST_ID );
+    let html_fragment;// = document.getElementById( SHADOW_HOST_ID ).shadowRoot;
+    let shadow_host      = document.getElementById( lib_util.SHADOW_HOST_ID );
     if(!shadow_host)
     {
 //lib_log.logBIG("➔ ADDING [shadow_host]", 1)
@@ -736,13 +736,18 @@ if(log_this) lib_log.logBIG(caller+"...OK [shadow_host]", 1);
     }
     /*}}}*/
     /* [div_tools] {{{*/
-    html_fragment.innerHTML = get_div_tools_innerHTML();
+    html_fragment.innerHTML
+        += get_div_tools_innerHTML();
 
     dom_load( html_fragment );
 
     update_div_tools_innerHTML( xpath_content.options );
 
     div_tools = html_fragment.getElementById("div_tools");
+
+//console.log("%c div_tools_html", "font-size:200%;");
+//console.dir(div_tools);
+//console.log("div_tools.parentElement:", div_tools.parentElement);
 
     /*}}}*/
 
@@ -958,13 +963,14 @@ if(!tools.loaded)
 /*{{{*/
 const STAGE_LIST
         = [   "stage_options"
-            , "stage_domains" // grid row 1
-            , "stage_urls"    // grid row 2
-            , "stage_pick"    // grid row 3
-            , "stage_sample"  // grid row 4
-            , "stage_xpaths"  // grid row 5
-            , "stage_delete"  // .... ... 5
-            , "stage_add"     // .... ... 5
+            , "stage_domains"  // grid row 1
+            , "stage_urls"     // grid row 2
+            , "stage_taxonomy" // grid row 3
+            , "stage_pick"     // grid row 4
+            , "stage_sample"   // grid row 5
+            , "stage_xpaths"   // grid row 6
+            , "stage_delete"   // .... ... 6
+            , "stage_add"      // .... ... 6
         ];
 
 /*}}}*/
@@ -1021,10 +1027,12 @@ let log_this = xpath_content.options.LOG3_SERVER;
     {
         div_tools.classList.add( className );
 
-if(log_this) lib_log.logBIG(caller+": "+ msg );
+if(log_this) lib_log.logBIG(caller+": "+ msg);
     }
     else {
-        lib_log.logBIG(     caller+": "+ msg +" *** STAGE_LIST MISMATCH", 2);
+        lib_log.logBIG     (caller+": "+ msg, 2);
+        lib_log.log        (STAGE_LIST);
+        lib_log.log_caller ();
     }
 };
 /*}}}*/

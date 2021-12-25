@@ -21,15 +21,22 @@
 /*}}}*/
 /*{{{*/
 const XPATH_CONTENT_SCRIPT_ID       = "xpath_content";
-const XPATH_CONTENT_SCRIPT_TAG      =  XPATH_CONTENT_SCRIPT_ID  +" (211222:14h:03)";
+const XPATH_CONTENT_SCRIPT_TAG      =  XPATH_CONTENT_SCRIPT_ID  +" (211226:00h:11)";
 /*}}}*/
 let   xpath_content = (function() {
+"use strict";
+
+/*_ get_div_tools {{{*/
+let get_div_tools = function()
+{
+    return lib_util.get_tool("div_tools");
+};
+/*}}}*/
 
     // ┌───────────────────────────────────────────────────────────────────────┐
     // │ LOG .. [console] .. [objects] ....................................... │
     // └───────────────────────────────────────────────────────────────────────┘
 /*{{{*/
-"use strict";
 
 /* eslint-disable no-unused-vars */
 /*_ {{{*/
@@ -148,14 +155,14 @@ div_tools_require_lib_log();
 /*}}}*/
 
     // ┌───────────────────────────────────────────────────────────────────────┐
-    // │ LOAD                                                                  │
+    // │ LOAD ................................... javascript/div_tools_html.js │
     // └───────────────────────────────────────────────────────────────────────┘
 /*➔ div_tools_init .. (listeners) {{{*/
 /*{{{*/
 const DIV_TOOLS_XY                = { x: 32 , y: 32 };
 let   CAPTURE_TRUE_PASSIVE_FALSE  = {capture:true, passive:false};
 
-let div_tools;
+//t div_tools;
 let activated;
 /*}}}*/
 let div_tools_init = function(request={})
@@ -200,12 +207,15 @@ if(log_this) logBIG("➔ ADDING DIV_TOOLS HTML", 1);
 //  let log_popup_div = lib_popup.log_popup_div_get();
 //  let div_mask      = lib_popup.div_mask_get();
 
-//  let shadow_host   = document.getElementById( lib_util.SHADOW_HOST_ID );
+    let shadow_host   = document.getElementById( lib_util.SHADOW_HOST_ID );
+
 //  shadow_host.appendChild( log_popup_div );
 //  shadow_host.appendChild( div_mask      );
 //  /*}}}*/
 
-    div_tools = lib_util.get_tool("div_tools");
+    let div_tools = get_div_tools();
+//console.log("...div_tools:",div_tools);
+//console.dir(                div_tools);
     lib_util.add_el_class(div_tools, XPATH_CONTENT_SCRIPT_ID);
 
     let      xy = lib_util.localStorage_getItem("div_tools_xy");
@@ -239,7 +249,7 @@ if(options.LOG3_SERVER) log_query_step("EMBEDDED", caller);
     /* HIDE until actiated {{{*/
     if(!activated)
     {
-        let shadow_host = document.getElementById( lib_util.SHADOW_HOST_ID );
+        shadow_host = document.getElementById( lib_util.SHADOW_HOST_ID );
         shadow_host.style.display = "none";
     }
     /*}}}*/
@@ -253,7 +263,9 @@ let div_tools_init_add_listeners = function()
 let   caller = "div_tools_init_add_listeners";
 let log_this = options.LOG5_DIV_TOOLS;
 
-if( log_this) log(caller);
+let div_tools = get_div_tools();
+if( log_this) log(caller+": div_tools=["+lib_util.get_id_or_tag(div_tools)+"]");
+if( log_this) console.dir(div_tools);
 /*}}}*/
     /* ON [ORIENTATION] {{{*/
     window.addEventListener("orientationchange", div_tools_onOrientationchange_CB);
@@ -276,18 +288,24 @@ if(log_this) logBIG("➔ ADDING [beforeunload] LISTENER", 6);
     let on_touch_device = ("ontouchstart" in document.documentElement);
     if( on_touch_device )
     {
-if(log_this) logBIG("➔ ADDING [touchstart] LISTENER", 3);
+if(log_this) logBIG("➔ ADDING [touch] LISTENERS", 3);
 
-        div_tools.addEventListener("touchstart", div_tools_onDown , CAPTURE_TRUE_PASSIVE_FALSE);
-        div_tools.addEventListener("touchend"  , div_tools_onUp   , CAPTURE_TRUE_PASSIVE_FALSE);
-        window   .addEventListener("touchend"  , div_tools_onUp   , CAPTURE_TRUE_PASSIVE_FALSE); /* off viewport release */
+        document.documentElement.addEventListener("touchstart", div_tools_onDown , CAPTURE_TRUE_PASSIVE_FALSE);
+        document.documentElement.addEventListener("touchend"  , div_tools_onUp   , CAPTURE_TRUE_PASSIVE_FALSE);
+        document.documentElement.addEventListener("touchend"  , div_tools_onUp   , CAPTURE_TRUE_PASSIVE_FALSE);
+//      div_tools               .addEventListener("touchstart", div_tools_onDown , CAPTURE_TRUE_PASSIVE_FALSE);
+//      div_tools               .addEventListener("touchend"  , div_tools_onUp   , CAPTURE_TRUE_PASSIVE_FALSE);
+//      window                  .addEventListener("touchend"  , div_tools_onUp   , CAPTURE_TRUE_PASSIVE_FALSE); /* off viewport release */
     }
     else {
-if(log_this) logBIG("➔ ADDING [mousedown] LISTENER", 4);
+if(log_this) logBIG("➔ ADDING [mouse] LISTENERS", 4);
 
-        div_tools.addEventListener("mousedown" , div_tools_onDown , CAPTURE_TRUE_PASSIVE_FALSE);
-        div_tools.addEventListener("mouseup"   , div_tools_onUp   , CAPTURE_TRUE_PASSIVE_FALSE);
-        window   .addEventListener("mouseup"   , div_tools_onUp   , CAPTURE_TRUE_PASSIVE_FALSE); /* off viewport release */
+        document.documentElement.addEventListener("mousedown" , div_tools_onDown , CAPTURE_TRUE_PASSIVE_FALSE);
+        document.documentElement.addEventListener("mouseup"   , div_tools_onUp   , CAPTURE_TRUE_PASSIVE_FALSE);
+        window                  .addEventListener("mouseup"   , div_tools_onUp   , CAPTURE_TRUE_PASSIVE_FALSE); /* off viewport release */
+//      div_tools               .addEventListener("mousedown" , div_tools_onDown , CAPTURE_TRUE_PASSIVE_FALSE);
+//      div_tools               .addEventListener("mouseup"   , div_tools_onUp   , CAPTURE_TRUE_PASSIVE_FALSE);
+//      window                  .addEventListener("mouseup"   , div_tools_onUp   , CAPTURE_TRUE_PASSIVE_FALSE); /* off viewport release */
     }
     /*}}}*/
     /* ON [click] {{{*/
@@ -298,7 +316,9 @@ if(log_this) logBIG("➔ ADDING [mousedown] LISTENER", 4);
     else {
 if(log_this) logBIG("➔ ADDING [click] LISTENER", 3);
 
-        div_tools.addEventListener("click"     , div_tools_onClick, CAPTURE_TRUE_PASSIVE_FALSE);
+        document.documentElement.addEventListener("click"     , div_tools_onClick, CAPTURE_TRUE_PASSIVE_FALSE);
+//      div_tools               .addEventListener("click"     , div_tools_onClick, CAPTURE_TRUE_PASSIVE_FALSE);
+//      window                  .addEventListener("click"     , div_tools_onClick, CAPTURE_TRUE_PASSIVE_FALSE);
     }
     /*}}}*/
 };
@@ -319,8 +339,7 @@ let div_tools_onDown = function(e)
 {
 /*{{{*/
 let   caller = "div_tools_onDown";
-let log_this = options.LOG5_DIV_TOOLS || options.LOG6_MOVE_TOOL;
-
+/* altKey ctrlKey {{{*/
 if(e.altKey) {
     lib_util.cancel_event(e);
     if(e.shiftKey) div_options_toggle();
@@ -332,10 +351,25 @@ if(e.ctrlKey) {
     lib_util.cancel_event(e);
     return;
 }
+/*}}}*/
+let log_this = options.LOG5_DIV_TOOLS || options.LOG6_MOVE_TOOL;
 
-let e_target = lib_util.get_event_target(e);
-if( log_this) log_sep_top(caller+"("+lib_util.get_id_or_tag(e_target)+")", 8);
-if( log_this) log(caller+": %c("+e.type+" ON "+lib_util.get_id_or_tag_and_className(e_target)+")", lf1);
+let div_tools =  get_div_tools();
+let e_target  =  lib_util.get_event_target(e);
+let tool_name =  lib_util.get_id_or_tag_and_className(e_target);
+let is_a_tool =  div_tools.contains(e_target);
+
+if( log_this) log("%c"+caller+": ..."+div_tools.id+"%c contains "+tool_name+"%c "+   is_a_tool
+                  ,lbL+lf4                         ,lbR                     ,lbH+lfX[is_a_tool ? 5:8]);
+/*{{{
+console.log("...div_tools:",div_tools );
+console.dir(                div_tools );
+console.log("....e_target:",e_target  );
+console.log("....e.path[0]:",e.path[0]);
+console.dir(e);
+}}}*/
+
+if(!is_a_tool ) return;
 /*}}}*/
     /* ONDOWN XY {{{*/
     div_tools_del_onmove_listener();
@@ -474,6 +508,7 @@ if( log_this) logBIG(caller+"("+e.type+" "+lib_util.get_id_or_tag(e_target)+")")
     div_tools_restoreScrolling();
 if( log_this) log_sep_bot(caller+"("+lib_util.get_id_or_tag(e.target)+")", 8);
 
+let div_tools = get_div_tools();
     if(!lib_util.is_el_child_of_el(e_target, div_tools))
         setTimeout(check_location_href_changed, LOCATION_HREF_CHECKED_DELAY);
 };
@@ -555,6 +590,7 @@ if( log_this) log("%c"+caller+"( "+(e_target ? (e_target.id || e_target.nodeName
     /* [div_magnify] {{{*/
     else if(e_target.parentElement.id == "div_magnify")
     {
+        let div_tools = get_div_tools();
         div_tools    .classList.toggle("magnify");
     }
     /*}}}*/
@@ -882,7 +918,7 @@ let caller = "save_div_tools_xy";
 let log_this = options.LOG5_DIV_TOOLS || options.LOG6_MOVE_TOOL;
 if( log_this) log(XPATH_CONTENT_SCRIPT_ID+"."+caller+"("+_caller+")");
 
-    div_tools = lib_util.get_tool("div_tools");
+let div_tools = get_div_tools();
     let    xy = { x: div_tools.offsetLeft , y: div_tools.offsetTop };
 if( log_this) log("xy",xy);
 
@@ -947,7 +983,7 @@ const DIV_TOOLS_CONFINE_TO_VIEWPORT_DELAY = 500;
 let   div_tools_confine_to_viewport_timer;
 /*}}}*/
 /*_ div_tools_confine_to_viewport {{{*/
-let div_tools_confine_to_viewport = function(el=div_tools,delay=DIV_TOOLS_CONFINE_TO_VIEWPORT_DELAY)
+let div_tools_confine_to_viewport = function(el=get_div_tools(),delay=DIV_TOOLS_CONFINE_TO_VIEWPORT_DELAY)
 {
     if(div_tools_confine_to_viewport_timer) clearTimeout( div_tools_confine_to_viewport_timer );
        div_tools_confine_to_viewport_timer=   setTimeout( function() { div_tools_move_EL_XY(el); }, delay);
@@ -2104,6 +2140,7 @@ let log_this = options.LOG2_MESSAGE;
 let tag_this = log_this || options.LOG5_DIV_TOOLS || options.LOG6_MOVE_TOOL;
 /*}}}*/
     /* EXTENSION UNLOADED {{{*/
+    let div_tools = get_div_tools();
     if(!div_tools)
     {
 if( tag_this) lib_log.logBIG("EXTENSION UNLOADED");

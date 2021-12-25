@@ -1,11 +1,13 @@
 // ┌───────────────────────────────────────────────────────────────────────────┐
-// │ taxo_pods_html.js ==== CONTENT SCRIPT ========== _TAG (211222:13h:59) === │
+// │ taxo_pods_html.js ==== CONTENT SCRIPT ========== _TAG (211226:00h:03) === │
 // └───────────────────────────────────────────────────────────────────────────┘
 /* jshint esversion: 9, laxbreak:true, laxcomma:true, boss:true */ /*{{{*/
 
 /* globals  console, window, document */
 
 /* exported TAXO_PODS_HTML_TAG, taxo_pods_html */
+
+/* eslint-disable no-warning-comments */
 
 const TAXO_PODS_HTML_ID    = "taxo_tree";
 const TAXO_PODS_HTML_TAG   =  TAXO_PODS_HTML_ID  +" (201116:19h:13)";
@@ -15,16 +17,44 @@ let   taxo_pods_html       = (function() {
 const log_this = false;
 
     // ┌───────────────────────────────────────────────────────────────────────┐
-    // │ CSS .. ➔ DYNAMIC JS-INLINING of [stylesheet/buttons_pod.css] ........ │
+    // │ HTML                                                                  │
     // └───────────────────────────────────────────────────────────────────────┘
-  /** [buttons_pod_css_data] {{{*/
+/*_  [BUTTON_INLINE_HTML] {{{*/
+const BUTTON_INLINE_HTML =
+`
+<button id="taxo_tools">
+ <span  id="taxo_single"></span>
+ <span  id="taxo_clear" ></span>
+ <span  id="taxo_multi" ></span>
+</button>
+`;
+
+/*}}}*/
+
+    // ┌───────────────────────────────────────────────────────────────────────┐
+    // │ CSS                                                                   │
+    // └───────────────────────────────────────────────────────────────────────┘
+/*_ [BUTTONS_POD_INLINE_CSS] .. (can be overridden by further injected CSS) {{{*/
+const BUTTONS_POD_INLINE_CSS =
+`
+`;
+/*{{{
+ * { outline : 4px solid blue !important; }
+}}}*/
+
+let   BUTTONS_POD_INLINE_CSS_DATA ="data:text/css,"+ escape(
+      BUTTONS_POD_INLINE_CSS
+).replace(/\\(\\x+)/g,"\\\\$1")
+;
+/*}}}*/
+/*_ [buttons_pod_css_data] {{{*/
 /*
 ../stylesheet/buttons_pod.css
 */
 let buttons_pod_css_data ="data:text/css,"+ escape(`
 /*INLINE{{{*/
 
-   #buttons_pod_css_tag { content: "buttons_pod_css (211222:00h:47)";       }
+   #buttons_pod_css_tag { content: "buttons_pod_css (211225:23h:12)";       }
 
 button                 { font-size : unset; }
                        .buttons_pod                { display               : grid;        }
@@ -74,9 +104,11 @@ button                 { font-size : unset; }
 .buttons_pod.movable   { z-index : 2147483647; }
 .buttons_pod           { z-index : 2147483601; }
 .buttons_pod.hidden    { display    : none !important; }
-.buttons_pod          { white-space      : nowrap;                              }
-.buttons_pod          { user-select      : none;                                }
-.buttons_pod>*>*      { pointer-events   : none;                                }
+.buttons_pod          { white-space      : nowrap;  }
+.buttons_pod          { user-select      : none;    }
+.buttons_pod>*>*      { pointer-events   : none;    }
+#taxo_tools>*         { pointer-events   : initial; }
+#div_tools>#taxo_tools { display: grid; }
 
 .buttons_pod           { transition : top 100ms ease-in, left 100ms ease-out; }
 .button_in_out div     { transition : all 500ms ease-out          !important; }
@@ -176,33 +208,34 @@ button                 { font-size : unset; }
  .replace(/\\(\\x+)/g,"\\\\$1")
 ;
 /*}}}*/
-/*_ [buttons_pod_css] {{{*/
-let  buttons_pod_css;
-/*_ dom_load {{{*/
-let dom_load = function(html_fragment)
+/*_ dom_load_css_id_data {{{*/
+/*_ dom_load_css_id_data {{{*/
+let dom_load_css_id_data = function(css_id,css_data)
 {
+//console.log("➔ dom_load_css_id_data("+css_id+" , "+css_data.length+")")
+
+    let css_EL;
     try {
 
         window.addEventListener("error", load_onerror, false);
 
-        buttons_pod_css = load_css_EL("buttons_pod_css", buttons_pod_css_data);
-        if(buttons_pod_css.href.length < 128)
+        css_EL   = load_css_EL(css_id, css_data);
+
+        if(css_EL.href.length < 24)
         {
-            let error_msg = "[buttons_pod_css_data] IS MISSING";
+            let error_msg = "["+css_id+" DATA] IS MISSING";
             console.log   ("%c *** "+error_msg+" *** ", "font-size:200%; background-color:red;");
             console.error (TAXO_PODS_HTML_ID+": "+error_msg);
         }
-
-        html_fragment.appendChild( buttons_pod_css );
     }
     catch(ex) {
         console.log(TAXO_PODS_HTML_ID   +": LOADING DATA .. catch");
         console.dir(ex);
     }
     finally {
-//console.log(TAXO_PODS_HTML_ID+": LOADING DATA .. finally: buttons_pod_css.length=["+buttons_pod_css.length+"]")
         window.removeEventListener("error", load_onerror, false);
     }
+    return css_EL;
 };
 /*}}}*/
 /*… load_onerror {{{*/
@@ -235,39 +268,11 @@ let load_css_EL = function(id, scheme_arg) {
 };
 /*}}}*/
 /*}}}*/
-/*_ [BUTTONS_POD_CSS] {{{*/
-
-/*
-:/<style>/+,/<\/style>/-d|-read!sed -e 's;\\\\;\\\\\\\\;' stylesheet/buttons_pod.css
-*/
-const BUTTONS_POD_CSS =
-`
-<style>
-
-
-</style>
-`;
-/*}}}*/
 
     // ┌───────────────────────────────────────────────────────────────────────┐
-    // │ HTML .. [BUTTON_HTML] ............................................... │
+    // │ HTML FRAGMENT .. shadow_host.shadowRoot                               │
     // └───────────────────────────────────────────────────────────────────────┘
-/*{{{*/
-const BUTTON_HTML =
-`
-<button id="div_tools" class="movable buttons_pod row_col_1x3">
- <span id='taxo_single'></span>
- <span id='taxo_clear' ></span>
- <span id='taxo_multi' ></span>
-</button>
-`;
-
-/*}}}*/
-
-    // ┌───────────────────────────────────────────────────────────────────────┐
-    // │ inject_shadow_root .. [shadow_host BUTTONS_POD_CSS BUTTON_HTML] ..... │
-    // └───────────────────────────────────────────────────────────────────────┘
-/* inject_shadow_root {{{*/
+/*➔ inject_shadow_root {{{*/
 /*{{{*/
 const SHADOW_HOST_ID   = "taxo_tree_shadow_host";
 
@@ -279,12 +284,12 @@ let caller = "inject_shadow_root";
 
 if(log_this) console.log(caller);
 /*}}}*/
-    /* HTML FRAGMENT .. shadow_host .. shadowRoot {{{*/
-    let html_fragment;
-    let shadow_host = document.getElementById( SHADOW_HOST_ID );
+    /* HTML FRAGMENT .. [shadow_host.shadowRoot] {{{*/
+    let html_fragment;// = document.getElementById( SHADOW_HOST_ID ).shadowRoot;
+    let shadow_host      = document.getElementById( SHADOW_HOST_ID );
     if(!shadow_host)
     {
-if(log_this) console.log("...ADDING [shadow_host]");
+if(log_this) console.log("...shadow_host ["+SHADOW_HOST_ID+"] ADDED");
 
         shadow_host = document.createElement("DIV");
         shadow_host.id  = SHADOW_HOST_ID;
@@ -299,26 +304,57 @@ if(log_this) console.log("...ADDING [shadow_host]");
 if(log_this) console.log(html_fragment);
     }
     else {
-if(log_this) console.log("...OK shadow_host");
+if(log_this) console.log("...shadow_host ["+SHADOW_HOST_ID+"] EXIST");
 
         html_fragment = shadow_host.shadowRoot;
     }
     /*}}}*/
+    /* [load_taxonomy_tools] {{{*/
 
-    /* POPULATE HTML */
-    html_fragment.innerHTML
-        = ((BUTTONS_POD_CSS.length > 64) ? BUTTONS_POD_CSS : "")
-        +  BUTTON_HTML;
+    load_taxonomy_tools( html_fragment );
 
-    /* POPULATE CSS */
-    dom_load( html_fragment );
-
+    /*}}}*/
     return html_fragment;
 };
 /*}}}*/
 
+    // ┌───────────────────────────────────────────────────────────────────────┐
+    // │ HTML CONTENT  .. BUTTON_INLINE_HTML .. BUTTONS_POD_INLINE_CSS         │
+    // └───────────────────────────────────────────────────────────────────────┘
+/*➔ load_taxonomy_tools {{{*/
+let load_taxonomy_tools = function(html_fragment)
+{
+    /* [BUTTON_INLINE_HTML] {{{*/
+    html_fragment.innerHTML
+        += BUTTON_INLINE_HTML;
+
+    /*}}}*/
+    /* [BUTTONS_POD_INLINE_CSS] {{{*/
+    if( BUTTONS_POD_INLINE_CSS_DATA.length > 24)
+    {
+        let css_el
+            = dom_load_css_id_data("buttons_pod_inline_css", BUTTONS_POD_INLINE_CSS_DATA);
+
+        if( css_el )
+            html_fragment.appendChild( css_el );
+    }
+
+    /*}}}*/
+    /* [buttons_pod_css] {{{*/
+    let buttons_pod_css_EL
+        = dom_load_css_id_data("buttons_pod_css", buttons_pod_css_data);
+    if( buttons_pod_css_EL )
+        html_fragment.appendChild( buttons_pod_css_EL );
+
+    /*}}}*/
+};
+/*}}}*/
+
 /* EXPORT .. inject_shadow_root {{{*/
-return { inject_shadow_root , SHADOW_HOST_ID };
+return { SHADOW_HOST_ID
+    ,    inject_shadow_root
+    ,    load_taxonomy_tools
+};
 /*}}}*/
 }());
 

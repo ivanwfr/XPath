@@ -1,5 +1,5 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐ */
-   #buttons_pod_css_tag { content: "buttons_pod_css (211222:00h:47)";       }
+   #buttons_pod_css_tag { content: "buttons_pod_css (211225:23h:12)";       }
 /* └────────────────────────────────────────────────────────────────────────┘ */
 button                 { font-size : unset; }
 /* div_tools {{{*/
@@ -77,9 +77,11 @@ button                 { font-size : unset; }
 .buttons_pod.hidden    { opacity    : 0.8 !important; }
 }}}*/
 
-.buttons_pod          { white-space      : nowrap;                              }
-.buttons_pod          { user-select      : none;                                }
-.buttons_pod>*>*      { pointer-events   : none;                                } /* event delegate .. first-level-child only */
+.buttons_pod          { white-space      : nowrap;  }
+.buttons_pod          { user-select      : none;    }
+.buttons_pod>*>*      { pointer-events   : none;    } /* event delegate .. first-level-child only */
+#taxo_tools>*         { pointer-events   : initial; }
+#div_tools>#taxo_tools { display: grid; }
 
 .buttons_pod           { transition : top 100ms ease-in, left 100ms ease-out; }
 .button_in_out div     { transition : all 500ms ease-out          !important; }
