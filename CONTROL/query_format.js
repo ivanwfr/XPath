@@ -8,7 +8,7 @@
 /* eslint-disable no-warning-comments */
 
 const QUERY_FORMAT_JS_ID  = "query_format";
-const QUERY_FORMAT_JS_TAG = QUERY_FORMAT_JS_ID    +" (211215:14h:57)";
+const QUERY_FORMAT_JS_TAG = QUERY_FORMAT_JS_ID    +" (211223:20h:00)";
 /*}}}*/
 let query_format = (function() {
 "use strict";
@@ -36,8 +36,10 @@ let query_format_load_config = function(config,textContent)
 //console.log("config.I18N_ACTIVE %c "+config.I18N_ACTIVE+" ", "background-color: "+(config.I18N_ACTIVE ? "#D00" : "#00D"));
 
     let el = document.getElementById("submit_I18N_ACTIVE");
-    if( config.I18N_ACTIVE ) { el.classList.add   ("selected"); el.title = "CURRENTLY ✔ ACTIVE"; }
-    else                     { el.classList.remove("selected"); el.title = "currently inactive"; }
+    if( el ) {
+        if( config.I18N_ACTIVE ) { el.classList.add   ("selected"); el.title = "CURRENTLY ✔ ACTIVE"; }
+        else                     { el.classList.remove("selected"); el.title = "currently inactive"; }
+    }
     /*}}}*/
     /* LOG_MORE {{{*/
     config.LOG_MORE = query_format_load_config_is_active(textContent, regexp_LOG_MORE);
