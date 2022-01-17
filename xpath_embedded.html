@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <!-- ┌─────────────────────────────────────────────────────────────────────┐ -->
-<!-- │ XPH [xpath_embedded.html]                      _TAG (211221:02h:48) │ -->
+<!-- │ XPH -->          <script> xpath_embedded_TAG="(220117:18h:21)"; </script>
 <!-- └─────────────────────────────────────────────────────────────────────┘ -->
 <html lang="fr">
 <head> <!--{{{-->
-  <title>XPath</title>
+  <title>XPath (embedded)</title>
   <meta http-equiv="content-type" content="text/html" charset="utf-8">
 <!-- STYLE link {{{-->
   <base href="./">
@@ -22,6 +22,19 @@
 
     summary>h2  { display: inline-block; }
     summary>h3  { display: inline-block; }
+
+#details_wikipedia       { background-color: #111; color: #888; }
+
+#details_domains         { background-color: #11A; color: #888; }
+#details_urls            { background-color: #11A; color: #888; }
+
+#details_xpaths          { background-color: #A11; color: #888; }
+#details_xpath_delete    { background-color: #A11; color: #888; }
+#details_xpaths_add      { background-color: #A11; color: #888; }
+
+#details_taxonomy        { background-color: #1A1; color: #888; }
+#details_taxonomy_update { background-color: #1A1; color: #888; }
+
 /*{{{
     summary>h2  { background-color: transparent; box-shadow: 2px 2px 2px rgba(136,136,136,0.5); }
     summary>h3  { background-color: #FFF;        box-shadow: 2px 2px 2px rgba(136,136,136,0.5); }
@@ -158,30 +171,29 @@
 </style>
 <!--}}}-->
 <!--}}}-->
-<!-- SCRIPT scr {{{-->
-  <script id="lib_log_js"               src="lib/lib_log.js"                ></script>
-  <script id="lib_popup_js"             src="lib/lib_popup.js"              ></script>
-  <script id="lib_util_js"              src="lib/lib_util.js"               ></script>
-  <script id="config_js"                src="javascript/config.js"          ></script>
-  <script id="xpath_outline_js"         src="javascript/xpath_outline.js"   ></script>
-  <script id="div_tools_html_js"        src="javascript/div_tools_html.js"  ></script>
-  <script id="xpath_js"                 src="javascript/xpath.js"           ></script>
-<!--}}}-->
-<!-- SCRIPT taxo {{{-->
-
-<!--
-  <script id="taxo_json_201118_js"      src="javascript/taxo_json_201118.js"></script>
--->
-  <script id="taxo_json_211211_js"      src="javascript/taxo_json_211211.js"></script>
-  <script id="taxo_pods_html_js"        src="javascript/taxo_pods_html.js"  ></script>
-
-<!--}}}-->
-  <script id="xpath_content_js"         src="javascript/xpath_content.js"   ></script>
-  <script id="taxo_content_js"          src="javascript/taxo_content.js"    ></script>
-<!-- SCRIPT simulate_send_message {{{-->
+<!-- SCRIPT 1/4 - [simulate_send_message] {{{-->
  <script>
 /*_ simulate_send_message {{{*/
 /*{{{*/
+
+const DOMAINS_ARRAY
+  =[ "goout.net"
+  , "jslint.com"
+  , "lemonde.fr"
+  , "lefigaro.fr"
+  , "remotetabs.com"
+  , "wikipedia.org"
+  ];
+
+const URLS_ARRAY
+ = [ "https://en.wikipedia.org/wiki/Data_mining"
+  , "https://en.wikipedia.org/wiki/Patricia_Janečková"
+  , "https://en.wikipedia.org/wiki/Richard_Smith-(English_guitarist)"
+  , "https://en.wikipedia.org/wiki/Tommy_Emmanuel"
+  , "https://wikipedia.org"
+  , "https://www.wikipedia.org/"
+ ];
+
 const XPATH_ARRAY
  = [ "/html/body/h1"
  ,   "/html/body/details/p[1]"
@@ -191,58 +203,86 @@ const XPATH_ARRAY
  ,   "/html/body/details[2]/details/div/pre[2]"
  ];
 
+const TAXO_SELECTED_ARRAY
+ = [ "ALL.OTHER"
+// , "ALL.GDPR"
+// , "ALL.AUTOMOTIVE.BRAND"
+// , "ALL.AUTOMOTIVE.RETAILER"
+   , "ALL.AUTOMOTIVE.EV_CARS"
+   , "ALL.AUTOMOTIVE.OIL_CARS"
+// , "ALL.AUTOMOTIVE.OIL_TRUCKS"
+// , "ALL.AUTOMOTIVE.CAR_CARE"
+   , "ALL.HOME.FLORRINGS"
+   , "ALL.HOME.HOUSEHOLD_APPLIANCES"
+   , "ALL.HOME.ELECTRICITY.HOUSEHOLD_APPLIANCES"
+ ];
+
+const TAXO_COLLECTED_ARRAY
+ = [ "ALL.HEALTH"
+   , "ALL.BEAUTY"
+ ];
+
  // from: javascript/xpath_content.js
 
-let config = { "CMD_ADD"      : "add"
- ,             "CMD_DELETE"   : "delete"
-};
+let config
+ = { "CMD_DOMAINS"  : "domains"
+   , "CMD_URLS"     : "urls"
+   , "CMD_XPATHS"   : "xpaths"
+   , "CMD_TAXONOMY" : "taxonomy"
+   , "CMD_ADD"      :  "add"
+   , "CMD_DELETE"   :  "delete"
+ };
+
 /*}}}*/
 let simulate_send_message = function(message_object,_caller)
 {
 let caller = "simulate_send_message";
-let log_this = xpath_content.options.LOG3_SERVER;
+
+let log_this
+ =  xpath_content.options.LOG2_MESSAGE
+ || xpath_content.options.LOG3_SERVER
+ || xpath_content.options.LOG4_XHR
+ ;
+
 if( log_this) lib_log.log_key_val_group(_caller+" ➔ "+caller+(message_object.cmd ? " "+message_object.cmd : ""),message_object, 9, true);
 
     let response = JSON.parse( JSON.stringify(message_object) ); /* DEEP COPY */
 
+    response.parsed_items               = "NO ITEMS";
     switch(message_object.cmd)
     {
-     case "domains" :
-      response.domains
-       =[ "goout.net"
-       , "jslint.com"
-       , "lemonde.fr"
-       , "lefigaro.fr"
-       , "remotetabs.com"
-       , "wikipedia.org"
-       ];
-
-      xpath_content.get_domains_handler(response.domains);
+     case config.CMD_DOMAINS:
+      response.parsed_response_err      = "no error";
+      response.err                      = "no error";
+      response.parsed_items             = "DOMAIN x"+DOMAINS_ARRAY.length;
+      response.domains                  = DOMAINS_ARRAY;
+      xpath_content.get_domains_handler (response.domains);
       break;
 
-     case "urls"    :
-      response.parsed_response_err = "no error";
-      response.parsed_items        = "URL x6";
-      response.err                 = "no error";
-      response.urls
-       = [ "https://en.wikipedia.org/wiki/Data_mining"
-       , "https://en.wikipedia.org/wiki/Patricia_Janečková"
-       , "https://en.wikipedia.org/wiki/Richard_Smith-(English_guitarist)"
-       , "https://en.wikipedia.org/wiki/Tommy_Emmanuel"
-       , "https://wikipedia.org"
-       , "https://www.wikipedia.org/"
-       ];
-
-      xpath_content.get_urls_handler   (response.urls);
+     case config.CMD_URLS:
+      response.parsed_response_err      = "no error";
+      response.err                      = "no error";
+      response.parsed_items             = "URL x"+URLS_ARRAY.length;
+      response.urls                     = URLS_ARRAY;
+      xpath_content.get_urls_handler    (response.urls);
       break;
 
-     case "xpaths":
-      response.parsed_response_err = "no error";
-      response.err                 = "no error";
-      response.parsed_items        = "XPATH x4";
-      response.xpaths              = XPATH_ARRAY;
+     case config.CMD_XPATHS:
+      response.parsed_response_err      = "no error";
+      response.err                      = "no error";
+      response.parsed_items             = "XPATH x"+XPATH_ARRAY.length;
+      response.xpaths                   = XPATH_ARRAY;
+      xpath_content.get_xpaths_handler  (response.xpaths);
+      break;
 
-      xpath_content.get_xpaths_handler (response.xpaths);
+     case config.CMD_TAXONOMY:
+      response.parsed_response_err      = "no error";
+      response.err                      = "no error";
+      response.parsed_items             = "TAXO_SELECTED x"+TAXO_SELECTED_ARRAY .length
+       +                                  " .. COLLECTED x"+TAXO_COLLECTED_ARRAY.length;
+      response.selected                 =  TAXO_SELECTED_ARRAY;
+      response.collected                =  TAXO_COLLECTED_ARRAY;
+      xpath_content.get_taxonomy_handler(response.selected, response.collected);
       break;
 
      case config.CMD_ADD     :
@@ -252,17 +292,46 @@ if( log_this) lib_log.log_key_val_group(_caller+" ➔ "+caller+(message_object.c
       break;
 
      default:
-      lib_log.logBIG(caller+" unhandled cmd=["+message_object.cmd+"]");
+      lib_log.logBIG(caller+" unexpected cmd=["+message_object.cmd+"]");
+      console.trace();
     }
     /* SYNC GUI LAYOUT */
-    div_tools_html_js.div_tools_layout_cmd( message_object.cmd );
+    xpath_tools.div_tools_layout_cmd( message_object.cmd );
+
+if( log_this)
+    lib_log.log_key_val_group("➔ response: "+response.parsed_items, response, 4, true);
 };
 /*}}}*/
  </script>
 <!--}}}-->
+<!-- SCRIPT 2/4 - [lib] [config] [xpath] {{{-->
+
+  <script id="lib_log_js"               src="lib/lib_log.js"                      ></script>
+  <script id="lib_popup_js"             src="lib/lib_popup.js"                    ></script>
+  <script id="lib_util_js"              src="lib/lib_util.js"                     ></script>
+  <script id="lib_tools_js"             src="lib/lib_tools.js"                    ></script>
+  <script id="config_js"                src="javascript/config.js"                ></script>
+  <script id="xpath_outline_js"         src="javascript/xpath_outline.js"         ></script>
+  <script id="xpath_tools_js"           src="javascript/xpath_tools.js"           ></script>
+  <script id="xpath_js"                 src="javascript/xpath.js"                 ></script>
+
+<!--}}}-->
+<!-- SCRIPT 3/4 - [taxo] {{{-->
+
+  <!--ipt id="taxo_json_201118_js"      src="javascript/taxo_json_201118.js"      ></scri-->
+  <script id="taxo_json_211211_js"      src="javascript/taxo_json_211211.js"      ></script>
+  <script id="taxo_tools_js"            src="javascript/taxo_tools.js"            ></script>
+
+<!--}}}-->
+<!-- SCRIPT 4/4 - [xpath_content] [taxo_content] [event_listeners] {{{-->
+
+  <script id="xpath_content_js"         src="javascript/xpath_content.js"         ></script>
+  <script id="taxo_content_js"          src="javascript/taxo_content.js"          ></script>
+  <script id="event_listeners_js"       src="javascript/event_listeners.js"       ></script>
+
+<!--}}}-->
 </head> <!--}}}-->
 <body onload='onload(event);'>
-
 <!-- details_radio {{{-->
 <script id="t_details_js" src="lib/t_details.js" ></script>
 <script> document.addEventListener("DOMContentLoaded", t_details.t_details_onload); </script>
@@ -277,8 +346,19 @@ if( log_this) lib_log.log_key_val_group(_caller+" ➔ "+caller+(message_object.c
  <label>details radio</label>
 </span>
 <!--}}}-->
+<!-- title {{{-->
+<H1 style="white-space:pre;"
+title="
+➔ meant to be injected
+➔ by an extension
+➔ as a content-script
+➔ into visited web-pages"
+>xpath_embedded</H1>
 
-<H1>Wikipedia Web_scraping</H1>
+<!--}}}-->
+<!-- ┌─────────────────────────────────────────────────────────────────────┐ -->
+<!-- │ WIKIPEDIA                                                           │ -->
+<!-- └─────────────────────────────────────────────────────────────────────┘ -->
 <details id="details_wikipedia"><summary><H3>Web Scraping</H3></summary> <!--{{{-->
  <a target="wikipedia" href="https://en.wikipedia.org/wiki/Web_scraping" style="float:right;">➔ wikipedia</a>
  <p style="clear:right;">Web scraping, web harvesting, or web data extraction is data scraping used for extracting data from websites. The web scraping software may directly access the World Wide Web using the Hypertext Transfer Protocol or a web browser. While web scraping can be done manually by a software user, the term typically refers to automated processes implemented using a bot or web crawler. It is a form of copying in which specific data is gathered and copied from the web, typically into a central local database or spreadsheet, for later retrieval or analysis.</p>
@@ -289,388 +369,9 @@ if( log_this) lib_log.log_key_val_group(_caller+" ➔ "+caller+(message_object.c
  <p>There are methods that some websites use to prevent web scraping, such as detecting and disallowing bots from crawling (viewing) their pages. In response, there are web scraping systems that rely on using techniques in  DOM parsing, computer vision and natural language processing to simulate human browsing to enable gathering web page content for offline parsing.</p>
 </details>
 <!--}}}-->
-
-
-
-
-
-<!-- NodeJS -->
-<hr> <details id="nodejs_dev_server_logs_details" class="nodejs_dev_server_logs"><summary><H2>nodejs_dev_server_logs</H2></summary> <!--{{{-->
-<pre class="comment"> <!--{{{-->
-NodeJS <em class="cc1">server</em> <em>←→</em> <em class="cc2">extension-background-script</em> XHR dialog
-
-These logs are those of the NodeJS server which was used to simulate
-XHR dialogues during the browser extension development.
-
-They can be used to verify the compliance of specified exchanges
-between the server and the extension's background-script.
-
-If necessary, it will be a question of converging the
-requests formulation and their expected responses ...
-
-</pre>
-<!--}}}-->
-<pre class="warning"> <!--{{{-->
-ERROR REPLY:
- JSON-Object <em class="cc2"> { err: "error message" , ...query } </em>
-</pre>
-<!--}}}-->
-<br>
-<details id="details_domains" class="nodejs_dev_server_logs"><summary><H3>/domains <em class="cc3"> FETCH PENDING DOMAINS ARRAY </em></H3></summary> <!--{{{-->
-<div>
-
-<H4>[domains] ➔ Expected reply</H4>
-<pre class="comment">
- ➔ JSON-URL-Array <em class="cc5"> [] </em>
- ➔ let items = <em class="cc8"> JSON.parse( xhr.response ); </em>
-</pre>
-
-<H4>[domains] ➔ NodeJS SERVER LOGS</H4>
-
- <pre class="fg6">
- ┌──────────────────────────────────────────────────────────────────────────────┐
- │ request_listener: [domains]
- └──────────────────────────────────────────────────────────────────────────────┘
- REQUEST #11  {{{ uri.path=[domains]
- </pre>
- <pre class="fg7">
-   ┌───────────────────────────────────────────────┐
- ➔ │ /domains method POST
-   └───────────────────────────────────────────────┘
- </pre>
- <pre class="fg4">
-   ┌─────────────────────────────────────────────────────────────────┐
-   │ handle_request: request=[/domains]
-   └─────────────────────────────────────────────────────────────────┘
- sql_query(response, qtext, uri=[/domains])
- qtext:
- [
- SELECT url FROM site_XPATH ORDER BY url
- ]
- </pre>
- <pre class="fg3">
- queries: ... length=[1]:
- [ 'SELECT url FROM site_XPATH ORDER BY url' ]
- </pre>
- <pre class="fg7">
-   ┌────────────────────────────────────────────────────────────────────────────┐
- … │ POSTGRES  [1 / 1]:
- … │  SELECT url FROM site_XPATH ORDER BY url
-   └────────────────────────────────────────────────────────────────────────────┘
- </pre>
- <pre class="fg6">
- sql_query: 1 pending_queries...
- ...responding with 123 res.rows:
- </pre>
- <pre class="fg7">
-  ➔ lines_JSON:
-    url : https://developer.mozilla.org
-    url : https://en.m.wikipedia.org
-    url : https://lefigaro.fr
-    url : https://lemonde.fr
- ...
- </pre>
- <pre class="fg6">
- REQUEST #11  }}} NO MORE pending_queries
- </pre>
-
-
-</div>
-</details>
-<!--}}}-->
-<br>
-<details id="details_urls" class="nodejs_dev_server_logs"><summary><H3>/urls {domain: url} <em class="cc3"> FETCH SELECTED DOMAIN URL ARRAY </em></H3></summary> <!--{{{-->
-<div>
-
-<H4>[urls] ➔ Expected reply</H4>
-<pre class="comment">
- ➔ JSON-URL-Array <em class="cc6"> [] </em>
- ➔ let items = <em class="cc8"> JSON.parse( xhr.response ); </em>
-</pre>
-
-<H4>[urls] ➔ NodeJS SERVER LOGS</H4>
-
- <pre class="fg6">
-┌──────────────────────────────────────────────────────────────────────────────┐
-│ request_listener: [urls]
-└──────────────────────────────────────────────────────────────────────────────┘
-REQUEST #12  {{{ uri.path=[urls]
- </pre>
- <pre class="fg7">
-  ┌───────────────────────────────────────────────┐
-➔ │ /urls method POST
-  └───────────────────────────────────────────────┘
- </pre>
- <pre class="fg4">
-  ┌─────────────────────────────────────────────────────────────────┐
-  │ handle_request: request=[/urls]
-➔ │ .      domain=[remotetabs.com]
-  └─────────────────────────────────────────────────────────────────┘
-sql_query(response, qtext, uri=[/urls])
-qtext:
-[
-SELECT url FROM site_XPATH ,REGEXP_MATCHES(url, 'remotetabs.com' ) ORDER BY url
-]
- </pre>
- <pre class="fg3">
-queries: ... length=[1]:
-[
-  "SELECT url FROM site_XPATH ,REGEXP_MATCHES(url, 'remotetabs.com' ) ORDER BY url"
-]
- </pre>
- <pre class="fg7">
-  ┌────────────────────────────────────────────────────────────────────────────┐
-… │ POSTGRES  [1 / 1]:
-… │  SELECT url FROM site_XPATH
-… │  , REGEXP_MATCHES(url
-… │  , 'remotetabs.com'
-… │  ) ORDER BY url
-  └────────────────────────────────────────────────────────────────────────────┘
- </pre>
- <pre class="fg6">
-sql_query: 1 pending_queries...
- </pre>
- <pre class="fg5">
-...responding with 23 res.rows:
- </pre>
- <pre class="fg7">
-  ➔ lines_JSON:
-    url : https://developer.mozilla.org
-    url : https://en.m.wikipedia.org
-    url : https://lefigaro.fr
-    url : https://lemonde.fr
-    ...
- </pre>
- <pre class="fg6">
-REQUEST #12  }}} NO MORE pending_queries
- </pre>
-
-</div>
-</details>
-<!--}}}-->
-<br>
-<details id="details_xpaths" class="nodejs_dev_server_logs"><summary><H3>/xpaths (no cmd) <em class="cc3"> FETCH SELECTED PAGE XPATH ARRAY </em></H3></summary> <!--{{{-->
-<div>
-
-<H4>[xpaths] ➔ Expected reply</H4>
-<pre class="comment">
- ➔ JSON-XPATH-Array <em class="cc6"> [] </em>
- ➔ let items = <em class="cc8"> JSON.parse( xhr.response ); </em>
-</pre>
-
-<H4>[xpaths] ➔ NodeJS SERVER LOGS</H4>
-
- <pre class="fg6">
-┌──────────────────────────────────────────────────────────────────────────────┐
-│ request_listener: [xpaths]
-└──────────────────────────────────────────────────────────────────────────────┘
-REQUEST #13  {{{ uri.path=[xpaths]
- </pre>
- <pre class="fg7">
-  ┌───────────────────────────────────────────────┐
-➔ │ /xpaths method POST
-  └───────────────────────────────────────────────┘
- </pre>
- <pre class="fg4">
-  ┌─────────────────────────────────────────────────────────────────┐
-  │ handle_request: request=[/xpaths]
-  │ .         cmd=[xpaths]
-➔ │ .         url=[https://remotetabs.com/]
-  └─────────────────────────────────────────────────────────────────┘
-sql_query(response, qtext, uri=[/xpaths])
-qtext:
-[
-SELECT xpath FROM site_XPATH WHERE url = $$https://remotetabs.com/$$;
-]
- </pre>
- <pre class="fg3">
-queries: ... length=[2]:
-[
-  'SELECT xpath FROM site_XPATH WHERE url = $$https://remotetabs.com/$$',
-  ''
-]
- </pre>
- <pre class="fg7">
-  ┌────────────────────────────────────────────────────────────────────────────┐
-… │ POSTGRES  [1 / 1]:
-… │  SELECT xpath FROM site_XPATH
-… │  WHERE url = $$https://remotetabs.com/$$
-  └────────────────────────────────────────────────────────────────────────────┘
- </pre>
- <pre class="fg6">
-sql_query: 1 pending_queries...
- </pre>
- <pre class="fg5">
-...responding with 3 res.rows:
- </pre>
- <pre class="fg7">
- ➔ lines_JSON:
-   xpath : /html/body/div 4 /section/div 2 /a
-   xpath : /html/body/div 4 /section/p 3
-   xpath : /html/body/div 4 /section/p 6 /span 2 /a 3
- </pre>
- <pre class="fg6">
-REQUEST #13  }}} NO MORE pending_queries
- </pre>
-
-</div>
-</details>
-<!--}}}-->
-<br>
-<details id="details_xpath_delete" class="nodejs_dev_server_logs"><summary><H3>/xpaths {cmd: delete} <em class="cc3"> DELETE PAGE SINGLE XPATH </em> </H3></summary> <!--{{{-->
-<div>
-
-<H4>[xpath] ➔ Expected reply</H4>
-<pre class="comment">
- [ANY ACK-REPLY JSON-Object] <em class="cc2">{...} </em>
-</pre>
-
-<H4>[xpath] ➔ NodeJS SERVER LOGS</H4>
- <pre class="fg6">
-┌──────────────────────────────────────────────────────────────────────────────┐
-│ request_listener: [xpaths]
-└──────────────────────────────────────────────────────────────────────────────┘
-REQUEST #48  {{{ uri.path=[xpaths]
- </pre>
- <pre class="fg7">
-  ┌───────────────────────────────────────────────┐
-➔ │ /xpaths method POST
-  └───────────────────────────────────────────────┘
- </pre>
- <pre class="fg4">
-
-  ┌─────────────────────────────────────────────────────────────────┐
-  │ handle_request: request=[/xpaths]
-  │ .         cmd=[delete]
-➔ │ .         url=[https://remotetabs.com/]
-  │ .       xpath=[/html/body/div[4]/section/p[6]/span[2]/a[3]]
-  │ .        text=[https://groups.google.com/forum/?hl=en#!forum/remotetabs]
-  └─────────────────────────────────────────────────────────────────┘
-sql_query(response, qtext, uri=[/xpaths])
-qtext:
-[
-DELETE       FROM site_XPATH WHERE url = $$https://remotetabs.com/$$ AND xpath=$$/html/body/div[4]/section/p[6]/span[2]/a[3]$$;
-]
- </pre>
- <pre class="fg3">
-
-queries: ... length=[2]:
-[
-  'DELETE       FROM site_XPATH WHERE url = $$https://remotetabs.com/$$ AND xpath=$$/html/body/div[4]/section/p[6]/span[2]/a[3]$$',
-  ''
-]
- </pre>
- <pre class="fg7">
-
-  ┌────────────────────────────────────────────────────────────────────────────┐
-… │ POSTGRES  [1 / 1]:
-… │  DELETE       FROM site_XPATH
-… │  WHERE url = $$https://remotetabs.com/$$
-… │  AND xpath=$$/html/body/div[4]/section/p[6]/span[2]/a[3]$$
-  └────────────────────────────────────────────────────────────────────────────┘
- </pre>
- <pre class="fg6">
-sql_query: 1 pending_queries...
- </pre>
- <pre class="fg4">
-
- ➔ answer:
-   err : NO SQL REPLY TO REQUEST
-   query : DELETE       FROM site_XPATH WHERE url = $$https://remotetabs.com/$$ AND xpath=$$/html/body/div 4 /section/p 6 /span 2 /a 3 $$
-   uri : /xpaths
-...
- </pre>
- <pre class="fg6">
-REQUEST #48  }}} NO MORE pending_queries
- </pre>
-</div>
-</details>
-<!--}}}-->
-<br>
-<details id="details_xpaths_add" class="nodejs_dev_server_logs"><summary><H3>/xpaths {cmd: add} <em class="cc3"> REPLACE PAGE SINGLE XPATH </em> </H3></summary> <!--{{{-->
-<div>
-
-<H4>[xpath] ➔ Expected reply</H4>
-<pre class="comment">
- [ANY ACK-REPLY JSON-Object] <em class="cc2">{...} </em>
-</pre>
-
-<H4>[xpath] ➔ NodeJS SERVER LOGS</H4>
-
- <pre class="fg6">
-┌──────────────────────────────────────────────────────────────────────────────┐
-│ request_listener: [xpaths]
-└──────────────────────────────────────────────────────────────────────────────┘
-REQUEST #61  {{{ uri.path=[xpaths]
- </pre>
- <pre class="fg7">
-  ┌───────────────────────────────────────────────┐
-➔ │ /xpaths method POST
-  └───────────────────────────────────────────────┘
- </pre>
- <pre class="fg4">
-
-  ┌─────────────────────────────────────────────────────────────────┐
-  │ handle_request: request=[/xpaths]
-  │ .         cmd=[add]
-➔ │ .         url=[https://remotetabs.com/]
-  │ .       xpath=[/html/body/div[4]/section/p[6]]
-  │ .        text=[...your input is quite welcome on the following sites:]
-  └─────────────────────────────────────────────────────────────────┘
-sql_query(response, qtext, uri=[/xpaths])
-qtext:
-[
-DELETE       FROM site_XPATH WHERE url = $$https://remotetabs.com/$$ AND xpath=$$/html/body/div[4]/section/p[6]$$;
-INSERT INTO site_XPATH values($$https://remotetabs.com/$$, $$/html/body/div[4]/section/p[6]$$, $$...your input is quite welcome on the following sites:$$);
-]
- </pre>
- <pre class="fg3">
-
-queries: ... length=[3]:
-[
-  'DELETE       FROM site_XPATH WHERE url = $$https://remotetabs.com/$$ AND xpath=$$/html/body/div[4]/section/p[6]$$',
-  'INSERT INTO site_XPATH values($$https://remotetabs.com/$$, $$/html/body/div[4]/section/p[6]$$, $$...your input is quite welcome on the following sites:$$)',
-  ''
-]
- </pre>
- <pre class="fg7">
-
-  ┌────────────────────────────────────────────────────────────────────────────┐
-… │ POSTGRES  [1 / 1]:
-… │  DELETE       FROM site_XPATH
-… │  WHERE url = $$https://remotetabs.com/$$
-… │  AND xpath=$$/html/body/div[4]/section/p[6]$$
-  └────────────────────────────────────────────────────────────────────────────┘
-  ┌────────────────────────────────────────────────────────────────────────────┐
-… │ POSTGRES  [2 / 2]:
-… │  INSERT INTO site_XPATH
-… │  values($$https://remotetabs.com/$$
-… │  , $$/html/body/div[4]/section/p[6]$$
-… │  , $$...your input is quite welcome on the following sites:$$
-… │  )
-  └────────────────────────────────────────────────────────────────────────────┘
- </pre>
- <pre class="fg6">
-sql_query: 2 pending_queries...
- </pre>
- <pre class="fg4">
- ➔ answer:
-   err : NO SQL REPLY TO REQUEST
-   query : DELETE       FROM site_XPATH WHERE url = $$https://remotetabs.com/$$ AND xpath=$$/html/body/div 4 /section/p 6 $$
-   uri : /xpaths
-...
- </pre>
- <pre class="fg6">
-REQUEST #61  }}} NO MORE pending_queries
- </pre>
-
-</div>
-</details>
-<!--}}}-->
-</details>
-<!--}}}-->
-
-<!-- TODO -->
+<!-- ┌─────────────────────────────────────────────────────────────────────┐ -->
+<!-- │ TODO (dev notes)                                                    │ -->
+<!-- └─────────────────────────────────────────────────────────────────────┘ -->
 <!--{{{-->
 <div id="div_notes">
  <details id="todo"> <summary>TODO</summary> <!--{{{-->
@@ -817,8 +518,9 @@ REQUEST #61  }}} NO MORE pending_queries
  </details> <!--}}}-->
 </div>
 <!--}}}-->
-
-<!-- SCRIPT -->
+<!-- ┌─────────────────────────────────────────────────────────────────────┐ -->
+<!-- │ SCRIPT (inline)                                                     │ -->
+<!-- └─────────────────────────────────────────────────────────────────────┘ -->
 <!--{{{-->
  <script>
 /*_ onload {{{*/
@@ -829,12 +531,13 @@ let onload = function()
  title_to_h1();
  //xpath_content.div_tools_init();
  t_details.details_onload();
+
 };
 /*}}}*/
 /*_ title_to_h1 {{{*/
 let title_to_h1 = function()
 {
- let server_index_tag = document.querySelector("HEAD>title").textContent +" (211221:02h:48)";
+ let server_index_tag = document.querySelector("HEAD>title").textContent +" "+xpath_embedded_TAG;
  let               el = document.querySelector("H1");
  el.textContent       = server_index_tag;
 
@@ -879,14 +582,517 @@ let tag_page = function(page_tag)
 /*}}}*/
  </script>
 <!--}}}-->
+<!-- ┌─────────────────────────────────────────────────────────────────────┐ -->
+<!-- │ NodeJS                                                              │ -->
+<!-- └─────────────────────────────────────────────────────────────────────┘ -->
+<hr> <details id="nodejs_dev_server_logs_details" class="nodejs_dev_server_logs"><summary><H2>nodejs_dev_server_logs</H2></summary> <!--{{{-->
+<pre class="comment"> <!--{{{-->
+NodeJS <em class="cc1">server</em> <em>←→</em> <em class="cc2">extension-background-script</em> XHR dialog
 
+These logs are those of the NodeJS server which was used to simulate
+XHR dialogues during the browser extension development.
+
+They can be used to verify the compliance of specified exchanges
+between the server and the extension's background-script.
+
+If necessary, it will be a question of converging the
+requests formulation and their expected responses ...
+
+</pre>
+<!--}}}-->
+<pre class="warning"> <!--{{{-->
+ERROR REPLY:
+ JSON-Object <em class="cc2"> { err: "error message" , ...query } </em>
+</pre>
+<!--}}}-->
+
+<!-- ┌─────────────────────────────────────────────────────────────────────┐ -->
+<!-- │ DOMAINS .. URLS                                                     │ -->
+<!-- └─────────────────────────────────────────────────────────────────────┘ -->
+<HR>
+<details id="details_domains" class="nodejs_dev_server_logs"><summary><H3>/domains <em class="cc3"> FETCH PENDING DOMAINS ARRAY </em></H3></summary> <!--{{{-->
+<div>
+
+<H4>[domains] ➔ Expected reply</H4>
+<pre class="comment">
+ ➔ JSON-URL-Array <em class="cc5"> [] </em>
+ ➔ let items = <em class="cc8"> JSON.parse( xhr.response ); </em>
+</pre>
+
+<H4>[domains] ➔ NodeJS SERVER LOGS</H4>
+
+ <pre class="fg6">
+ ┌──────────────────────────────────────────────────────────────────────────────┐
+ │ request_listener: [domains]
+ └──────────────────────────────────────────────────────────────────────────────┘
+ </pre>
+ <pre class="fg7">
+   ┌───────────────────────────────────────────────┐
+ ➔ │ /domains method POST
+   └───────────────────────────────────────────────┘
+ </pre>
+ <pre class="fg4">
+   ┌─────────────────────────────────────────────────────────────────┐
+   │ handle_request: request=[/domains]
+   └─────────────────────────────────────────────────────────────────┘
+ </pre>
+ <pre class="fg3">
+ queries: ... length=[1]:
+ [
+   'SELECT url FROM site_XPATH ORDER BY url'
+ ]
+ </pre>
+ <pre class="fg7">
+   ┌────────────────────────────────────────────────────────────────────────────┐
+ … │ POSTGRES  [1 / 1]:
+ … │  SELECT url FROM site_XPATH ORDER BY url
+   └────────────────────────────────────────────────────────────────────────────┘
+ </pre>
+ <pre class="fg6">
+ ...responding with 123 res.rows:
+ </pre>
+ <pre class="fg7">
+  ➔ lines_JSON:
+    url : https://developer.mozilla.org
+    url : https://en.m.wikipedia.org
+    url : https://lefigaro.fr
+    url : https://lemonde.fr
+ ...
+ </pre>
+
+</div>
+</details>
+<!--}}}-->
+<br>
+<details id="details_urls" class="nodejs_dev_server_logs"><summary><H3>/urls {domain: url} <em class="cc3"> FETCH SELECTED DOMAIN URL ARRAY </em></H3></summary> <!--{{{-->
+<div>
+
+<H4>[urls] ➔ Expected reply</H4>
+<pre class="comment">
+ ➔ JSON-URL-Array <em class="cc6"> [] </em>
+ ➔ let items = <em class="cc8"> JSON.parse( xhr.response ); </em>
+</pre>
+
+<H4>[urls] ➔ NodeJS SERVER LOGS</H4>
+
+ <pre class="fg6">
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ request_listener: [urls]
+└──────────────────────────────────────────────────────────────────────────────┘
+ </pre>
+ <pre class="fg7">
+  ┌───────────────────────────────────────────────┐
+➔ │ /urls method POST
+  └───────────────────────────────────────────────┘
+ </pre>
+ <pre class="fg4">
+  ┌─────────────────────────────────────────────────────────────────┐
+  │ handle_request: request=[/urls]
+➔ │ .      domain=[remotetabs.com]
+  └─────────────────────────────────────────────────────────────────┘
+ </pre>
+ <pre class="fg3">
+queries: ... length=[1]:
+[
+  'SELECT url FROM site_XPATH ,REGEXP_MATCHES(url, 'remotetabs.com' ) ORDER BY url'
+]
+ </pre>
+ <pre class="fg7">
+  ┌────────────────────────────────────────────────────────────────────────────┐
+… │ POSTGRES  [1 / 1]:
+… │  SELECT url FROM site_XPATH
+… │  , REGEXP_MATCHES(url
+… │  , 'remotetabs.com'
+… │  ) ORDER BY url
+  └────────────────────────────────────────────────────────────────────────────┘
+ </pre>
+ <pre class="fg5">
+...responding with 23 res.rows:
+ </pre>
+ <pre class="fg7">
+  ➔ lines_JSON:
+    url : https://developer.mozilla.org
+    url : https://en.m.wikipedia.org
+    url : https://lefigaro.fr
+    url : https://lemonde.fr
+    ...
+ </pre>
+
+</div>
+</details>
+<!--}}}-->
+
+<!-- ┌─────────────────────────────────────────────────────────────────────┐ -->
+<!-- │ XPATH                                                               │ -->
+<!-- └─────────────────────────────────────────────────────────────────────┘ -->
+<HR>
+<details id="details_xpaths" class="nodejs_dev_server_logs"><summary><H3>/xpaths (no cmd) <em class="cc3"> FETCH SELECTED PAGE XPATH ARRAY </em></H3></summary> <!--{{{-->
+<div>
+
+<H4>[xpaths] ➔ Expected reply</H4>
+<pre class="comment">
+ ➔ JSON-XPATH-Array <em class="cc6"> [] </em>
+ ➔ let items = <em class="cc8"> JSON.parse( xhr.response ); </em>
+</pre>
+
+<H4>[xpaths] ➔ NodeJS SERVER LOGS</H4>
+
+ <pre class="fg6">
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ request_listener: [xpaths]
+└──────────────────────────────────────────────────────────────────────────────┘
+ </pre>
+ <pre class="fg7">
+  ┌───────────────────────────────────────────────┐
+➔ │ /xpaths method POST
+  └───────────────────────────────────────────────┘
+ </pre>
+ <pre class="fg4">
+  ┌─────────────────────────────────────────────────────────────────┐
+  │ handle_request: request=[/xpaths]
+  │ .         cmd=[xpaths]
+➔ │ .         url=[https://remotetabs.com/]
+  └─────────────────────────────────────────────────────────────────┘
+ </pre>
+ <pre class="fg3">
+queries: ... length=[2]:
+[
+  'SELECT xpath FROM site_XPATH WHERE url = $$https://remotetabs.com/$$'
+]
+ </pre>
+ <pre class="fg7">
+  ┌────────────────────────────────────────────────────────────────────────────┐
+… │ POSTGRES  [1 / 1]:
+… │  SELECT xpath FROM site_XPATH
+… │  WHERE url = $$https://remotetabs.com/$$
+  └────────────────────────────────────────────────────────────────────────────┘
+ </pre>
+ <pre class="fg5">
+...responding with 3 res.rows:
+ </pre>
+ <pre class="fg7">
+ ➔ lines_JSON:
+   xpath : /html/body/div 4 /section/div 2 /a
+   xpath : /html/body/div 4 /section/p 3
+   xpath : /html/body/div 4 /section/p 6 /span 2 /a 3
+ </pre>
+
+</div>
+</details>
+<!--}}}-->
+<br>
+<details id="details_xpath_delete" class="nodejs_dev_server_logs"><summary><H3>/xpaths {cmd: delete} <em class="cc3"> DELETE PAGE SINGLE XPATH </em> </H3></summary> <!--{{{-->
+<div>
+
+<H4>[xpath] ➔ Expected reply</H4>
+<pre class="comment">
+ [ANY ACK-REPLY JSON-Object] <em class="cc2">{...} </em>
+</pre>
+
+<H4>[xpath] ➔ NodeJS SERVER LOGS</H4>
+ <pre class="fg6">
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ request_listener: [xpaths]
+└──────────────────────────────────────────────────────────────────────────────┘
+ </pre>
+ <pre class="fg7">
+  ┌───────────────────────────────────────────────┐
+➔ │ /xpaths method POST
+  └───────────────────────────────────────────────┘
+ </pre>
+ <pre class="fg4">
+  ┌─────────────────────────────────────────────────────────────────┐
+  │ handle_request: request=[/xpaths]
+  │ .         cmd=[delete]
+➔ │ .         url=[https://remotetabs.com/]
+  │ .       xpath=[/html/body/div[4]/section/p[6]/span[2]/a[3]]
+  │ .        text=[https://groups.google.com/forum/?hl=en#!forum/remotetabs]
+  └─────────────────────────────────────────────────────────────────┘
+ </pre>
+ <pre class="fg3">
+
+queries: ... length=[2]:
+[
+  'DELETE       FROM site_XPATH WHERE url = $$https://remotetabs.com/$$ AND xpath=$$/html/body/div[4]/section/p[6]/span[2]/a[3]$$'
+]
+ </pre>
+ <pre class="fg7">
+  ┌────────────────────────────────────────────────────────────────────────────┐
+… │ POSTGRES  [1 / 1]:
+… │  DELETE       FROM site_XPATH
+… │  WHERE url = $$https://remotetabs.com/$$
+… │  AND xpath=$$/html/body/div[4]/section/p[6]/span[2]/a[3]$$
+  └────────────────────────────────────────────────────────────────────────────┘
+ </pre>
+ <pre class="fg4">
+
+ ➔ answer:
+   err : NO SQL REPLY TO REQUEST
+   query : DELETE       FROM site_XPATH WHERE url = $$https://remotetabs.com/$$ AND xpath=$$/html/body/div 4 /section/p 6 /span 2 /a 3 $$
+   uri : /xpaths
+...
+ </pre>
+</div>
+</details>
+<!--}}}-->
+<br>
+<details id="details_xpaths_add" class="nodejs_dev_server_logs"><summary><H3>/xpaths {cmd: add} <em class="cc3"> REPLACE PAGE SINGLE XPATH </em> </H3></summary> <!--{{{-->
+<div>
+
+<H4>[xpath] ➔ Expected reply</H4>
+<pre class="comment">
+ [ANY ACK-REPLY JSON-Object] <em class="cc2">{...} </em>
+</pre>
+
+<H4>[xpath] ➔ NodeJS SERVER LOGS</H4>
+
+ <pre class="fg6">
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ request_listener: [xpaths]
+└──────────────────────────────────────────────────────────────────────────────┘
+ </pre>
+ <pre class="fg7">
+  ┌───────────────────────────────────────────────┐
+➔ │ /xpaths method POST
+  └───────────────────────────────────────────────┘
+ </pre>
+ <pre class="fg4">
+  ┌─────────────────────────────────────────────────────────────────┐
+  │ handle_request: request=[/xpaths]
+  │ .         cmd=[add]
+➔ │ .         url=[https://remotetabs.com/]
+  │ .       xpath=[/html/body/div[4]/section/p[6]]
+  │ .        text=[...your input is quite welcome on the following sites:]
+  └─────────────────────────────────────────────────────────────────┘
+ </pre>
+ <pre class="fg3">
+queries: ... length=[3]:
+[
+  'DELETE       FROM site_XPATH WHERE url = $$https://remotetabs.com/$$ AND xpath=$$/html/body/div[4]/section/p[6]$$',
+  'INSERT INTO site_XPATH values($$https://remotetabs.com/$$, $$/html/body/div[4]/section/p[6]$$, $$...your input is quite welcome on the following sites:$$)'
+]
+ </pre>
+ <pre class="fg7">
+  ┌────────────────────────────────────────────────────────────────────────────┐
+… │ POSTGRES  [1 / 1]:
+… │  DELETE       FROM site_XPATH
+… │  WHERE url = $$https://remotetabs.com/$$
+… │  AND xpath=$$/html/body/div[4]/section/p[6]$$
+  └────────────────────────────────────────────────────────────────────────────┘
+  ┌────────────────────────────────────────────────────────────────────────────┐
+… │ POSTGRES  [2 / 2]:
+… │  INSERT INTO site_XPATH
+… │  values($$https://remotetabs.com/$$
+… │  , $$/html/body/div[4]/section/p[6]$$
+… │  , $$...your input is quite welcome on the following sites:$$
+… │  )
+  └────────────────────────────────────────────────────────────────────────────┘
+ </pre>
+ <pre class="fg4">
+ ➔ answer:
+   err : NO SQL REPLY TO REQUEST
+   query : DELETE       FROM site_XPATH WHERE url = $$https://remotetabs.com/$$ AND xpath=$$/html/body/div 4 /section/p 6 $$
+   uri : /xpaths
+...
+ </pre>
+
+</div>
+</details>
+<!--}}}-->
+
+<!-- ┌─────────────────────────────────────────────────────────────────────┐ -->
+<!-- │ TAXONOMY                                                            │ -->
+<!-- └─────────────────────────────────────────────────────────────────────┘ -->
+<HR>
+
+
+
+
+<details id="details_taxonomy" class="nodejs_dev_server_logs">
+<summary><H3>/taxonomy { cmd:<em class="fg3">taxonomy</em> ...} <em class="cc3"> FETCH SELECTED PAGE TAXONOMY ARRAYS </em></H3>
+<pre class="comment">
+ /taxonomy { cmd:<em class="fg3">taxonomy</em> , selected:<em class="fg3">undefined</em> , collected:<em class="fg3">undefined</em> }
+</pre>
+</summary> <!--{{{-->
+<div>
+
+<H4>[taxonomy] ➔ Expected reply</H4>
+<pre class="comment">
+ ➔ JSON-TAXONOMY-selectedArray  <em class="cc6"> [] </em>
+ ➔ JSON-TAXONOMY-collectedArray <em class="cc6"> [] </em>
+ ➔ let items = <em class="cc8"> JSON.parse( xhr.response ); </em>
+</pre>
+
+<H4>[taxonomy] ➔ NodeJS SERVER LOGS</H4>
+
+ <pre class="fg6">
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ request_listener: [taxonomy]
+└──────────────────────────────────────────────────────────────────────────────┘
+ </pre>
+ <pre class="fg7">
+  ┌───────────────────────────────────────────────┐
+➔ │ /taxonomy method POST
+  └───────────────────────────────────────────────┘
+ </pre>
+ <pre class="fg4">
+  ┌─────────────────────────────────────────────────────────────────┐
+  │ handle_request: request=[/taxonomy]
+  │ .         cmd=[taxonomy]
+➔ │ .         url=[https://remotetabs.com/]
+  │ .    selected=[undefined]
+  │ .   collected=[undefined]
+  └─────────────────────────────────────────────────────────────────┘
+ </pre>
+ <pre class="fg3">
+  ┌────────────────────────────────────────────────────────────────────────────┐
+… │ SQL  [1 / 1]:
+… │  SELECT selected
+… │  , collected FROM site_TAXONOMY
+… │  WHERE url = $$https://remotetabs.com/$$
+  └────────────────────────────────────────────────────────────────────────────┘
+ </pre>
+ <pre class="fg5">
+...responding with 1 res.rows:
+ </pre>
+ <pre class="fg7">
+ ➔ lines_JSON:
+   selected : ALL.OTHER
+   ALL.GDPR 
+   collected : ALL.HOME.FURNITURE
+ </pre>
+
+</div>
+</details>
+<!--}}}-->
+
+
+<br>
+<details id="details_taxonomy_update" class="nodejs_dev_server_logs">
+<summary>
+<H3>/taxonomy { cmd:<em class="fg3">taxonomy</em> ...}<em class="cc3"> UPDATE TAXONOMY ARRAYS </em></H3>
+<pre class="comment">
+/taxonomy { cmd:<em class="fg3">taxonomy</em> , selected:<em class="fg3">[ALL.AUTOMOTIVE.EV_CARS]</em> , collected:<em class="fg3">[ALL.HOME]</em> }
+</pre>
+</summary> <!--{{{-->
+<div>
+
+<H4>[taxonomy] ➔ Expected reply</H4>
+<pre class="comment">
+ [ANY ACK-REPLY JSON-Object] <em class="cc2">{...} </em>
+</pre>
+
+<H4>[taxonomy] ➔ NodeJS SERVER LOGS</H4>
+ <pre class="fg6">
+┌──────────────────────────────────────────────────────────────────────────────┐
+│ request_listener: [taxonomy]
+└──────────────────────────────────────────────────────────────────────────────┘
+ </pre>
+ <pre class="fg7">
+  ┌───────────────────────────────────────────────┐
+➔ │ /taxonomy method POST
+  └───────────────────────────────────────────────┘
+ </pre>
+ <pre class="fg4">
+  ┌─────────────────────────────────────────────────────────────────┐
+  │ handle_request: request=[/taxonomy]
+  │ .         cmd=[taxonomy]
+➔ │ .         url=[https://remotetabs.com/]
+  │ .    selected=[ALL.OTHER,ALL.AUTOMOTIVE.EV_CARS]
+  │ .   collected=[ALL.HOME]
+  └─────────────────────────────────────────────────────────────────┘
+ </pre>
+ <pre class="fg7">
+  ┌────────────────────────────────────────────────────────────────────────────┐
+… │ SQL  [1 / 1]:
+… │  DELETE FROM    site_TAXONOMY
+… │  WHERE url = $$https://remotetabs.com/$$
+  └────────────────────────────────────────────────────────────────────────────┘
+  ┌────────────────────────────────────────────────────────────────────────────┐
+… │ SQL  [2 / 2]:
+… │  INSERT INTO    site_TAXONOMY
+… │
+… │  values( $$https://remotetabs.com/$$
+… │  , $$ALL.OTHER
+… │  , ALL.AUTOMOTIVE.EV_CARS$$
+… │  , $$ALL.HOME$$
+… │  ) 
+  └────────────────────────────────────────────────────────────────────────────┘
+ </pre>
+</div>
+</details>
+<!--}}}-->
+
+</details>
+<!--}}}-->
 </body>
 </html>
 
-<!--{{{
+<!-- EMBEDDED {{{
+" EMBEDDED (FILE)
+:!start /b  explorer "file:///c:/LOCAL/DATA/ANDROID/PROJECTS/XPH/xpath_embedded.html"
+:!start /b  explorer "file:///c:/LOCAL/DATA/ANDROID/PROJECTS/iwintoo/TAX/taxo_embedded.html"
+:!start /b  explorer "file:///c:/LOCAL/DATA/ANDROID/PROJECTS/iwintoo/XPH/xpath.html"
+:!start /b  explorer "file:///c:/LOCAL/DATA/ANDROID/PROJECTS/XPH/DOC/xpath_js.html"
+
+" EMBEDDED (ONLINE)
+:!start /b "C:/Program Files (x86)/Google/Chrome/Application/chrome.exe" https://remotetabs.com/dev/XPH/xpath_embedded.html
+
+" SERVER (LOCAL 83..446)
+:!start /b mintty -t %:h -p 0,0 -s 165,54 --exec sh -c "cd %:h; ./server.sh"
+:!start /b "C:/Program Files (x86)/Google/Chrome/Application/chrome.exe"      http://localhost:83/server_index.html
+:!start /b "C:/Program Files (x86)/Google/Chrome/Application/chrome.exe"   http://192.168.1.14:83/server_index.html
+:!start /b "C:/Program Files (x86)/Google/Chrome/Application/chrome.exe" https://192.168.1.14:446/server_index.html
+
 vim sw=4
-:!start "C:/Program Files (x86)/Google/Chrome/Application/chrome.exe" http://localhost:83/server_index.html
-:!start "C:/Program Files (x86)/Google/Chrome/Application/chrome.exe" %:p
-:e manifest.json
 }}}-->
+<!-- tree {{{
+}!!tree -f --dirsfirst | sed -e 's/^/    /' -e 's/\.\///' | grep -E '(embed|javascript|lib|manifest|stylesheet)'
+
+    ├── javascript
+    │   ├── javascript/config.js
+    │
+    │   ├── javascript/event_listeners.js
+    │
+    │   ├── javascript/taxo_content.js
+    │   ├── javascript/taxo_json_201118.js
+    │   ├── javascript/taxo_json_211211.js
+    │   ├── javascript/taxo_tools.js
+    │
+    │   ├── javascript/xpath.js
+    │   ├── javascript/xpath_background.js
+    │   ├── javascript/xpath_content.js
+    │   ├── javascript/xpath_outline.js
+    │   └── javascript/xpath_tools.js
+    │
+    ├── lib
+    │   ├── lib/lib_log.js
+    │   ├── lib/lib_popup.js
+    │   ├── lib/lib_postgres.js
+    │   ├── lib/lib_tools.js
+    │   ├── lib/lib_util.js
+    │   └── lib/t_details.js
+    │
+    ├── stylesheet
+    │   ├── stylesheet/dom_details.css
+    │   ├── stylesheet/dom_host.css
+    │   ├── stylesheet/dom_wot.css
+    │   ├── stylesheet/taxo_tools.css
+    │   └── stylesheet/xpath_tools.css
+    │
+    ├── manifest.json
+    └── xpath_embedded.html
+
+"-------------------------------------------------------------------------------
+}}}-->
+<!-- vim note {{{
+ *
+ * Folding may be activated for editors able to use Vim {{{ and }}} folding markers.
+ *
+ * vim: sw=4 foldmethod=marker
+ *
+}}}-->
+<!--
+:!start /b "C:/Program Files (x86)/Google/Chrome/Application/chrome.exe" %:p
+-->
 

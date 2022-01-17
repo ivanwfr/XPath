@@ -14,7 +14,7 @@
 /* eslint-disable no-warning-comments */
 
 const XPATH_BACKGROUND_SCRIPT_ID    = "xpath_background";
-const XPATH_BACKGROUND_SCRIPT_TAG   =  XPATH_BACKGROUND_SCRIPT_ID  +" (211222:15h:13)";
+const XPATH_BACKGROUND_SCRIPT_TAG   =  XPATH_BACKGROUND_SCRIPT_ID  +" (220106:16h:17)";
 /*}}}*/
 let xpath_background    = (function() {
 "use strict";
@@ -241,9 +241,7 @@ if( log_this) logBIG("4 getFile_reader_handler", 5);
 if( log_this) log_key_val(config.file_name+" ➔ config", config, 3);
 
 if( log_this) log("%c ...calling load_localStorage", "color: orange;");
-
     load_localStorage();
-if( log_this) log_key_val("load_localStorage ➔ config", config, 4);
 
 if( log_this) log_sep_bot(caller, 1);
 };
@@ -596,11 +594,17 @@ if(log_this) log(         response  );
     /*}}}*/
     if( request.options )
     {
+        /* MODIFY CONFIG KEYS */
         for(let i=0; i   < config_js.OPTION_KEYS.length; ++i) {
             let key      = config_js.OPTION_KEYS[i];
             if(typeof request.options[key] != "undefined")
                 options              [key]  =   request.options[key];
         }
+        //Object.keys(request.options).forEach( function(k) { options[k] = JSON.stringify(request.options[k]); });
+
+        if( request.options.     div_tools_xy) options.     div_tools_xy = request.options.     div_tools_xy;
+        if( request.options.taxo_tools_xy) options.taxo_tools_xy = request.options.taxo_tools_xy;
+
         save_localStorage();
 
     }
@@ -725,7 +729,7 @@ if( log_this) logBIG("RESPONSE TO ["+args.cmd+"]:", 5);
 
         let server_args = JSON.parse( JSON.stringify(args) ); /* DEEP COPY */
 if( log_this) log_key_val_group(caller+" server_args", { server_args }, lf7, false);
-if(!log_this) log("\nREQUEST"                          ,   server_args              );
+//(!log_this) log("\nREQUEST"                          , server_args              );
 
         if((args.cmd == "domains") || (args.cmd == "urls"))
             delete server_args.cmd;
@@ -800,7 +804,7 @@ if(log_this) console.table(domains);
 
     /*}}}*/
 if( log_this) log_sep_bot(caller, 3);
-if(!log_this) log("%c➔ domains\n", lbH+lf3,domains);
+//(!log_this) log("%c➔ domains\n", lbH+lf3,domains);
 //  return sendResponse ? true : false; // i.e. ASYNC / SYNC usage of sendResponse
     return false;
 };
@@ -850,7 +854,7 @@ if( log_this) console.table(urls);
 
     /*}}}*/
 if( log_this) log_sep_bot(caller, 4);
-if(!log_this) log("%c➔ urls\n", lbH+lf4, urls);
+//(!log_this) log("%c➔ urls\n", lbH+lf4, urls);
     return sendResponse ? true : false; // i.e. ASYNC / SYNC usage of sendResponse
 };
 /*}}}*/
@@ -911,7 +915,7 @@ if( log_this) console.table(xpaths);
     send_parsed_object_to_content_script(parsed_object,args,xhr,sendResponse);
     /*}}}*/
 if( log_this) log_sep_bot(caller, 5);
-if(!log_this) log("%c➔ xpaths\n", lbH+lf5, xpaths);
+//(!log_this) log("%c➔ xpaths\n", lbH+lf5, xpaths);
     return false;
 };
 /*}}}*/
@@ -972,8 +976,8 @@ if( log_this) console.log("...collected:", collected);
     send_parsed_object_to_content_script(parsed_object,args,xhr,sendResponse);
     /*}}}*/
 if( log_this) log_sep_bot(caller, 6);
-if(!log_this) log("%c➔  selected\n", lbH+lf6,  selected);
-if(!log_this) log("%c➔ collected\n", lbH+lf6, collected);
+//(!log_this) log("%c➔  selected\n", lbH+lf6,  selected);
+//(!log_this) log("%c➔ collected\n", lbH+lf6, collected);
     return false;
 };
 /*}}}*/

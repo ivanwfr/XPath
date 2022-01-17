@@ -1,5 +1,5 @@
 // ┌───────────────────────────────────────────────────────────────────────────┐
-// │ taxo_json.js ========= CONTENT SCRIPT ========== _TAG (211213:14h:19) === │
+// │ taxo_json.js ========= CONTENT SCRIPT ========== _TAG (220106:16h:00) === │
 // └───────────────────────────────────────────────────────────────────────────┘
 /* jshint esversion: 9, laxbreak:true, laxcomma:true, boss:true */ /*{{{*/
 /* exported TAXO_JSON_JS_TAG, taxo_json */
@@ -298,7 +298,7 @@ return JSON.parse(
   },
   {
    "id": "FASHION",
-   "description": "(Mode)",
+   "description": "&#x1F460; (Mode)",
    "list": [
     {
      "id": "BRAND_2",
@@ -1520,7 +1520,7 @@ return JSON.parse(
   },
   {
    "id": "HOME",
-   "description": "(Maison)",
+   "description": "&#x1F3E0; (Maison)",
    "list": [
     {
      "id": "BRAND_5",
@@ -1599,7 +1599,7 @@ return JSON.parse(
     },
     {
      "id": "FURNITURE",
-     "description": "(meubles)",
+     "description": "&#x1F4BA; (meubles)",
      "list": [
       {
        "id": "CURTAINS",
@@ -1660,7 +1660,7 @@ return JSON.parse(
     },
     {
      "id": "ELECTRICITY",
-     "description": "(électricité)",
+     "description": "&#x1F50C; (électricité)",
      "list": [
       {
        "id": "HOUSEHOLD_APPLIANCES",
@@ -1676,7 +1676,7 @@ return JSON.parse(
     },
     {
      "id": "HOME_SERVICES",
-     "description": "(Service Maison)",
+     "description": "&#x1F528; (Service Maison)",
      "list": [
       {
        "id": "REPAIRS",
@@ -2561,6 +2561,20 @@ return JSON.parse(
     javascript/taxo_json.js
     javascript/taxonomy_json.js
 
-    javascript/taxo_pods_html.js
+    javascript/taxo_tools.js
 
+}}}*/
+/* BY LEVEL SAMPLE {{{
+:%g/^           "list"/--t$
+:%g/^         "list"/--t$
+:%g/^       "list"/--t$
+:%g/^     "list"/--t$
+:%g/^   "list"/--t$
+:%g/^ "list"/--t$
+           "id": "RING_MEN",
+         "id": "BATHING_SUIT_MEN",
+       "id": "BATHING_SUIT",
+     "id": "BRAND",
+   "id": "OTHER",
+ "id": "ALL",
 }}}*/

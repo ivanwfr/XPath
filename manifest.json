@@ -20,16 +20,18 @@
             "js"       : [ "lib/lib_log.js"
                 ,          "lib/lib_popup.js"
                 ,          "lib/lib_util.js"
+                ,          "lib/lib_tools.js"
                 ,          "javascript/config.js"
                 ,          "javascript/xpath_outline.js"
-                ,          "javascript/div_tools_html.js"
+                ,          "javascript/xpath_tools.js"
                 ,          "javascript/xpath.js"
 
                 ,          "javascript/taxo_json_211211.js"
-                ,          "javascript/taxo_pods_html.js"
+                ,          "javascript/taxo_tools.js"
 
-                ,          "javascript/taxo_content.js"
                 ,          "javascript/xpath_content.js"
+                ,          "javascript/taxo_content.js"
+                ,          "javascript/event_listeners.js"
             ],
             "css"      : [ "stylesheet/dom_host.css" ]
         }

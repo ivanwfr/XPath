@@ -1,43 +1,41 @@
 // ┌───────────────────────────────────────────────────────────────────────────┐
-// │ [xpath_content] ................................. XPATH CONTENT SCRIPT │
+// │ [xpath_content] ................................ EXTENSION CONTENT SCRIPT │
 // └───────────────────────────────────────────────────────────────────────────┘
 /* jshint esversion: 9, laxbreak:true, laxcomma:true, boss:true {{{*/
 /* globals lib_log, lib_popup */
-/* globals div_tools_html_js */
+/* globals xpath_tools */
 /* globals chrome */
 /* globals console, window, document */
 /* globals setTimeout, clearTimeout */
 /* globals lib_util */
-/* globals xpath_outline */
-/* globals simulate_send_message */
+/* globals lib_tools */
+
 /* globals config_js */
-/* globals xpath_js */
+/* globals event_listeners */ /* eslint-disable-line no-unused-vars */
 /* globals taxo_content */
+/* globals xpath_outline */
+/* globals xpath_js */
+/* globals simulate_send_message */
 
 /* exported XPATH_CONTENT_SCRIPT_TAG */
 
 /* eslint-disable no-warning-comments */
 
-/*}}}*/
-/*{{{*/
 const XPATH_CONTENT_SCRIPT_ID       = "xpath_content";
-const XPATH_CONTENT_SCRIPT_TAG      =  XPATH_CONTENT_SCRIPT_ID  +" (211226:00h:11)";
+const XPATH_CONTENT_SCRIPT_TAG      =  XPATH_CONTENT_SCRIPT_ID  +" (220114:16h:38)";
 /*}}}*/
 let   xpath_content = (function() {
 "use strict";
 
-/*_ get_div_tools {{{*/
-let get_div_tools = function()
-{
-    return lib_util.get_tool("div_tools");
-};
-/*}}}*/
+
+
+const SHADOW_HOST_ID = "shadow_host"; // javascript/xpath_tools.js
+const   DIV_TOOLS_ID =   "div_tools";
 
     // ┌───────────────────────────────────────────────────────────────────────┐
     // │ LOG .. [console] .. [objects] ....................................... │
     // └───────────────────────────────────────────────────────────────────────┘
 /*{{{*/
-
 /* eslint-disable no-unused-vars */
 /*_ {{{*/
 //let lib_log = {};
@@ -135,95 +133,106 @@ div_tools_require_lib_log();
 /*}}}*/
 
     // ┌───────────────────────────────────────────────────────────────────────┐
-    // │ CONFIG [config.json] ................................. chrome.runtime │
+    // │ TOOLS .. [shadow_host] [shadow_root] ................................ │
     // └───────────────────────────────────────────────────────────────────────┘
 /*{{{*/
-     let config = { "SERVER_URL"   : "SERVER_URL"
-        ,          "TEXT_LEN_MAX" :  96
-
-        ,          "CMD_DOMAINS"  : "domains"
-        ,          "CMD_URLS"     : "urls"
-        ,          "CMD_XPATHS"   : "xpaths"
-        ,          "CMD_TAXONOMY" : "taxonomy"
-
-        ,          "CMD_ADD"      : "add"
-        ,          "CMD_DELETE"   : "delete"
-
-        ,       "ACTION_REPLACED" : "replaced"
-    };
-
+/* eslint-disable no-unused-vars */
+let get_used_shadow_host_id = (     ) => lib_tools.get_used_shadow_host_id(SHADOW_HOST_ID);
+let get_shadow_host         = (     ) => lib_tools.get_shadow_host        (SHADOW_HOST_ID);
+let get_shadow_root         = (     ) => lib_tools.get_shadow_root        (SHADOW_HOST_ID);
+let get_div_tools           = (     ) => lib_tools.get_div_tools          (DIV_TOOLS_ID,SHADOW_HOST_ID);
+let get_is_a_div_tools_el   = (el   ) => lib_tools.get_is_a_div_tools_el  (DIV_TOOLS_ID, el);
+let get_use_lib_shadow_root = (     ) => lib_tools.get_use_lib_shadow_root();
+let set_use_lib_shadow_root = (state) => lib_tools.set_use_lib_shadow_root(state);
+/* eslint-ensable no-unused-vars */
 /*}}}*/
 
     // ┌───────────────────────────────────────────────────────────────────────┐
-    // │ LOAD ................................... javascript/div_tools_html.js │
+    // │ LOAD ...................................... javascript/xpath_tools.js │
     // └───────────────────────────────────────────────────────────────────────┘
 /*➔ div_tools_init .. (listeners) {{{*/
 /*{{{*/
 const DIV_TOOLS_XY                = { x: 32 , y: 32 };
-let   CAPTURE_TRUE_PASSIVE_FALSE  = {capture:true, passive:false};
+const CAPTURE_TRUE_PASSIVE_FALSE  = {capture:true, passive:false};
 
-//t div_tools;
-let activated;
 /*}}}*/
 let div_tools_init = function(request={})
 {
+
 /*{{{*/
-let   caller = "div_tools_init";
-let log_this = options.LOG5_DIV_TOOLS;
+let   caller = XPATH_CONTENT_SCRIPT_ID+".div_tools_init";
+let log_this = options.LOG1_EVENT || options.LOG5_DIV_TOOLS;
 
-if( log_this) log_key_val_group(caller+":(request)", request);
-
+if(options.LOG1_EVENT) logBIG(XPATH_CONTENT_SCRIPT_ID+" ➔ "+caller, 7);
+//console.trace()
+//log("request:", request)
 /*}}}*/
-    /* POPUP [EMBEDDED OR EXTENSION] {{{*/
-    let is_embedded = lib_log.is_embedded( XPATH_CONTENT_SCRIPT_ID   );
+    /* [set_use_lib_shadow_root] {{{*/
+    if(request && (typeof request.use_lib_shadow_root != "undefined"))
+        set_use_lib_shadow_root( request.use_lib_shadow_root );
 
-if(log_this) lib_popup.log_popup(is_embedded ? "RUNNING ENBEDDED SCRIPT" : "RUNNING BROWSER EXTENSION");
     /*}}}*/
-    /* ON [message] .. GET ACTIVATED STATE FROM BACKGROUND SCRIPT {{{*/
-    if(!is_embedded && !request.activated)
+    /* [already called once] {{{*/
+    let div_tools = get_div_tools();
+    if( div_tools )
     {
-if(log_this) log("%c GET ACTIVATED STATE FROM BACKGROUND SCRIPT", lbH+lf9);
-        add_message_listener();
-
-if(options.LOG3_SERVER) log_query_step("EXTENSION", caller);
-
-        send_message({ activated : "undefined" }, caller);
-
+        console.warn("...already called once"); console.trace();
         return;
     }
     /*}}}*/
-    /* EMBEDDED .. LOAD OPTIONS {{{*/
-    else if( is_embedded )
+    /* EMBEDDED {{{*/
+    let is_embedded = lib_log.is_embedded( XPATH_CONTENT_SCRIPT_ID   );
+    if( is_embedded )
     {
-        on_activated_load_options();
+if(log_this) lib_popup.log_popup(is_embedded ? "RUNNING ENBEDDED SCRIPT" : "RUNNING BROWSER EXTENSION");
+
+        /* LOAD OPTIONS FROM localStorage */
+        on_activated_load_options( request );
+
+        set_use_lib_shadow_root( options.use_lib_shadow_root );
+    }
+    /*}}}*/
+    /* ACTIVATED {{{*/
+    else if(!request.activated)
+    {
+if(log_this) log("%c GET ACTIVATED STATE FROM BACKGROUND SCRIPT", lbH+lf9);
+if(options.LOG3_SERVER) log_query_step("EXTENSION", caller);
+
+        query_active_state();
+        return;
     }
     /*}}}*/
     /* INJECT DIV_TOOLS HTML {{{*/
-if(log_this) logBIG("➔ ADDING DIV_TOOLS HTML", 1);
 
-    div_tools_html_js.inject_shadow_root();
+if(options.LOG1_EVENT) logBIG(XPATH_CONTENT_SCRIPT_ID+" ➔ ADDING DIV_TOOLS HTML", 7);
+
+    xpath_tools.inject_shadow_root(log_this);
+    div_tools = get_div_tools();
+if(options.LOG1_EVENT) logBIG("...div_tools=["+lib_util.get_id_or_tag(div_tools)+"]", 7);
 
 //  /* [log_popup_div] [div_mask] into [shadow_host] {{{*/
 //  let log_popup_div = lib_popup.log_popup_div_get();
 //  let div_mask      = lib_popup.div_mask_get();
 
-    let shadow_host   = document.getElementById( lib_util.SHADOW_HOST_ID );
-
+//  let shadow_host   = document.getElementById( get_used_shadow_host_id() );
 //  shadow_host.appendChild( log_popup_div );
 //  shadow_host.appendChild( div_mask      );
 //  /*}}}*/
 
-    let div_tools = get_div_tools();
-//console.log("...div_tools:",div_tools);
-//console.dir(                div_tools);
+
     lib_util.add_el_class(div_tools, XPATH_CONTENT_SCRIPT_ID);
+    /*}}}*/
+    /* [xpath_tools_xy] {{{*/
+    let xy = ( lib_log.is_embedded(XPATH_CONTENT_SCRIPT_ID) ) ? lib_util.localStorage_getItem("xpath_tools_xy")
+        :    (request && request.     xpath_tools_xy          ) ?                      request.xpath_tools_xy
+        :    "" ;
+//console.log(               "xy=["+xy+"]")
+    if(!xy)   xy  = { x:12 , y:12 };
+    if(typeof xy == "string") xy = JSON.parse( xy );
+//console.log("xpath_tools_xy=["+xy.x+" , "+xy.y+"]")
 
-    let      xy = lib_util.localStorage_getItem("div_tools_xy");
-    if( xy ) xy = JSON.parse( xy );
-if( log_this) console.log(XPATH_CONTENT_SCRIPT_ID+".xy:", xy);
-    div_tools.style.left = (xy ? xy.x : DIV_TOOLS_XY.x)+"px";
-    div_tools.style.top  = (xy ? xy.y : DIV_TOOLS_XY.y)+"px";
-
+    load_div_tools_xy( xy );
+    /*}}}*/
 
 //  let docked = true;
 //  xpath_outline.div_xpaths_sync_GUI( docked );
@@ -231,7 +240,6 @@ if( log_this) console.log(XPATH_CONTENT_SCRIPT_ID+".xy:", xy);
     div_tools_confine_to_viewport();
 
     lib_util.add_el_class(div_tools,"movable");
-    /*}}}*/
     /* [EMBEDDED ➔ set_activated] .. (EXTENSION ➔ BACKGROUND-SCRIPT ➔ set_activated) {{{*/
     if( is_embedded )
     {
@@ -243,98 +251,174 @@ if(options.LOG3_SERVER) log_query_step("EMBEDDED", caller);
     }
     /*}}}*/
     /* ADD EVENT LISTENERS {{{*/
-    div_tools_init_add_listeners();
+//  @see javascript/event_listeners.js
+
 
     /*}}}*/
-    /* HIDE until actiated {{{*/
-    if(!activated)
+    /* ACTIVE STATE QUERY {{{*/
+    if( !is_activated )
     {
-        shadow_host = document.getElementById( lib_util.SHADOW_HOST_ID );
+        let shadow_host = document.getElementById( get_used_shadow_host_id() );
         shadow_host.style.display = "none";
+
     }
     /*}}}*/
     xpath_outline.set_config( config );
 };
 /*}}}*/
-/*_ div_tools_init_add_listeners {{{*/
-let div_tools_init_add_listeners = function()
+/*➔ load_div_tools_xy {{{*/
+let load_div_tools_xy = function(xy)
 {
 /*{{{*/
-let   caller = "div_tools_init_add_listeners";
-let log_this = options.LOG5_DIV_TOOLS;
+let   caller = "load_div_tools_xy";
+let log_this = options.LOG6_MOVE_TOOL;
 
-let div_tools = get_div_tools();
-if( log_this) log(caller+": div_tools=["+lib_util.get_id_or_tag(div_tools)+"]");
-if( log_this) console.dir(div_tools);
+if( log_this ) log(caller+"("+xy+")");
 /*}}}*/
-    /* ON [ORIENTATION] {{{*/
-    window.addEventListener("orientationchange", div_tools_onOrientationchange_CB);
+    /* LAYOUT [div_tools] {{{*/
+    let div_tools = get_div_tools();
+    lib_util.add_el_class(div_tools,XPATH_CONTENT_SCRIPT_ID);
+    if(!div_tools) return;
 
     /*}}}*/
-    /* ON [RESIZE] {{{*/
-    window.addEventListener("resize"  , div_tools_onResize_CB);
+    /* [xy] {{{*/
+if( log_this) log("xy:", xy);
 
-    /*}}}*/
-    /* ON [KEY] {{{*/
-    window.addEventListener("keydown"  , div_tools_onKey_CB);
+    xy.x = Math.max(xy.x, 12);
+    xy.x = Math.min(xy.x, window.innerWidth  - 64);
 
-    /*}}}*/
-    /* ON [beforeunload] .. LOAD {{{*/
-if(log_this) logBIG("➔ ADDING [beforeunload] LISTENER", 6);
-        window.addEventListener("beforeunload", div_tools_beforeunload, CAPTURE_TRUE_PASSIVE_FALSE);
+    xy.y = Math.max(xy.y, 12);
+    xy.y = Math.min(xy.y, window.innerHeight - 64);
 
+    div_tools.style.left = (xy ? xy.x : DIV_TOOLS_XY.x)+"px";
+    div_tools.style.top  = (xy ? xy.y : DIV_TOOLS_XY.y)+"px";
     /*}}}*/
-    /* ON [touchstart] OR [mousedown] {{{*/
+};
+/*}}}*/
+/*➔ save_div_tools_xy {{{*/
+let save_div_tools_xy = function(_caller)
+{
+let caller = "save_div_tools_xy";
+let log_this = options.LOG5_DIV_TOOLS || options.LOG6_MOVE_TOOL;
+if( log_this) log(XPATH_CONTENT_SCRIPT_ID+"."+caller+"("+_caller+")");
+
+    let div_tools = get_div_tools();
+    let        xy = { x: div_tools.offsetLeft , y: div_tools.offsetTop };
+if( log_this) log("xy",xy);
+
+    if( !xy.x && !xy.y) return;
+
+    if( lib_log.is_embedded(XPATH_CONTENT_SCRIPT_ID) )
+    {
+        lib_util.localStorage_setItem("xpath_tools_xy", JSON.stringify(xy));
+    }
+    else {
+        options.xpath_tools_xy = xy;
+        send_message( { caller: _caller , options }, caller);
+    }
+};
+/*}}}*/
+
+    // ┌───────────────────────────────────────────────────────────────────────┐
+    // │ EVENT LISTENERS ..................................................... │
+    // └───────────────────────────────────────────────────────────────────────┘
+/*_ div_tools_add_onmove_listener {{{*/
+/*{{{*/
+let     moving_EL;
+
+/*}}}*/
+let div_tools_add_onmove_listener = function(el)
+{
+/*{{{*/
+let   caller = "div_tools_add_onmove_listener";
+let log_this = options.LOG6_MOVE_TOOL;
+
+if(log_this) log("%c"+caller+"("+lib_util.get_id_or_tag(el)+")", lbH+lf4);
+/*}}}*/
+    /* GET - MOVE DATA {{{*/
+    moving_EL          = el;
+    moving_EL.onDown_X = moving_EL.offsetLeft;
+    moving_EL.onDown_Y = moving_EL.offsetTop;
+
+    lib_util.add_el_class(moving_EL, "pressed");
+if(log_this) log("%c...moving_EL.onDown_XY=["+moving_EL.onDown_X+" "+moving_EL.onDown_Y+"]", lf3);
+    /*}}}*/
+    /* ADD - TOUCH MOVE LISTENER {{{*/
     let on_touch_device = ("ontouchstart" in document.documentElement);
     if( on_touch_device )
     {
-if(log_this) logBIG("➔ ADDING [touch] LISTENERS", 3);
-
-        document.documentElement.addEventListener("touchstart", div_tools_onDown , CAPTURE_TRUE_PASSIVE_FALSE);
-        document.documentElement.addEventListener("touchend"  , div_tools_onUp   , CAPTURE_TRUE_PASSIVE_FALSE);
-        document.documentElement.addEventListener("touchend"  , div_tools_onUp   , CAPTURE_TRUE_PASSIVE_FALSE);
-//      div_tools               .addEventListener("touchstart", div_tools_onDown , CAPTURE_TRUE_PASSIVE_FALSE);
-//      div_tools               .addEventListener("touchend"  , div_tools_onUp   , CAPTURE_TRUE_PASSIVE_FALSE);
-//      window                  .addEventListener("touchend"  , div_tools_onUp   , CAPTURE_TRUE_PASSIVE_FALSE); /* off viewport release */
-    }
-    else {
-if(log_this) logBIG("➔ ADDING [mouse] LISTENERS", 4);
-
-        document.documentElement.addEventListener("mousedown" , div_tools_onDown , CAPTURE_TRUE_PASSIVE_FALSE);
-        document.documentElement.addEventListener("mouseup"   , div_tools_onUp   , CAPTURE_TRUE_PASSIVE_FALSE);
-        window                  .addEventListener("mouseup"   , div_tools_onUp   , CAPTURE_TRUE_PASSIVE_FALSE); /* off viewport release */
-//      div_tools               .addEventListener("mousedown" , div_tools_onDown , CAPTURE_TRUE_PASSIVE_FALSE);
-//      div_tools               .addEventListener("mouseup"   , div_tools_onUp   , CAPTURE_TRUE_PASSIVE_FALSE);
-//      window                  .addEventListener("mouseup"   , div_tools_onUp   , CAPTURE_TRUE_PASSIVE_FALSE); /* off viewport release */
+if(options.LOG1_EVENT) logBIG("➔ ADDING [touchmove] LISTENER on ["+lib_util.get_id_or_tag(moving_EL)+"]", 4);
+//      moving_EL.addEventListener("touchmove", div_tools_onMove  , CAPTURE_TRUE_PASSIVE_FALSE);
+        window   .addEventListener("touchmove", div_tools_onMove  , CAPTURE_TRUE_PASSIVE_FALSE);
     }
     /*}}}*/
-    /* ON [click] {{{*/
+    /* ADD - MOUSE MOVE LISTENER {{{*/
+    else {
+if(options.LOG1_EVENT) logBIG("➔ ADDING [mousemove] LISTENER on ["+lib_util.get_id_or_tag(moving_EL)+"]", 5);
+
+        window   .addEventListener("mousemove", div_tools_onMove  , CAPTURE_TRUE_PASSIVE_FALSE);
+    }
+    /*}}}*/
+    /* DEL - SCROLL LISTENER {{{*/
+if(log_this) log("%c...REMOVING [scroll]    LISTENER", lf8);
+
+    window       .removeEventListener("scroll"   , div_tools_onScroll, CAPTURE_TRUE_PASSIVE_FALSE);
+
+if(log_this) log_caller();
+    /*}}}*/
+};
+/*}}}*/
+/*_ div_tools_del_onmove_listener {{{*/
+let div_tools_del_onmove_listener = function()
+{
+/*{{{*/
+let   caller = "div_tools_del_onmove_listener";
+let log_this = options.LOG6_MOVE_TOOL;
+
+
+if(!moving_EL) return;
+if(log_this) log("%c"+caller+"("+lib_util.get_id_or_tag(moving_EL)+")", lbH+lf4);
+
+if(log_this) log("%c...moving_EL.offsetXY=["+moving_EL.offsetLeft+" "+moving_EL.offsetTop+"]", lf3);
+/*}}}*/
+    /* DEL - TOUCH MOVE LISTENER {{{*/
+    let on_touch_device = ("ontouchstart" in document.documentElement);
     if( on_touch_device )
     {
-        div_tools.addEventListener("touchend"  , div_tools_onClick, CAPTURE_TRUE_PASSIVE_FALSE);
+if(log_this) log("%c...REMOVING [touchmove] LISTENER on ["+lib_util.get_id_or_tag(moving_EL)+"]", lf8);
+//      moving_EL.removeEventListener("touchmove", div_tools_onMove  , CAPTURE_TRUE_PASSIVE_FALSE);
+        window   .removeEventListener("touchmove", div_tools_onMove  , CAPTURE_TRUE_PASSIVE_FALSE);
     }
+    /*}}}*/
+    /* DEL - MOUSE MOVE LISTENER {{{*/
     else {
-if(log_this) logBIG("➔ ADDING [click] LISTENER", 3);
+        if(log_this) log("%c...REMOVING [mousemove] LISTENER on ["+lib_util.get_id_or_tag(moving_EL)+"]", lbR+lf0);
 
-        document.documentElement.addEventListener("click"     , div_tools_onClick, CAPTURE_TRUE_PASSIVE_FALSE);
-//      div_tools               .addEventListener("click"     , div_tools_onClick, CAPTURE_TRUE_PASSIVE_FALSE);
-//      window                  .addEventListener("click"     , div_tools_onClick, CAPTURE_TRUE_PASSIVE_FALSE);
+        window   .removeEventListener("mousemove", div_tools_onMove  , CAPTURE_TRUE_PASSIVE_FALSE);
     }
+    /*}}}*/
+    /* ADD - SCROLL LISTENER {{{*/
+if(options.LOG1_EVENT) logBIG("➔ ADDING [scroll]    LISTENER", 6);
+
+    window.addEventListener   ("scroll"   , div_tools_onScroll, CAPTURE_TRUE_PASSIVE_FALSE);
+    /*}}}*/
+    /* CLR - MOVE DATA {{{*/
+    delete moving_EL.onDown_X;
+    delete moving_EL.onDown_Y;
+    lib_util.del_el_class(moving_EL, "pressed");
+
+    moving_EL = null;
     /*}}}*/
 };
 /*}}}*/
 
     // ┌───────────────────────────────────────────────────────────────────────┐
-    // │ EVENT DOWN MOVE UP CLICK RESIZE KEY SCROLL                            │
+    // │ EVENT HANDLERS .. [DOWN MOVE UP CLICK RESIZE KEY SCROLL] ............ │
     // └───────────────────────────────────────────────────────────────────────┘
 /*{{{*/
 /* DOWN */
 /*{{{*/
 /*_ div_tools_onDown {{{*/
-/*{{{*/
-let has_moved;
-
-/*}}}*/
 let div_tools_onDown = function(e)
 {
 /*{{{*/
@@ -354,30 +438,30 @@ if(e.ctrlKey) {
 /*}}}*/
 let log_this = options.LOG5_DIV_TOOLS || options.LOG6_MOVE_TOOL;
 
-let div_tools =  get_div_tools();
-let e_target  =  lib_util.get_event_target(e);
-let tool_name =  lib_util.get_id_or_tag_and_className(e_target);
-let is_a_tool =  div_tools.contains(e_target);
+if(options.LOG1_EVENT) logBIG(caller,6);
+/*}}}*/
+    /* [is_a_tool] {{{*/
+    let div_tools = get_div_tools();
+    if(!div_tools) return;
 
-if( log_this) log("%c"+caller+": ..."+div_tools.id+"%c contains "+tool_name+"%c "+   is_a_tool
-                  ,lbL+lf4                         ,lbR                     ,lbH+lfX[is_a_tool ? 5:8]);
+    let e_target  = lib_util.get_event_target(e);
+    let tool_name = lib_util.get_id_or_tag_and_className(e_target);
+    let is_a_tool = get_is_a_div_tools_el(e_target);
+
+if( log_this) log("%c"+caller+"%c"+tool_name+"%c is "+(is_a_tool ? "a":"not a")+" child of %c"+DIV_TOOLS_ID
+                  ,lbL+lf3    ,lbC           ,lbC+lfX[ is_a_tool ? 5:8]                   ,lbR+lf3         );
 /*{{{
 console.log("...div_tools:",div_tools );
 console.dir(                div_tools );
 console.log("....e_target:",e_target  );
+console.log("....e_target.parentElement:",e_target.parentElement);
 console.log("....e.path[0]:",e.path[0]);
 console.dir(e);
 }}}*/
 
-if(!is_a_tool ) return;
-/*}}}*/
-    /* ONDOWN XY {{{*/
-    div_tools_del_onmove_listener();
-
-    lib_util.set_onDown_XY(e, caller);
-    has_moved = false;
+    if(!is_a_tool ) return;
     /*}}}*/
-    /* on_touch_device {{{*/
+    /*  on_touch_device .. div_tools_preventScrolling {{{*/
     let on_touch_device = ("ontouchstart" in document.documentElement);
     if( on_touch_device )
     {
@@ -391,6 +475,86 @@ if(!is_a_tool ) return;
         div_tools_add_onmove_listener( moving_target );
     }
     /*}}}*/
+    lib_util.set_onDown_XY(e, caller);
+};
+/*}}}*/
+/*_ div_tools_onDown_moving_target {{{*/
+/*{{{*/
+const FONTSIZE_DEFAULT = 12;
+
+/*}}}*/
+let div_tools_onDown_moving_target = function(e,moving_target)
+{
+if(options.LOG1_EVENT) logBIG("div_tools_onDown_moving_target",6);
+/*{{{*/
+let   caller = "div_tools_onDown_moving_target";
+let log_this = options.LOG5_DIV_TOOLS || options.LOG6_MOVE_TOOL;
+
+let e_target = lib_util.get_event_target(e, log_this);
+if( log_this) log(caller+": %c("+e.type+" ON "+lib_util.get_id_or_tag_and_className(e_target)+")", lf1);
+//console.log("moving_target:", moving_target)
+/*}}}*/
+    /* [moving_target] {{{*/
+    if(!moving_target) return null;
+
+    /*}}}*/
+    /* movable [moving_target] .. up from [e_target] {{{*/
+    let is_a_tool = lib_util.is_el_child_of_id(e_target, moving_target.id);
+    if(!is_a_tool )
+    {
+        let tool_name = lib_util.get_id_or_tag_and_className( e_target );
+
+if( log_this) log("%c"+caller+"%c"+tool_name+"%c is "+(is_a_tool ? "a":"not a")+" child of %c"+moving_target
+                  ,lbL+lf3    ,lbC           ,lbC+lfX[ is_a_tool ? 5:8]                   ,lbR+lf3          );
+
+        return null;
+    }
+    /*}}}*/
+//  div_tools_onDown_adjust_transformOrigin(e, moving_target);
+    return moving_target;
+};
+/*}}}*/
+/*_ div_tools_onDown_adjust_transformOrigin {{{*/
+let div_tools_onDown_adjust_transformOrigin = function(e,moving_target)
+{
+/*{{{*/
+let   caller = "div_tools_onDown_adjust_transformOrigin";
+let log_this = options.LOG5_DIV_TOOLS || options.LOG6_MOVE_TOOL;
+
+/*}}}*/
+    /* [transformOrigin] drift towards view center */
+    /* NOTE: [transformOrigin] is not used when [fontSize] does the scaling */
+
+    /* [click-to-origin-offset] */
+    let event_xy    = lib_util.get_event_XY(e               );
+    let e_target_xy = lib_util.get_el_xy   (moving_target, caller);
+
+    let          dx = (event_xy.x - e_target_xy.x);
+    let          dy = (event_xy.y - e_target_xy.y);
+
+    /* [transformOrigin] */
+    let   x_percent = (100 * dx / moving_target.offsetWidth ).toFixed(2);
+    let   y_percent = (100 * dy / moving_target.offsetHeight).toFixed(2);
+    moving_target.style.transformOrigin = x_percent+"% "+ y_percent+"%";
+
+    /* scale .. f(fontSize) */
+    let fontSize    = parseFloat( moving_target.style.fontSize );
+    let scale       = fontSize / FONTSIZE_DEFAULT;
+
+/*{{{*/
+if(log_this)
+    log_key_val_group( caller
+        , {     moving_target
+           ,    event_xy
+           ,    e_target_xy
+           ,    dx
+           ,    dy
+           ,    transformOrigin : moving_target.style.transformOrigin
+           ,    fontSize
+           ,    scale
+        }, lf4, true);
+
+/*}}}*/
 };
 /*}}}*/
 /*_ div_options_toggle {{{*/
@@ -406,67 +570,13 @@ let div_options_toggle = function()
     ;
 };
 /*}}}*/
-/*_ div_tools_onDown_moving_target {{{*/
-/*{{{*/
-const FONTSIZE_DEFAULT = 12;
-
 /*}}}*/
-let div_tools_onDown_moving_target = function(e,moving_target)
+/* RESIZE */
+/*_ div_tools_onResize {{{*/
+let div_tools_onResize = function(e) /* eslint-disable-line no-unused-vars */
 {
-/*{{{*/
-let   caller = "xpath_content.div_tools_onDown_moving_target";
-let log_this = options.LOG6_MOVE_TOOL;
-
-let e_target = lib_util.get_event_target(e);
-if( log_this) log(caller+": %c("+e.type+" ON "+lib_util.get_id_or_tag_and_className(e_target)+")", lf1);
-/*}}}*/
-    /* movable [moving_target] .. up from [e_target] {{{*/
-    if(!moving_target) return null;
-
-    if(!lib_util.is_el_child_of_id(e_target, moving_target.id) )
-    {
-if( log_this) log("NOT A CHILD OF ["+moving_target.id+"]");
-
-        return null;
-    }
-    /*}}}*/
-    /* [transformOrigin] drift towards view center {{{*/
-    /* NOTE: [transformOrigin] is not used when [fontSize] does the scaling */
-
-    /* [click-to-origin-offset] */
-    let event_xy    = lib_util.get_event_XY(e               );
-    let e_target_xy = lib_util.get_el_xy   (moving_target, caller);
-
-    let          dx = (event_xy.x - e_target_xy.x);
-    let          dy = (event_xy.y - e_target_xy.y);
-
-    /* [transformOrigin] */
-    let   x_percent = (100 * dx / moving_target.offsetWidth ).toFixed(2);
-    let   y_percent = (100 * dy / moving_target.offsetHeight).toFixed(2);
-    moving_target.style.transformOrigin = x_percent+"% "+ y_percent+"%";
-
-    /* [fontSize] */
-    let fontSize    = parseFloat( moving_target.style.fontSize );
-    let scale       = fontSize / FONTSIZE_DEFAULT;
-
-    /*}}}*/
-/*{{{*/
-if(log_this)
-    log_key_val_group( caller
-        , {     moving_target
-           ,    event_xy
-           ,    e_target_xy
-           ,    dx
-           ,    dy
-           ,    transformOrigin : moving_target.style.transformOrigin
-           ,    fontSize
-           ,    scale
-        }, lf4, false);
-
-/*}}}*/
-    return moving_target;
+    div_tools_confine_to_viewport();
 };
-/*}}}*/
 /*}}}*/
 /* ORIENTATION */
 /*_ div_tools_onOrientationchange_CB {{{*/
@@ -475,20 +585,189 @@ let div_tools_onOrientationchange_CB = function(e) /* eslint-disable-line no-unu
     div_tools_confine_to_viewport();
 };
 /*}}}*/
-/* RESIZE */
-/*_ div_tools_onResize_CB {{{*/
-let div_tools_onResize_CB = function(e) /* eslint-disable-line no-unused-vars */
-{
-    div_tools_confine_to_viewport();
-};
-/*}}}*/
 /* MOVE */
+/*{{{*/
+const BUTTONS_FONT_SIZE                   = 64; /* eslint-disable-line no-unused-vars */
+const BUTTONS_FONT_SIZE_MIN               =  6;
+let   buttons_fontSize                    = BUTTONS_FONT_SIZE_MIN;
+
+const DIV_TOOLS_CONFINE_TO_VIEWPORT_DELAY = 500;
+const MOVE_MARGIN_D                       =  16;
+const MOVE_MARGIN_L                       =   4;
+const MOVE_MARGIN_R                       =  32;
+const MOVE_MARGIN_U                       =   4;
+let   div_tools_confine_to_viewport_timer;
+
+/*}}}*/
 /*_ div_tools_onMove {{{*/
 let div_tools_onMove = function(e)
 {
-    moving_EL_onMove(e);
+/*{{{*/
+    moving_EL = moving_EL || e.path[0];
+if(!moving_EL) return;
+
+let   caller = "div_tools_onMove";
+let log_this = options.LOG5_DIV_TOOLS || options.LOG6_MOVE_TOOL;
+
+if( log_this ) caller += "("+e.type+")";
+/*}}}*/
+    /* [has_moved] ➔ [pressed] {{{*/
+    let movement = lib_util.set_onMove_XY(e);
+if( log_this &&  movement.has_moved) log("%c...[has_moved "+  movement.has_moved +"]", lf6);
+//log_key_val_group("movement", movement)
+    if( movement.has_moved )
+    {
+        lib_util.add_el_class(moving_EL, "pressed");
+
+        let e_target = lib_util.get_event_target(e);
+if( log_this) logBIG(caller+": .. "+lib_util.get_id_or_tag(e_target)+" has_moved ");
+    }
+    /*}}}*/
+    /* MOVE [moving_EL] {{{*/
+    let x =              moving_EL.onDown_X + movement.dxy.x ;
+    let y =              moving_EL.onDown_Y + movement.dxy.y ;
+
+    div_tools_move_EL_XY(moving_EL, x, y);
+    /*}}}*/
+    /*  [taxo_layout_cluster] {{{*/
+    call_taxo_layout_cluster( moving_EL );
+
+    /*}}}*/
 };
 /*}}}*/
+/*_ call_taxo_layout_cluster {{{*/
+/* eslint-disable no-undef */
+/*{{{*/
+let taxo_layout_cluster;
+let taxo_layout_cluster_timeout;
+
+/*}}}*/
+let call_taxo_layout_cluster = function(_moving_EL)
+{
+    if( taxo_layout_cluster == undefined)
+        taxo_layout_cluster
+            =  (typeof taxo_content != "undefined")
+            ?          taxo_content.layout_cluster
+            :                       null;
+
+    if(taxo_layout_cluster == null) return;
+
+    if( taxo_layout_cluster_timeout ) clearTimeout(      taxo_layout_cluster_timeout         );
+    /**/taxo_layout_cluster_timeout =   setTimeout(() => taxo_layout_cluster({ moving_EL: _moving_EL }), 250);
+};
+/* eslint-ensable no-undef */
+/*}}}*/
+/*_ div_tools_move_EL_XY {{{*/
+let div_tools_move_EL_XY = function(el, x,y)
+{
+    if(!el) return; // may happen when both extension an embedded are running
+let caller = "div_tools_move_EL_XY"; // eslint-disable-line no-unused-vars
+/*{{{
+log(caller+"("+lib_util.get_id_or_tag(el)+") .. [position "+el.style.position+"] .. [xy "+x+" "+y+"]")
+}}}*/
+    div_tools_confine_to_viewport_timer = null;
+
+    /* just moved in place to cope with expandable WH */
+    let check_expanded_WH = (x == undefined) || (y == undefined);
+
+    /* TOP LEFT {{{*/
+    let bcr  = el.getBoundingClientRect();
+    if(   x == undefined) { x = bcr.x; } // when x,y are not given
+    if(   y == undefined) { y = bcr.y; } // move in place to trigger confinement
+
+    /* WIDTH HEIGHT */
+    let { w , h }
+        = check_expanded_WH
+        ?  get_expanded_EL_WH(el)
+        :  { w: bcr.width , h: bcr.height }
+    ;
+    if(w == 0) return;
+
+    /* VIEWPORT */
+    let w_min = (BUTTONS_FONT_SIZE_MIN * w / parseInt(buttons_fontSize || el.style.fontSize)).toFixed(0);
+    let h_min = (BUTTONS_FONT_SIZE_MIN * h / parseInt(buttons_fontSize || el.style.fontSize)).toFixed(0);
+
+    /* eslint-disable no-param-reassign */
+    let x_min =                              MOVE_MARGIN_L;
+    let y_min =                              MOVE_MARGIN_U;
+    let x_max = window.innerWidth  - w_min - MOVE_MARGIN_R;
+    let y_max = window.innerHeight - h_min - MOVE_MARGIN_D;
+
+    y_max     = Math.max(  0, y_max);
+    x_max     = Math.max(  0, x_max);
+
+    /* CLIP URDL */
+    if(typeof el.urdl == "undefined")   el.urdl = {}; // CLIP: UP RIGHT DOWN LEFT
+    el.urdl.u = (y <= y_min );
+    el.urdl.r = (x >= x_max );
+    el.urdl.d = (y >= y_max );
+    el.urdl.l = (x <= x_min );
+
+    /* CONFINE EL TOP */
+    x         = Math.min(x, x_max);
+    y         = Math.max(y, y_min);
+    x         = Math.max(x, x_min);
+    y         = Math.min(y, y_max);
+    el.style.left   =  x+"px";
+    el.style.top    =  y+"px";
+    el.style.right  = "unset";
+    el.style.bottom = "unset";
+
+/*{{{
+log_key_val("CONFINE EL TOP"
+            , { w     , h
+              , w_min , h_min
+              , x_max , y_max
+              , urdl   : el.urdl
+              , left   : el.style.left
+              , top    : el.style.top
+              , el_style_fontSize : el.style.fontSize
+            });
+}}}*/
+
+     /*}}}*/
+/*XXX*/
+    /* APPLY URDL BORDER CAP .. f(docked state) {{{*/
+    let docked = el.urdl.l/* && !el.urdl.r*/; /* Note: right folding defeats bordering condition when applied! */
+    xpath_outline.div_xpaths_sync_GUI( docked );
+
+    /*}}}*/
+    /* RESCALE {{{*/
+
+
+
+    /*}}}*/
+};
+/*}}}*/
+/*_ div_tools_confine_to_viewport {{{*/
+let div_tools_confine_to_viewport = function(el=get_div_tools(),delay=DIV_TOOLS_CONFINE_TO_VIEWPORT_DELAY)
+{
+    if(div_tools_confine_to_viewport_timer) clearTimeout( div_tools_confine_to_viewport_timer );
+       div_tools_confine_to_viewport_timer=   setTimeout( function() { div_tools_move_EL_XY(el); }, delay);
+};
+/*}}}*/
+/*_ get_expanded_EL_WH {{{*/
+let get_expanded_EL_WH = function(el)
+{
+    /* save current xy */
+    let       bcr = el.getBoundingClientRect();
+    let         x = bcr.x;
+    let         y = bcr.y;
+
+    /* move to page top left to get more room */
+    el.style.left = 0;
+    el.style.top  = 0;
+    bcr           = el.getBoundingClientRect();
+
+    /* move back to saved xy */
+    el.style.left = x+"px";
+    el.style.top  = y+"px";
+
+//log("get_expanded_EL_WH: WH=[ "+bcr.width+" , "+bcr.height+" ]")
+
+    return { w : bcr.width , h : bcr.height };
+};
+    /*}}}*/
 /* UP */
 /*_ div_tools_onUp {{{*/
 let div_tools_onUp = function(e) // eslint-disable-line no-unused-vars
@@ -496,21 +775,60 @@ let div_tools_onUp = function(e) // eslint-disable-line no-unused-vars
 if(e.altKey ) return;
 if(e.ctrlKey) return;
 /*{{{*/
-let   caller = "div_tools_onUp";
+let   caller = "XPATH ➔ div_tools_onUp";
 let log_this = options.LOG5_DIV_TOOLS || options.LOG6_MOVE_TOOL;
 
     let e_target = lib_util.get_event_target(e);
 if( log_this) logBIG(caller+"("+e.type+" "+lib_util.get_id_or_tag(e_target)+")");
 /*}}}*/
+if(options.LOG1_EVENT) logBIG(caller, 6);
+
+    if(e_target.id == "div_mask") return;
+
+    let div_tools = get_div_tools();
+
+    if(moving_EL) call_taxo_layout_cluster( div_tools ); /* i.e. some layout adjustement may have occured */
 
     moving_EL_onUp(e);
 
-    div_tools_restoreScrolling();
-if( log_this) log_sep_bot(caller+"("+lib_util.get_id_or_tag(e.target)+")", 8);
-
-let div_tools = get_div_tools();
     if(!lib_util.is_el_child_of_el(e_target, div_tools))
         setTimeout(check_location_href_changed, LOCATION_HREF_CHECKED_DELAY);
+
+    onClick_div_tools(e);
+
+    div_tools_restoreScrolling();
+if( log_this) log_sep_bot(caller+"("+lib_util.get_id_or_tag(e.target)+")", 8);
+};
+/*}}}*/
+/*_ moving_EL_onUp {{{*/
+let moving_EL_onUp = function(e) // eslint-disable-line no-unused-vars
+{
+if(options.LOG1_EVENT) logBIG("moving_EL_onUp",6);
+/*{{{*/
+let   caller = "moving_EL_onUp";
+let log_this = options.LOG5_DIV_TOOLS || options.LOG6_MOVE_TOOL;
+
+    let movement = lib_util.set_onMove_XY(e);
+    let e_target = lib_util.get_event_target(e);
+if( log_this)
+    logBIG(   caller+"("+e.type+" "      +lib_util.get_id_or_tag( e_target  )+")"
+           + (movement.has_moved ? (" has_moved ["+lib_util.get_id_or_tag( moving_EL )+"]") : "")
+           , (movement.has_moved ?                                                        6 : 8 )
+          );
+
+if(!moving_EL) return;
+/*}}}*/
+
+    div_tools_del_onmove_listener();
+
+    if( movement.has_moved )
+    {
+        div_tools_confine_to_viewport();
+
+        save_div_tools_xy(caller);
+    }
+
+    moving_EL = null;
 };
 /*}}}*/
 /*_ check_location_href_changed {{{*/
@@ -547,38 +865,51 @@ if( log_this) logBIG(caller+": FROM ["+location_href_checked+"] TO ["+document.l
 
     location_href_checked = document.location.href;
 
-    activated = undefined;
-
     query_domains( caller  );
 };
 /*}}}*/
 /* CLICK */
-/*_ div_tools_onClick {{{*/
-let div_tools_onClick = function(e) // eslint-disable-line complexity
+/*_ onClick_div_tools {{{*/
+let onClick_div_tools = function(e) // eslint-disable-line complexity
 {
+if(options.LOG1_EVENT) logBIG("onClick_div_tools",6);
+
+    //┌────────────────────────────────────────────────────────────────────────┐
+    //│ CLICK EVENT                                                            │
+    //└────────────────────────────────────────────────────────────────────────┘
 /*{{{*/
 if(e.altKey) return;
-let   caller = "div_tools_onClick";
+let   caller = "onClick_div_tools";
 let log_this = options.LOG5_DIV_TOOLS;
+
+
+
 
 let e_target = lib_util.get_event_target(e);
 if( log_this) log("%c"+caller+"( "+(e_target ? (e_target.id || e_target.nodeName) : "")+" )", lbb+lbH+lf6);
 /*}}}*/
     /* e_target {{{*/
     if(!e_target.parentElement) return;
-    //console.log("e_target.parentElement:")
-    //console.dir( e_target.parentElement  )
 
+//console.log("e_target.parentElement:")
+//console.dir( e_target.parentElement  )
     /*}}}*/
     /* has_moved .. (NOT A CLICK! .. KICK OFF ALL THOSE STUPID CLICK HANDLERS) {{{*/
-    if( log_this) log("%c...[has_moved "+ has_moved +"]", lf6);
+    let movement = lib_util.set_onMove_XY(e);
+if( log_this &&  movement.has_moved) log("%c...[has_moved "+  movement.has_moved +"]", lf6);
+if( log_this && !movement.has_moved) log("%c...!has_moved .. onDown_EL.id=["+ (movement.onDown_EL ? movement.onDown_EL.id : "") +"]", lf6);
 
-    if( has_moved ) {
+    if( movement.has_moved )
+    {
         lib_util.cancel_event(e);
-        return; // eslint-disable-line no-useless-return
+        return;
     }
     /*}}}*/
-    /* [div_reload] {{{*/
+
+    //┌────────────────────────────────────────────────────────────────────────┐
+    //│ CLICK TOOL                                                             │
+    //└────────────────────────────────────────────────────────────────────────┘
+    /* [div_reload  ] {{{*/
     if     (e_target.parentElement.id == "div_reload" )
     {
         let div_reload = lib_util.get_tool("div_reload");
@@ -587,27 +918,24 @@ if( log_this) log("%c"+caller+"( "+(e_target ? (e_target.id || e_target.nodeName
         document.location.reload();
     }
     /*}}}*/
-    /* [div_magnify] {{{*/
+    /* [div_magnify ] {{{*/
     else if(e_target.parentElement.id == "div_magnify")
     {
         let div_tools = get_div_tools();
         div_tools    .classList.toggle("magnify");
     }
     /*}}}*/
-    /* [div_options] {{{*/
-    else if(e_target.parentElement.id == "div_options")
-    {
-        lib_util.get_tool("div_options").classList.toggle("hidden" );
-    }
+    /* [div_options ] .. [SHOW-HIDE] OR [log_toggle] {{{*/
+    else if(        e_target.parentElement.id == "div_options" ) lib_util.get_tool("div_options").classList.toggle("hidden" );
+    else if(lib_util.is_el_child_of_id(e_target, "div_options")) log_toggle(e);
     /*}}}*/
-
 };
 /*}}}*/
 /* KEY */
-/*_ div_tools_onKey_CB {{{*/
+/*_ div_tools_onKey {{{*/
 //const CHAR_CODE_ESC = 27;
 
-let div_tools_onKey_CB = function(e)
+let div_tools_onKey = function(e)
 {
     if(e.altKey) return;
 
@@ -618,9 +946,9 @@ let div_tools_onKey_CB = function(e)
     ;
     if(options.LOG5_DIV_TOOLS) logBIG("KEY: "+charCode, lf7);
 
-    //  if(charCode != CHAR_CODE_ESC) return;
+//  if(charCode != CHAR_CODE_ESC) return;
 
-    //  div_tools_standby();
+//  div_tools_standby();
 };
 /*}}}*/
 /* SCROLL */
@@ -688,13 +1016,13 @@ if( log_this) {
     if(document.documentElement.scrolling_context)
         log_key_val_group(_caller+"➔"+caller+": scrolling_context"
             , document.documentElement.scrolling_context
-            , lbH+lf9, false);
+            , lbH+lf9, true);
 
     log_key_val_group("documentElement OVERFLOW HIDDEN",
         { overflow     : document.documentElement.style.overflow
         , marginRight  : document.documentElement.style.marginRight
         , marginBottom : document.documentElement.style.marginBottom
-        }, lf2, false);
+        }, lf2, true);
 }
 /*}}}*/
 };
@@ -702,13 +1030,14 @@ if( log_this) {
 /*_ div_tools_restoreScrolling {{{*/
 let div_tools_restoreScrolling = function()
 {
-    /*{{{*/
-    let   caller = "div_tools_restoreScrolling"; // eslint-disable-line no-unused-vars
+/*{{{*/
+let   caller = "div_tools_restoreScrolling"; // eslint-disable-line no-unused-vars
+let log_this = options.LOG5_DIV_TOOLS || options.LOG6_MOVE_TOOL;
 
-    /*}}}*/
+/*}}}*/
     /* NO SCROLLBAR TO HIDE {{{*/
-    //  let on_touch_device = ("ontouchstart" in document.documentElement);
-    //  if(!on_touch_device &&  lib_util.has_scrollbar(document.documentElement)) return;
+//  let on_touch_device = ("ontouchstart" in document.documentElement);
+//  if(!on_touch_device &&  lib_util.has_scrollbar(document.documentElement)) return;
 
     /* }}}*/
     /* APPLY CACHED [scrolling_context] {{{*/
@@ -720,29 +1049,31 @@ let div_tools_restoreScrolling = function()
 
     }
     /*}}}*/
-    /*{{{
+/*{{{*/
+if( log_this ) {
 
     log_key_val_group(caller+": documentElement OVERFLOW HIDDEN",
         { overflow     : document.documentElement.style.overflow
         , marginRight  : document.documentElement.style.marginRight
         , marginBottom : document.documentElement.style.marginBottom
         , callers      : lib_log.get_callers()
-        }, lf2, false);
+        }, lf2, true);
 
     if(document.documentElement.scrolling_context)
         log_key_val_group("...document.documentElement.scrolling_context"
             , document.documentElement.scrolling_context
-            , lbH+lf9, false);
+            , lbH+lf9, true);
 
-}}}*/
+}
+/*}}}*/
 };
 /*}}}*/
 /*_ div_tools_onScroll {{{*/
 let div_tools_onScroll = function(e) // eslint-disable-line no-unused-vars
 {
-    let log_this = options.LOG5_DIV_TOOLS;
+let log_this = options.LOG5_DIV_TOOLS;
 
-    if( log_this) logBIG("div_tools_onScroll");
+if( log_this) logBIG("div_tools_onScroll");
 
     div_tools_del_onmove_listener();
 };
@@ -751,182 +1082,30 @@ let div_tools_onScroll = function(e) // eslint-disable-line no-unused-vars
 /*_ div_tools_beforeunload {{{*/
 let div_tools_beforeunload = function()
 {
-    save_options_now("div_tools_beforeunload");
-
+//  save_options_now("div_tools_beforeunload");
 };
 /*}}}*/
 /*}}}*/
 
     // ┌───────────────────────────────────────────────────────────────────────┐
-    // │ [moving_EL]                                                           │
+    // │ CONFIG [config.json] ................................. chrome.runtime │
     // └───────────────────────────────────────────────────────────────────────┘
 /*{{{*/
-/*_ div_tools_add_onmove_listener {{{*/
-/*{{{*/
-let     moving_EL;
+     let config = { "SERVER_URL"   : "SERVER_URL"
+        ,          "TEXT_LEN_MAX" :  96
 
-/*}}}*/
-let div_tools_add_onmove_listener = function(el)
-{
-    /*{{{*/
-    let   caller = "div_tools_add_onmove_listener";
-    let log_this = options.LOG6_MOVE_TOOL;
+        ,          "CMD_DOMAINS"  : "domains"
+        ,          "CMD_URLS"     : "urls"
+        ,          "CMD_XPATHS"   : "xpaths"
+        ,          "CMD_TAXONOMY" : "taxonomy"
 
-    if(log_this) log("%c"+caller+"("+lib_util.get_id_or_tag(el)+")", lbH+lf4);
-    /*}}}*/
-    /* start following [has_moved] {{{*/
-    has_moved          = false;
-    moving_EL          = el;
-    moving_EL.onDown_X = moving_EL.offsetLeft;
-    moving_EL.onDown_Y = moving_EL.offsetTop;
+        ,          "CMD_ADD"      : "add"
+        ,          "CMD_DELETE"   : "delete"
+        ,          "CMD_CONFIRM"  : "delete"
 
-    if(log_this) log("%c...moving_EL.onDown_XY=["+moving_EL.onDown_X+" "+moving_EL.onDown_Y+"]", lf3);
-    /*}}}*/
-    /* ADD - TOUCH MOVE LISTENER {{{*/
-    let on_touch_device = ("ontouchstart" in document.documentElement);
-    if( on_touch_device )
-    {
-if(log_this) logBIG("➔ ADDING [touchmove] LISTENER on ["+lib_util.get_id_or_tag(moving_EL)+"]", 4);
+        ,       "ACTION_REPLACED" : "replaced"
+    };
 
-        moving_EL.addEventListener("touchmove", div_tools_onMove  , CAPTURE_TRUE_PASSIVE_FALSE);
-    }
-    /*}}}*/
-    /* ADD - MOUSE MOVE LISTENER {{{*/
-    else {
-if(log_this) logBIG("➔ ADDING [mousemove] LISTENER on ["+lib_util.get_id_or_tag(moving_EL)+"]", 5);
-
-        window.addEventListener("mousemove", div_tools_onMove  , CAPTURE_TRUE_PASSIVE_FALSE);
-    }
-    /*}}}*/
-    /* DEL - SCROLL LISTENER {{{*/
-    if(log_this) log("%c...REMOVING [scroll]    LISTENER", lf8);
-
-    window.removeEventListener("scroll"   , div_tools_onScroll, CAPTURE_TRUE_PASSIVE_FALSE);
-
-    /*}}}*/
-
-};
-/*}}}*/
-/*_ div_tools_del_onmove_listener {{{*/
-let div_tools_del_onmove_listener = function()
-{
-/*{{{*/
-let   caller = "div_tools_del_onmove_listener";
-let log_this = options.LOG6_MOVE_TOOL;
-
-
-if(!moving_EL) return;
-if(log_this) log("%c"+caller+"("+lib_util.get_id_or_tag(moving_EL)+")", lbH+lf4);
-
-if(log_this) log("%c...moving_EL.offsetXY=["+moving_EL.offsetLeft+" "+moving_EL.offsetTop+"]", lf3);
-/*}}}*/
-    /* DEL - TOUCH MOVE LISTENER {{{*/
-    let on_touch_device = ("ontouchstart" in document.documentElement);
-    if( on_touch_device )
-    {
-if(log_this) log("%c...REMOVING [touchmove] LISTENER on ["+lib_util.get_id_or_tag(moving_EL)+"]", lf8);
-
-        // window.removeEventListener("touchmove", div_tools_onMove  , CAPTURE_TRUE_PASSIVE_FALSE);
-        moving_EL.removeEventListener("touchmove", div_tools_onMove  , CAPTURE_TRUE_PASSIVE_FALSE);
-    }
-    /*}}}*/
-    /* DEL - MOUSE MOVE LISTENER {{{*/
-    else {
-        if(log_this) log("%c...REMOVING [mousemove] LISTENER on ["+lib_util.get_id_or_tag(moving_EL)+"]", lbR+lf0);
-
-        window.removeEventListener("mousemove", div_tools_onMove  , CAPTURE_TRUE_PASSIVE_FALSE);
-    }
-    /*}}}*/
-    /* ADD - SCROLL LISTENER {{{*/
-if(log_this) logBIG("➔ ADDING [scroll]    LISTENER", 6);
-
-    window.addEventListener   ("scroll"   , div_tools_onScroll, CAPTURE_TRUE_PASSIVE_FALSE);
-    /*}}}*/
-    /* CLR - MOVE DATA {{{*/
-    delete moving_EL.onDown_X;
-    delete moving_EL.onDown_Y;
-    lib_util.del_el_class(moving_EL, "pressed");
-
-    moving_EL = null;
-    /*}}}*/
-};
-/*}}}*/
-/*_ moving_EL_onMove {{{*/
-let moving_EL_onMove = function(e)
-{
-/*{{{*/
-if(!moving_EL) return;
-
-let   caller = "moving_EL_onMove";
-let log_this = options.LOG5_DIV_TOOLS || options.LOG6_MOVE_TOOL;
-
-if( log_this ) caller += "("+e.type+")";
-/*}}}*/
-    /* [has_moved] ➔ [pressed] {{{*/
-    let              movement = lib_util.set_onMove_XY(e);
-    if(!has_moved && movement.has_moved)
-    {
-        lib_util.add_el_class(moving_EL, "pressed");
-        has_moved  = true;
-
-        let e_target = lib_util.get_event_target(e);
-if(log_this) logBIG(caller+": .. "+lib_util.get_id_or_tag(e_target)+" has_moved ");
-    }
-    /*}}}*/
-    /* MOVE [moving_EL] {{{*/
-    let x =              moving_EL.onDown_X + movement.dxy.x ;
-    let y =              moving_EL.onDown_Y + movement.dxy.y ;
-    div_tools_move_EL_XY(moving_EL, x, y);
-//  moving_EL.style.left   =  x+"px";
-//  moving_EL.style.top    =  y+"px";
-
-    /*}}}*/
-};
-/*}}}*/
-/*_ moving_EL_onUp {{{*/
-let moving_EL_onUp = function(e) // eslint-disable-line no-unused-vars
-{
-/*{{{*/
-let   caller = "moving_EL_onUp";
-let log_this = options.LOG5_DIV_TOOLS || options.LOG6_MOVE_TOOL;
-
-    let e_target = lib_util.get_event_target(e);
-if( log_this)
-    logBIG(   caller+"("+e.type+" "      +lib_util.get_id_or_tag( e_target  )+")"
-           + (has_moved ? (" has_moved ["+lib_util.get_id_or_tag( moving_EL )+"]") : "")
-           , (has_moved ?                                                        6 : 8 )
-          );
-
-if(!moving_EL) return;
-/*}}}*/
-
-    div_tools_del_onmove_listener();
-    if( has_moved )
-    {
-        div_tools_confine_to_viewport();
-
-//      save_options( caller );
-        save_div_tools_xy(caller);
-    }
-
-};
-/*}}}*/
-/*➔ save_div_tools_xy {{{*/
-let save_div_tools_xy = function(_caller)
-{
-let caller = "save_div_tools_xy";
-let log_this = options.LOG5_DIV_TOOLS || options.LOG6_MOVE_TOOL;
-if( log_this) log(XPATH_CONTENT_SCRIPT_ID+"."+caller+"("+_caller+")");
-
-let div_tools = get_div_tools();
-    let    xy = { x: div_tools.offsetLeft , y: div_tools.offsetTop };
-if( log_this) log("xy",xy);
-
-    if( !xy.x && !xy.y) return;
-
-    lib_util.localStorage_setItem("div_tools_xy", JSON.stringify(xy));
-};
-/*}}}*/
 /*}}}*/
 
     // ┌───────────────────────────────────────────────────────────────────────┐
@@ -970,122 +1149,13 @@ let is_div_folded = function(div)
 /*}}}*/
 
     // ┌───────────────────────────────────────────────────────────────────────┐
-    // │ CONFINE TO VIEWPORT                                                   │
-    // └───────────────────────────────────────────────────────────────────────┘
-/*{{{*/
-/*{{{*/
-const MOVE_MARGIN_U =  4;
-const MOVE_MARGIN_R = 32;
-const MOVE_MARGIN_D = 16;
-const MOVE_MARGIN_L =  4;
-
-const DIV_TOOLS_CONFINE_TO_VIEWPORT_DELAY = 500;
-let   div_tools_confine_to_viewport_timer;
-/*}}}*/
-/*_ div_tools_confine_to_viewport {{{*/
-let div_tools_confine_to_viewport = function(el=get_div_tools(),delay=DIV_TOOLS_CONFINE_TO_VIEWPORT_DELAY)
-{
-    if(div_tools_confine_to_viewport_timer) clearTimeout( div_tools_confine_to_viewport_timer );
-       div_tools_confine_to_viewport_timer=   setTimeout( function() { div_tools_move_EL_XY(el); }, delay);
-};
-/*}}}*/
-/*_ div_tools_move_EL_XY {{{*/
-let div_tools_move_EL_XY = function(el, x,y)
-{
-    if(!el) return; // may happen when both extension an embedded are running
-    let caller = "div_tools_move_EL_XY"; // eslint-disable-line no-unused-vars
-/*{{{
-log(caller+"("+lib_util.get_id_or_tag(el)+") .. [position "+el.style.position+"] .. [xy "+x+" "+y+"]")
-}}}*/
-    div_tools_confine_to_viewport_timer = null;
-
-    /* just moved in place to cope with expandable WH */
-    let check_expanded_WH = (x == undefined) || (y == undefined);
-
-    /* TOP LEFT */
-    let bcr =  el.getBoundingClientRect();
-    if(  x == undefined) { x = bcr.x; } // when x,y are not given
-    if(  y == undefined) { y = bcr.y; } // move in place to trigger confinement
-//  x = x || el.offsetLeft;
-//  y = y || el.offsetTop;
-
-    /* WIDTH HEIGHT */
-    let { w , h }
-        = check_expanded_WH
-        ?  get_expanded_EL_WH(el)
-        :  { w: bcr.width , h: bcr.height }
-    ;
-    if(w == 0) return;
-
-    /* VIEWPORT */
-    let x_min =                          MOVE_MARGIN_L;
-    let y_min =                          MOVE_MARGIN_U;
-    let x_max = window.innerWidth  - w - MOVE_MARGIN_R;
-    let y_max = window.innerHeight - h - MOVE_MARGIN_D;
-//console.log({ y_min, x_max, y_max, x_min})
-
-    y_max     = Math.max(  0, y_max);
-    x_max     = Math.max(  0, x_max);
-
-    /* CLIP URDL */
-    if(typeof el.urdl == "undefined")   el.urdl = {}; // CLIP: UP RIGHT DOWN LEFT
-    el.urdl.u = (y <= y_min );
-    el.urdl.r = (x >= x_max );
-    el.urdl.d = (y >= y_max );
-    el.urdl.l = (x <= x_min );
-//console.log(el.urdl)
-
-    /* CONFINE EL TOP */
-    y         = Math.max(y, y_min);
-    x         = Math.min(x, x_max);
-    y         = Math.min(y, y_max);
-    x         = Math.max(x, x_min);
-    el.style.left   =  x+"px";
-    el.style.top    =  y+"px";
-    el.style.right  = "unset";
-    el.style.bottom = "unset";
-
-    /* APPLY URDL BORDER CAP .. f(docked state) */
-    let docked = el.urdl.l/* && !el.urdl.r*/; /* Note: right folding defeats bordering condition when applied! */
-    xpath_outline.div_xpaths_sync_GUI( docked );
-
-/*{{{
-log(caller+"("+lib_util.get_id_or_tag(el)+" .. XY=["+x+" "+y+"] .. WH=["+w+" "+h+"]) .. "+el.className)
-}}}*/
-};
-/*}}}*/
-/*_ get_expanded_EL_WH {{{*/
-let get_expanded_EL_WH = function(el)
-{
-    /* save current xy */
-    let       bcr = el.getBoundingClientRect();
-    let         x = bcr.x;
-    let         y = bcr.y;
-
-    /* move to page top left to get more room */
-    el.style.left = 0;
-    el.style.top  = 0;
-    bcr           = el.getBoundingClientRect();
-
-    /* move back to saved xy */
-    el.style.left = x+"px";
-    el.style.top  = y+"px";
-
-//log("get_expanded_EL_WH: WH=[ "+bcr.width+" , "+bcr.height+" ]")
-
-    return { w : bcr.width , h : bcr.height };
-};
-    /*}}}*/
-/*}}}*/
-
-    // ┌───────────────────────────────────────────────────────────────────────┐
     // │ SELECT                                                                │
     // └───────────────────────────────────────────────────────────────────────┘
 /*{{{*/
 /*_ sel_clear {{{*/
 let sel_clear = function(_caller)
 {
-    let shadow_host = document.getElementById( lib_util.SHADOW_HOST_ID );
+    let shadow_host = document.getElementById( get_used_shadow_host_id() );
     let from_parent = shadow_host.shadowRoot;
     let    siblings = unselect_from_parent( from_parent );
 
@@ -1487,9 +1557,13 @@ let caller = "query_taxonomy";
 let simulate_send_message_args = function(args,_caller)
 {
     if(typeof simulate_send_message != "undefined")
+    {
         setTimeout( function() { simulate_send_message(args, _caller); }, 250);
-    else
+    }
+    else {
         log_feature(_caller, "&#x26A0; EXTENSION MESSAGING IS OFF\n… Cannot send cmd=["+ args.cmd +"]");
+//lib_log.log_caller()
+    }
 };
 /*}}}*/
 /*}}}*/
@@ -1497,30 +1571,28 @@ let simulate_send_message_args = function(args,_caller)
     // ┌───────────────────────────────────────────────────────────────────────┐
     // │ MESSAGE FROM BACKGROUND-SCRIPT [activated] ........... chrome.runtime │
     // └───────────────────────────────────────────────────────────────────────┘
-/*{{{*/
-/* LISTENER {{{*/
+/*_ add_message_listener {{{*/
 let add_message_listener = function()
 {
-let log_this = options.LOG2_MESSAGE;
+let log_this = options.LOG1_STEP || options.LOG2_MESSAGE;
 
     try {
         chrome.runtime.onMessage.addListener( onMessage_listener );
-if(log_this) log("%c LISTENING TO MESSAGE FROM BACKGROUND SCRIPT...", lbH+lf5);
+if( log_this) log("%c LISTENING TO MESSAGE FROM BACKGROUND SCRIPT...", lbH+lf5);
     }
     catch(ex) {
         log("%c"+XPATH_CONTENT_SCRIPT_ID+": CANNOT LISTEN TO MESSAGE FROM BACKGROUND SCRIPT:\n"+ex, lbH+lf2);
     }
 };
-
+/*}}}*/
+/*_ onMessage_listener {{{*/
 let onMessage_listener = function(request, sender, sendResponse) // eslint-disable-line no-unused-vars
 {
-let log_this = options.LOG2_MESSAGE;
+let log_this = options.LOG1_STEP || options.LOG2_MESSAGE;
+if( log_this) log("%c RECEIVING MESSAGE FROM BACKGROUND SCRIPT...", "color:#AFA");
 
-if( log_this) console.log("%c RECEIVING MESSAGE FROM BACKGROUND SCRIPT...", "color:#AFA");
-if( log_this) console.log( request );
-
-    if(   (      typeof request.activated != "undefined")
-      ) {
+    if(typeof request.activated != "undefined")
+    {
         onMessage_activated(request,sendResponse);
 
         sendResponse({ ack: JSON.stringify( request ) });
@@ -1532,27 +1604,31 @@ if( log_this) console.log( request );
 let onMessage_activated = function(request,sendResponse)
 {
 let caller = "onMessage_activated";
-if(options.LOG1_STEP) console.log("%c➔ Extension %c activated "+activated+" %c .. "+XPATH_CONTENT_SCRIPT_TAG+" ", "color:#AFA", "background-color:"+(request.activated ? "#0A0" : "#00A"), "background-color: black;");
-//console.trace()
+
+    let activated = is_activated();
+if(options.LOG1_STEP) log("%c➔ Extension %c activated "+activated+" %c .. "+XPATH_CONTENT_SCRIPT_TAG+" ", "color:#AFA", "background-color:"+(request.activated ? "#0A0" : "#00A"), "background-color: black;");
 
     on_activated_load_options( request );
 
-    /* LOADS THE GUI WITH BACKGROUND SCRIPT localStorage OPTIONS */
+    // ┌───────────────────────────────────────────────────────────────┐
+    // │ ACTIVATED [div_tools] .. [request.options]                    │
+    // └───────────────────────────────────────────────────────────────┘
+    /*{{{*/
     if(activated != request.activated)
     {
-        div_tools_init( request );
+        let div_tools = get_div_tools();
+        if(!div_tools) div_tools_init( request );
     }
     else {
-        div_tools_html_js.update_div_tools_innerHTML(request);
+        xpath_tools.update_div_tools_innerHTML(request);
     }
-
+    /*}}}*/
     // ┌───────────────────────────────────────────────────────────────┐
     // │ CONFIG  FROM BACKGROUND-SCRIPT                                │
     // └───────────────────────────────────────────────────────────────┘
     //{{{
     if( request.  SERVER_URL ) config.  SERVER_URL = request  .SERVER_URL;
     if( request.TEXT_LEN_MAX ) config.TEXT_LEN_MAX = request.TEXT_LEN_MAX;
-//console.log( config )
 
     // UI
     let div_domains = lib_util.get_tool("div_domains");
@@ -1569,8 +1645,8 @@ if(options.LOG1_STEP) console.log("%c➔ Extension %c activated "+activated+" %c
     // │ ACTIVATED ON-OFF                                              │
     // └───────────────────────────────────────────────────────────────┘
     //{{{
-    if(!request.activated && request.is_active_tab) // save active tab options
-        save_options_now(caller, sendResponse);
+//  if(!request.activated && request.is_active_tab) // save active tab options
+//      save_options_now(caller, sendResponse);
 
     if(     activated != request.activated)
         set_activated(   request );
@@ -1578,35 +1654,85 @@ if(options.LOG1_STEP) console.log("%c➔ Extension %c activated "+activated+" %c
     //}}}
 };
 /*}}}*/
-/*_ set_activated {{{*/
-let set_activated = function( request )
+
+    // ┌───────────────────────────────────────────────────────────────────────┐
+    // │ [activated] ......................................................... │
+    // └───────────────────────────────────────────────────────────────────────┘
+/*_ is_activated {{{*/
+let    activated = false;
+let is_activated = function()
 {
-    let caller = "set_activated";
-let log_this = options.LOG2_MESSAGE;
-
-if( log_this) console.log("%c set_activated: ➔ %c activated "+request.activated, "color:#AFA", "background-color:"+(request.activated ? "#0A0" : "#00A"));
-//console.trace()
-
-    let shadow_host = document.getElementById( lib_util.SHADOW_HOST_ID );
-//console.log("shadow_host=["+shadow_host+"]")
-    if(!shadow_host)
-    {
-        activated = false;
-        return;
-    }
-
-    /* CLEAR PAGE HILIGHTED TARGETS */
-    xpath_outline.outline_clear_all(caller+"("+JSON.stringify(request)+")");
-
-    activated         = request.activated;
-    shadow_host.style.display = activated ? "block" : "none";
-
-    if( activated )
-        query_domains( caller  );
-
-    div_tools_confine_to_viewport();
+    return activated;
 };
 /*}}}*/
+/*_ set_activated {{{*/
+let set_activated = function(request)
+{
+/*{{{*/
+let   caller = XPATH_CONTENT_SCRIPT_ID+" ➔ set_activated";
+let log_this = options.LOG1_STEP || options.LOG2_MESSAGE;
+
+    let state
+        = (request.activated == undefined) /* SET OR TOGGLE */
+        ?         !activated
+        :  request.activated;
+
+if(log_this)
+    log("%c "+caller+" %c FROM "+activated     +" %c TO "+ state
+        ,lbL          ,lbC+lfX[  activated ? 4:2],lbR+lfX[ state ? 4:2]);
+if(log_this) log_key_val_group("request", request, 1, true);
+/*}}}*/
+    activated = state;
+    /* [div_tools_init] .. [event_listeners] .. [query_domains] {{{*/
+    if( activated )
+    {
+        let div_tools = get_div_tools();
+        if(!div_tools) {
+            div_tools_init( request );
+//          event_listeners.add_listeners(); // auto-loaded by javascript/event_listeners.js
+        }
+        query_domains( caller  );
+    }
+    /*}}}*/
+    /* display [shadow_host] {{{*/
+    let shadow_host = document.getElementById( get_used_shadow_host_id() );
+    if( shadow_host )
+    {
+        if( activated )
+        {
+            shadow_host.style.display = "block";
+
+            div_tools_confine_to_viewport();
+        }
+        else {
+            shadow_host.style.display = "none";
+        }
+    }
+    /*}}}*/
+    /* PAGE CLEAR HILIGHTED TARGETS  {{{*/
+    if(!activated)
+        xpath_outline.outline_clear_all(caller+"("+JSON.stringify(request)+")");
+
+    /*}}}*/
+};
+/*}}}*/
+/*_ query_active_state {{{*/
+let query_active_state = function()
+{
+    /* 1/2 [EXTENSION] .. [QUERY BACKGROUND SCRIPT ACTIVE STATE]  */
+    if(   (typeof chrome            != "undefined")
+       && (typeof chrome.runtime    != "undefined")
+       && (       chrome.runtime.id !=  undefined )
+      ) {
+        add_message_listener();
+        chrome.runtime.sendMessage({ activated : "undefined" }, read_response);
+    }
+    /* 2/2 [EMBEDDED] .. [AUTO-ACTIVATE] */
+    else {
+        setTimeout(function() {            set_activated({ activated: true }); },   0);
+
+    }
+};
 /*}}}*/
 
     // ┌───────────────────────────────────────────────────────────────────────┐
@@ -1657,10 +1783,10 @@ if(log_this) log_key_val("response", response);
     {
         switch(response.cmd)
         {
-        case config.CMD_DOMAINS : get_domains_handler (response.domains                      );                  break;
-        case config.CMD_URLS    : get_urls_handler    (response.urls                         );                  break;
-        case config.CMD_TAXONOMY: get_taxonomy_handler(response                              );                  break;
-        case config.CMD_XPATHS  : get_xpaths_handler  (response.xpaths                       );                  break;
+        case config.CMD_DOMAINS : get_domains_handler (response.domains                     );                   break;
+        case config.CMD_URLS    : get_urls_handler    (response.urls                        );                   break;
+        case config.CMD_TAXONOMY: get_taxonomy_handler(response.selected, response.collected);                   break;
+        case config.CMD_XPATHS  : get_xpaths_handler  (response.xpaths                      );                   break;
         case config.CMD_ADD     : xpath_outline.add_or_delete_server_response_handler(response, message_object); break;
         case config.CMD_DELETE  : xpath_outline.add_or_delete_server_response_handler(response, message_object); break;
         default:
@@ -1668,7 +1794,7 @@ lib_log.log("%c"+caller+"%c cmd=["+response.cmd+"]", lbL,lbR);
         }
 
         /* SYNC GUI LAYOUT */
-        div_tools_html_js.div_tools_layout_cmd( response.cmd );
+        xpath_tools.div_tools_layout_cmd( response.cmd );
     }
     /*}}}*/
 if(log_this) log_key_val_group("options", options, 8, true);
@@ -1795,7 +1921,8 @@ let get_urls_handler = function(urls)
 let caller = "get_urls_handler";
 let log_this = options.LOG2_MESSAGE;
 
-if( log_this) lib_log.logBIG(caller+": URLS x"+urls.length);
+if( log_this) log_sep_top("LOADING "+urls.length+" URL ITEMS", 6);
+//( log_this) lib_log.logBIG(caller+": URLS x"+urls.length);
 //console.table(urls)
 /*}}}*/
     /* CURRENT PAGE LOCATION .. f(urls) {{{*/
@@ -1878,6 +2005,7 @@ if(options.LOG3_SERVER) log_query_step("CALLING query_xpaths", "ON ["+location_u
     }
     /*}}}*/
 
+if(log_this) log_sep_bot(caller, 6);
 };
 /*}}}*/
     // ┌───────────────────────────────────────────────────────────────────────┐
@@ -1929,17 +2057,15 @@ if(options.LOG3_SERVER) log_query_step("CALLING query_taxonomy", "ON ["+location
     // │ RESPONSE  TAXONOMY .. NEXTSTEP ➔ [select..collect] taxo_id .......... │
     // └───────────────────────────────────────────────────────────────────────┘
 /*_ get_taxonomy_handler {{{*/
-let get_taxonomy_handler = function(response)
+let get_taxonomy_handler = function(selected,collected)
 {
 /*{{{*/
 let caller = "get_taxonomy_handler";
 let log_this = options.LOG2_MESSAGE;
 
 if( log_this) lib_log.logBIG(caller+": [selected,collected]");
-//log("response", response)
 /*}}}*/
     /* COLLECT TAXONOMY [selected , collected] {{{*/
-    let { selected , collected } = response;
 
     if( !selected)  selected = [];
     if(!collected) collected = [];
@@ -1949,6 +2075,11 @@ if( log_this) log("collected: ", collected);
     /*}}}*/
     /* NEXTSTEP ENABLE TAXONOMY [select / collect] {{{*/
     taxo_content.load_taxo_id_array(selected, collected);
+
+    /*}}}*/
+    /* [taxo_layout_cluster] {{{*/
+    let div_tools = get_div_tools();
+    if( get_use_lib_shadow_root() ) call_taxo_layout_cluster( div_tools );
 
     /*}}}*/
 };
@@ -2025,7 +2156,7 @@ if( log_this) logBIG(caller,1);
     selected     = !selected;
 
     /* update GUI */
-    xpath_outline.cancel_pending_event(e_target);
+    xpath_outline.cancel_pending_event(  e_target);
     if( selected ) lib_util.add_el_class(e_target, CSS_SELECTED);
     else           lib_util.del_el_class(e_target, CSS_SELECTED);
 
@@ -2036,18 +2167,36 @@ if( log_this) logBIG(caller,1);
     document.documentElement.style.scrollBehavior = selected ? "smooth":"auto";
 };
 /*}}}*/
+/*➔ shadow_root_toggle_handler {{{*/
+let shadow_root_toggle_handler = function(e_target)
+{
+/*{{{*/
+let caller = "shadow_root_toggle_handler";
+let log_this = options.LOG5_DIV_TOOLS;
+
+if( log_this) logBIG(caller,1);
+/*}}}*/
+
+    /* GET INPUT CURRENT STATE */
+    let       id = e_target.id;
+    let selected = lib_util.has_el_class(e_target, CSS_SELECTED);
+
+    /* TOGGLE */
+    selected     = !selected;
+
+    /* STORE state */
+    set_option(id, selected);
+    save_options_now();
+
+    /* APPLY */
+    document.location.reload();
+};
+/*}}}*/
 /*}}}*/
 
     // ┌───────────────────────────────────────────────────────────────────────┐
     // │ OPTIONS [LOAD] [APPLY] [SAVE] ....................................... │
     // └───────────────────────────────────────────────────────────────────────┘
-/*{{{*/
-/*{{{*/
-const SAVE_OPTIONS_TIMOUT_DELAY = 1000;
-
-let options = {}; // EXPORTED OBJECT ➔ SHOULD NOT MUTATE
-let save_options_timeout;
-/*}}}*/
 /*_ on_activated_load_options {{{*/
 let on_activated_load_options = function(request)
 {
@@ -2056,28 +2205,47 @@ let   caller = "on_activated_load_options";
 let log_this = options.LOG2_MESSAGE || options.LOG5_DIV_TOOLS;
 
 let tag_this = log_this || options.LOG5_DIV_TOOLS || options.LOG6_MOVE_TOOL;
-if(log_this) log_sep_top(caller+" ["+XPATH_CONTENT_SCRIPT_TAG+"]", 5);
+if( tag_this) log_sep_top("LOADING OPTIONS FROM "+Object.keys(request).length+" REQUEST KEYS", 6);
 //console.trace()
 /*}}}*/
-    /* FROM BACKGROUND SCRIPT MESSAGE (activated) {{{*/
+    /* [options] FROM BACKGROUND SCRIPT MESSAGE (activated) {{{*/
     if(request && typeof request.activated != "undefined")
     {
-if(tag_this) log_key_val("FROM BACKGROUND SCRIPT MESSAGE (activated) request", request, 4);
+if(tag_this) log_key_val("➔ FROM BACKGROUND SCRIPT MESSAGE (activated) request", request, 4);
 
         /* client controls all options, except [activated] .. (which is controled by browser_action_click) */
         Object.keys(request).forEach( function(k) { options[k] = request[k]; });
     }
     /*}}}*/
-    /* FROM EMBEDDED PAGE DOMAIN [localStorage] {{{*/
+    /* [options] FROM EMBEDDED PAGE DOMAIN [localStorage] {{{*/
     else {
-if(log_this) log("FROM EMBEDDED PAGE DOMAIN [localStorage]:");
+if(log_this) log("➔ FROM EMBEDDED PAGE DOMAIN [localStorage]:");
 
-        for(let i=0;i< config_js.OPTION_KEYS.length; ++i) {
+        // ┌───────────────────────────────────────────────────────────────────┐
+        // │ [use_lib_shadow_root] FROM [OPTION_KEYS]                          │
+        // └───────────────────────────────────────────────────────────────────┘
+        for(let i=0;i< config_js.OPTION_KEYS.length; ++i)
+        {
             let key  = config_js.OPTION_KEYS[i];
             let val  = lib_util.localStorage_getItem( key );
             if( val  ) options[key] =     JSON.parse( val );
         }
+
+        // ┌───────────────────────────────────────────────────────────────────┐
+        // │ [use_lib_shadow_root] FROM [localStorage]                         │
+        // └───────────────────────────────────────────────────────────────────┘
+        if(typeof options.use_lib_shadow_root == "undefined")
+        {
+            /**/  options.use_lib_shadow_root  = lib_util.localStorage_getItem("use_lib_shadow_root");
+            if(   options.use_lib_shadow_root == null) delete options.use_lib_shadow_root;
+        }
     }
+    /*}}}*/
+    /* [options] FROM DEFAULT [lib_util] {{{*/
+    if(typeof options.use_lib_shadow_root == "undefined")
+        options.use_lib_shadow_root = lib_util.USE_LIB_SHADOW_ROOT;
+
+//console.log(   "use_lib_shadow_root=["+        options.use_lib_shadow_root +"]")
     /*}}}*/
     /* [scrollBehavior] {{{*/
     if(!get_option("smooth_scroll") )
@@ -2086,9 +2254,17 @@ if(log_this) log("FROM EMBEDDED PAGE DOMAIN [localStorage]:");
         document.documentElement.style.scrollBehavior = "smooth";
 
     /*}}}*/
+
 if(log_this) log_key_val("options", options, 6);
-if(log_this) log_sep_bot(caller, 5);
+if(tag_this) log_sep_bot(caller, 6);
 };
+/*}}}*/
+/*{{{*/
+/*{{{*/
+const SAVE_OPTIONS_TIMOUT_DELAY = 1000;
+
+let options = {}; // EXPORTED OBJECT ➔ SHOULD NOT MUTATE
+let save_options_timeout;
 /*}}}*/
 /*_ get_option {{{*/
 let get_option  = function(key)
@@ -2106,7 +2282,8 @@ let set_option  = function(key,val)
 {
 let log_this = options.LOG2_MESSAGE;
 
-if(log_this) log("set_option(key["+key+"] , val=["+val+"])");
+if( log_this) log("set_option(key["+key+"] , val=["+val+"])");
+
     options[key] = val;
 
     save_options("set_option(key["+key+"] , val=["+val+"])");
@@ -2134,7 +2311,7 @@ let save_options_now = function(_caller,sendResponse)
 let save_options_handler = function(_caller,sendResponse)
 {
 /*{{{*/
-let   caller = "save_options";
+let   caller = "save_options_handler";
 let log_this = options.LOG2_MESSAGE;
 
 let tag_this = log_this || options.LOG5_DIV_TOOLS || options.LOG6_MOVE_TOOL;
@@ -2148,11 +2325,12 @@ if( tag_this) lib_log.logBIG("EXTENSION UNLOADED");
         return false;
     }
     /*}}}*/
+if( tag_this) log_sep_top(caller+" SAVING "+Object.keys(options).length+" options", 5);
     /* [options] .. (updated current postion and location) {{{*/
 
     options.location_href = document.location.href;
 
-if(tag_this) log_key_val_group(caller+"("+_caller+(sendResponse ? (", "+sendResponse.name) : "")+")", options, 5, false);
+if(tag_this) log_key_val_group(caller+"(_caller=["+_caller+"]"+(sendResponse ? (", "+sendResponse.name) : "")+")", options, 5, true);
     /*}}}*/
     /* 1/2 - SAVE IN [BACKGROUND SCRIPT localStorage] {{{*/
     if( sendResponse )
@@ -2167,28 +2345,30 @@ if(tag_this) log_key_val_group(caller+"("+_caller+(sendResponse ? (", "+sendResp
     }
     /*}}}*/
     /* 2/2 - SAVE IN [EMBEDDING PAGE DOMAIN localStorage] {{{*/
+    else if( lib_log.is_embedded(TAXO_CONTENT_SCRIPT_ID) )
     {
         Object.keys(options).forEach( function(key) {
                                           let val  =                options[ key ];
-                                          if(!val) {
-                                              lib_util.localStorage_delItem( key );
-                                          }
-                                          else {
+//                                        if(!val) {
+//                                            lib_util.localStorage_delItem( key );
+//                                        }
+//                                        else {
                                               let str =      JSON.stringify( val );
                                               lib_util.localStorage_setItem( key , str);
-                                          }
+//                                        }
 if(log_this) console.log("...saving "+key+": ",val);
                                       }
                                     );
     }
     /*}}}*/
+if(tag_this) log_sep_bot(caller, 5);
     return true;
 };
 /*}}}*/
 /*}}}*/
 
     // ┌───────────────────────────────────────────────────────────────────────┐
-    // │ OPTIONS LOG [CLICK] [STORAGE] ...... XPH/javascript/div_tools_html.js │
+    // │ OPTIONS LOG [CLICK] [STORAGE] ......... XPH/javascript/xpath_tools.js │
     // └───────────────────────────────────────────────────────────────────────┘
 /*{{{*/
 /*_ log_toggle {{{*/
@@ -2196,28 +2376,29 @@ let log_toggle = function(e) // eslint-disable-line no-unused-vars
 {
 /* eslint-disable new-cap */
 
-    let label = e.target.innerText.trim();
+    let label = e.path[0].innerText.trim();
 //console.log("%c log_toggle: label=["+label+"]", "background-color: #808; border-radius:1em; padding: 0 1em;")
+//console.trace()
 
     switch(label) {
 
     /* TOOLS */
-    case "LOG_TOOLS"      : log_toggle_LOG_TOOLS  (                    e); break;
-    case "LOG1_STEP"      : log_toggle_KEY        ( "LOG1_STEP"      , e); break;
-    case "LOG2_MESSAGE"   : log_toggle_KEY        ( "LOG2_MESSAGE"   , e); break;
-    case "LOG3_SERVER"    : log_toggle_KEY        ( "LOG3_SERVER"    , e); break;
-    case "LOG4_XHR"       : log_toggle_KEY        ( "LOG4_XHR"       , e); break;
-    case "LOG5_DIV_TOOLS" : log_toggle_KEY        ( "LOG5_DIV_TOOLS" , e); break;
-    case "LOG6_MOVE_TOOL" : log_toggle_KEY        ( "LOG6_MOVE_TOOL" , e); break;
+    case "LOG_TOOLS"      : log_toggle_LOG_TOOLS (                    e); break;
+    case "LOG1_STEP"      : log_toggle_KEY       ( "LOG1_STEP"      , e); break;
+    case "LOG2_MESSAGE"   : log_toggle_KEY       ( "LOG2_MESSAGE"   , e); break;
+    case "LOG3_SERVER"    : log_toggle_KEY       ( "LOG3_SERVER"    , e); break;
+    case "LOG4_XHR"       : log_toggle_KEY       ( "LOG4_XHR"       , e); break;
+    case "LOG5_DIV_TOOLS" : log_toggle_KEY       ( "LOG5_DIV_TOOLS" , e); break;
+    case "LOG6_MOVE_TOOL" : log_toggle_KEY       ( "LOG6_MOVE_TOOL" , e); break;
 
 
-    /* OUTLINE */
-    case "LOG_OUTLINE"    : log_toggle_LOG_OUTLINE(                    e); break;
-    case "LOG1_EVENT"     : log_toggle_KEY        ( "LOG1_EVENT"     , e); break;
-    case "LOG2_WHEEL"     : log_toggle_KEY        ( "LOG2_WHEEL"     , e); break;
-    case "LOG3_MASK"      : log_toggle_KEY        ( "LOG3_MASK"      , e); break;
-    case "LOG4_FRAMES"    : log_toggle_KEY        ( "LOG4_FRAMES"    , e); break;
-    case "LOG5_XPATH"     : log_toggle_KEY        ( "LOG5_XPATH"     , e); break;
+    /* ACTION */
+    case "LOG_ACTION"     : log_toggle_LOG_ACTION(                    e); break;
+    case "LOG1_EVENT"     : log_toggle_KEY       ( "LOG1_EVENT"     , e); break;
+    case "LOG2_WHEEL"     : log_toggle_KEY       ( "LOG2_WHEEL"     , e); break;
+    case "LOG3_MASK"      : log_toggle_KEY       ( "LOG3_MASK"      , e); break;
+    case "LOG4_FRAMES"    : log_toggle_KEY       ( "LOG4_FRAMES"    , e); break;
+    case "LOG5_XPATH"     : log_toggle_KEY       ( "LOG5_XPATH"     , e); break;
     }
 
 };
@@ -2225,7 +2406,8 @@ let log_toggle = function(e) // eslint-disable-line no-unused-vars
 /*_ log_toggle_KEY {{{*/
 let log_toggle_KEY = function(key,e)
 {
-    let ecl = e.target.classList;
+    let e_target = lib_util.get_event_target(e);
+    let      ecl = e_target.classList;
     ecl.toggle( CSS_SELECTED);
     set_option(key, ecl.contains(CSS_SELECTED));
 };
@@ -2258,29 +2440,29 @@ console.log( "...LOG_TOOLS: "    + state);
     /*}}}*/
 };
 /*}}}*/
-/*_ log_toggle_LOG_OUTLINE {{{*/
-let log_toggle_LOG_OUTLINE   = function(e) // eslint-disable-line no-unused-vars
+/*_ log_toggle_LOG_ACTION {{{*/
+let log_toggle_LOG_ACTION   = function(e) // eslint-disable-line no-unused-vars
 {
-    /* SAVE OUTLINE OPTION STATE {{{*/
+    /* SAVE ACTION OPTION STATE {{{*/
     let      state = !options.LOG3_MASK ;
-console.log( "...LOG_OUTLINE: "  + state);
+console.log( "...LOG_ACTION: "  + state);
 
-    set_option( "LOG1_EVENT"     , state);
-    set_option( "LOG2_WHEEL"     , state);
-    set_option( "LOG3_MASK"      , state);
-    set_option( "LOG4_FRAMES"    , state);
-    set_option( "LOG5_XPATH"     , state);
+    set_option( "LOG1_EVENT"    , state);
+    set_option( "LOG2_WHEEL"    , state);
+    set_option( "LOG3_MASK"     , state);
+    set_option( "LOG4_FRAMES"   , state);
+    set_option( "LOG5_XPATH"    , state);
 
     /*}}}*/
     /* SYNC GUI {{{*/
     let el;
 
-    el = lib_util.get_tool("LOG_OUTLINE"   ); if(el) { if(state) el.classList.add(CSS_SELECTED); else el.classList.remove(CSS_SELECTED); }
-    el = lib_util.get_tool("LOG1_EVENT"    ); if(el) { if(state) el.classList.add(CSS_SELECTED); else el.classList.remove(CSS_SELECTED); }
-    el = lib_util.get_tool("LOG2_WHEEL"    ); if(el) { if(state) el.classList.add(CSS_SELECTED); else el.classList.remove(CSS_SELECTED); }
-    el = lib_util.get_tool("LOG3_MASK"     ); if(el) { if(state) el.classList.add(CSS_SELECTED); else el.classList.remove(CSS_SELECTED); }
-    el = lib_util.get_tool("LOG4_FRAMES"   ); if(el) { if(state) el.classList.add(CSS_SELECTED); else el.classList.remove(CSS_SELECTED); }
-    el = lib_util.get_tool("LOG5_XPATH"    ); if(el) { if(state) el.classList.add(CSS_SELECTED); else el.classList.remove(CSS_SELECTED); }
+    el = lib_util.get_tool("LOG_ACTION"   ); if(el) { if(state) el.classList.add(CSS_SELECTED); else el.classList.remove(CSS_SELECTED); }
+    el = lib_util.get_tool("LOG1_EVENT"   ); if(el) { if(state) el.classList.add(CSS_SELECTED); else el.classList.remove(CSS_SELECTED); }
+    el = lib_util.get_tool("LOG2_WHEEL"   ); if(el) { if(state) el.classList.add(CSS_SELECTED); else el.classList.remove(CSS_SELECTED); }
+    el = lib_util.get_tool("LOG3_MASK"    ); if(el) { if(state) el.classList.add(CSS_SELECTED); else el.classList.remove(CSS_SELECTED); }
+    el = lib_util.get_tool("LOG4_FRAMES"  ); if(el) { if(state) el.classList.add(CSS_SELECTED); else el.classList.remove(CSS_SELECTED); }
+    el = lib_util.get_tool("LOG5_XPATH"   ); if(el) { if(state) el.classList.add(CSS_SELECTED); else el.classList.remove(CSS_SELECTED); }
 
     /*}}}*/
 };
@@ -2288,16 +2470,28 @@ console.log( "...LOG_OUTLINE: "  + state);
 /*}}}*/
 
 /* EXPORT {{{*/
-return { check_script_loaded
+return { SHADOW_HOST_ID
+    ,    DIV_TOOLS_ID
+    ,    check_script_loaded
     ,    div_tools_init
     ,    get_domains
     ,    get_urls
     ,    send_xpath_cmd
     ,    log_query_step
+    ,    get_div_tools
+
     , smooth_scroll_toggle_handler
+    , shadow_root_toggle_handler
     , div_tools_preventScrolling
     , div_tools_restoreScrolling
-    ,    get_div_tools : () => lib_util.get_tool("div_tools")
+
+    // EVENT
+    , div_tools_beforeunload
+    , div_tools_onDown
+    , div_tools_onKey
+    , div_tools_onOrientationchange_CB
+    , div_tools_onResize
+    , div_tools_onUp
 
     // OPTIONS
     , options
@@ -2307,11 +2501,13 @@ return { check_script_loaded
 
     // DEBUG
     , on_activated_load_options
+    , set_activated : (args) => set_activated(args || {})
 
     // DEBUG EMBEDDING [XPH/xpath_embedded.html]
     ,  get_domains_handler
     ,  get_urls_handler
     ,  get_xpaths_handler
+    ,  get_taxonomy_handler
     ,  div_tools_confine_to_viewport
     ,  get_expanded_EL_WH
     ,  query_domains
@@ -2320,8 +2516,11 @@ return { check_script_loaded
 };
 /*}}}*/
 })();
-/* ONLOAD {{{*/
-if( !xpath_content.check_script_loaded() ) xpath_content.div_tools_init();
 
-/*}}}*/
-
+xpath_content.div_tools_init();
+/*
+:e xpath_embedded.html
+:e javascript/xpath_content.js
+:e javascript/taxo_content.js
+:e javascript/event_listeners.js
+*/

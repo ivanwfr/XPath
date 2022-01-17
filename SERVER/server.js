@@ -7,7 +7,7 @@
 /* eslint-disable no-warning-comments */
 
 const SERVER_JS_ID  = "server";
-const SERVER_JS_TAG = SERVER_JS_ID  +" (211222:14h:02)";
+const SERVER_JS_TAG = SERVER_JS_ID  +" (211231:09h:03)";
 /*}}}*/
 let server = (function() {
 "use strict";
@@ -1096,7 +1096,7 @@ log_Y( "  ┌──────────────────────�
     if     ((request.url == "/taxonomy" ) && !updating && (args.url)) sql = server_sql.SELECT_taxonomy       (config, args);
     else if((request.url == "/taxonomy" )              && (args.url)) sql = server_sql.SELECT_taxonomy_update(config, args);
 
-console.log("sql=["+sql+"]");//FIXME
+//console.log("sql=["+sql+"]")
 
     response.writeHead(200, "OK", {"Content-Type": "text/html; charset=UTF-8"});
     lib_postgres.sql_query(response, sql, request.url);

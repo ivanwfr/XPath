@@ -8,7 +8,7 @@
 /*}}}*/
 /*{{{*/
 const CONFIG_JS_ID   = "config_js";
-const CONFIG_JS_TAG  =  CONFIG_JS_ID  +" (211221:00h:28)";
+const CONFIG_JS_TAG  =  CONFIG_JS_ID  +" (220112:23h:24)";
 
 /*}}}*/
 let config_js = (function() {
@@ -20,6 +20,12 @@ const OPTION_KEYS
         , "outline_log_dot"
         , "outline_log_frame"
         , "smooth_scroll"
+        , "use_lib_shadow_root"
+
+        , "activity_xpath"
+        , "activity_taxonomy"
+        , "xpath_tools_xy"
+        ,  "taxo_tools_xy"
 
         /* LOG_TOOLS */
         , "LOG1_STEP"
@@ -29,7 +35,7 @@ const OPTION_KEYS
         , "LOG5_DIV_TOOLS"
         , "LOG6_MOVE_TOOL"
 
-        /* LOG_OUTLINE */
+        /* LOG_ACTION */
         , "LOG1_EVENT"
         , "LOG2_WHEEL"
         , "LOG3_MASK"

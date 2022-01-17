@@ -32,7 +32,7 @@
 */
 
 const XPATH_OUTLINE_JS_ID         = "outline";
-const XPATH_OUTLINE_JS_TAG        =  XPATH_OUTLINE_JS_ID +" (211225:23h:45)";
+const XPATH_OUTLINE_JS_TAG        =  XPATH_OUTLINE_JS_ID +" (220110:15h:59)";
 /*}}}*/
 let xpath_outline = (function() {
 /*➔ LOG {{{*/
@@ -105,13 +105,29 @@ const CAPTURE_TRUE_PASSIVE_FALSE       = {capture:true, passive:false};
 const BODY_WHEEL_TITLE = "TURN MOUSE WHEEL TO SELECT A PARENT CONTAINER";
 /*}}}*/
 
+//┌────────────────────────────────────────────────────────────────────────────┐
+//│ CONFIG                                                                     │
+//└────────────────────────────────────────────────────────────────────────────┘
+/*_ set_config {{{*/
 let config = {};
+
 let set_config = function(_config)
 {
-//console.trace()
-    config = _config;
-//log_key_val_group("set_config config", config , 7)
+    config = _config;   let missing_config  = "";
+
+    if(!config.CMD_ADD    ) missing_config += "CMD_ADD";
+    if(!config.CMD_DELETE ) missing_config += "CMD_DELETE";
+    if(!config.CMD_CONFIRM) missing_config += "CMD_CONFIRM";
+
+    if( missing_config)
+    {
+        logBIG(XPATH_OUTLINE_JS_ID+".set_config: MISSING CONFIG: ["+missing_config+"]",2);
+        lib_log.log_caller();
+        log_key_val("config", config);
+    }
 };
+/*}}}*/
+
 //┌────────────────────────────────────────────────────────────────────────────┐
 //│ TOOL [STATE-TRANSITION]                                                    │
 //└────────────────────────────────────────────────────────────────────────────┘
@@ -133,7 +149,7 @@ if( log_this) log_caller();
 
     xpath_content.div_tools_restoreScrolling();
 
-    tools_unselect();
+    outline_tools_unselect();
 
     if(e_target) e_target.classList.add("selected");
 
@@ -159,37 +175,32 @@ let page_refresh = function(_caller)
     page_show_usr_xpath_targets(_caller);
 };
 /*}}}*/
-/*_ tools_unselect {{{*/
-let tools_unselect = function()
+/*_ outline_tools_unselect {{{*/
+let outline_tools_unselect = function()
 {
 /*{{{*/
-let   caller = "tools_unselect";
+let   caller = "outline_tools_unselect";
 let log_this = xpath_content.options.LOG1_EVENT;
 
 /*}}}*/
-    let             div_tools = lib_util.get_tool         ("div_tools"  );
-    let            taxo_tools = lib_util.get_tool         ("taxo_tools" );
-    let           div_options = lib_util.get_tool         ("div_options");
-    let div_tools_child_array = div_tools.querySelectorAll(".selected"  );
+    let             div_tools = lib_util.get_tool         ( "div_tools"    );
+    let            taxo_tools = lib_util.get_tool         ( "taxo_tools"   );
+    let           div_options = lib_util.get_tool         ( "div_options"  );
+    let          div_activity = lib_util.get_tool         ( "div_activity" );
+
+    let div_tools_child_array = div_tools.querySelectorAll( ".selected"    );
 
     for(let i=0; i<div_tools_child_array.length; ++i)
     {
         let el = div_tools_child_array[i];
 
-        if(  lib_util.is_parent_or_child(taxo_tools , el) ) /* skip children of [taxo_tools] */
-            continue;
+        if(  lib_util.is_parent_or_child(taxo_tools  , el) ) continue; /* skip children of [taxo_tools  ] */
+        if(  lib_util.is_parent_or_child(div_activity, el) ) continue; /* skip children of [div_activity] */
+        if(  lib_util.is_parent_or_child(div_options , el) ) continue; /* skip children of [div_options] */
 
-        if( !lib_util.is_parent_or_child(div_options, el) ) /* skip children of [div_options] */
-        {
-if(log_this) lib_log.log(caller+": %c"+(el.id || lib_util.get_id_or_tag(el))            , lf3);
-
+if(log_this) lib_log.log(caller+": %c"+(el.id || lib_util.get_id_or_tag(el)), lf3);
             el.classList.remove("selected");
             el.classList.remove("confirm" );
-        }
-        else {
-if(log_this) lib_log.log(caller+": %c"+(el.id || lib_util.get_id_or_tag(el))+" ➔ OPTION", lf8);
-
-        }
     }
 };
 /*}}}*/
@@ -340,7 +351,7 @@ if( log_this) log("%c"+caller, lbH+lf6);
     {
         div_outline_pick_button_clicked = null;
     }
-    div_mask_hide();
+    lib_popup.div_mask_hide();
 };
 /*}}}*/
 /*_ pick2_outline_onclick_start {{{*/
@@ -565,23 +576,32 @@ let log_this = xpath_content.options.LOG5_XPATH;
 /*}}}*/
     /* [CLICK STAGES] .. (state ➔ transition priorities) {{{*/
 
-    let handled_xpath                = wheelable_target_xpath_get();
-    let div_xpaths_child             = lib_util.get_el_parent_with_tag(e_target,"DIV");
-    let div_xpaths_child_on_cooldown = wheel_stop_handler_is_on_cooldown(div_xpaths_child);
+    let     handled_xpath                =     wheelable_target_xpath_get();
+    let     div_xpaths_child             =     lib_util.get_el_parent_with_tag     ( e_target , "DIV" );
+    let     div_xpaths_child_on_cooldown =     wheel_stop_handler_is_on_cooldown   ( div_xpaths_child );
+
+    let     div_xpaths_child_WAS = log_this && lib_util.get_id_or_tag_and_className( div_xpaths_child );
+    let             e_target_WAS = log_this && lib_util.get_id_or_tag_and_className( e_target         );
 
     let click1_oncooldown
         =   div_xpaths_child_on_cooldown
     ;
-    let click2_cmd_add_or_delete
-        =  (e_target == e_target.parentElement.firstElementChild)
+    let click2_cmd_confirm
+        =   div_xpaths_child
+        &&  div_xpaths_child.classList.contains("confirm")
     ;
-    let click3_stop
+    let click3_cmd_add_or_delete
+        =  !click2_cmd_confirm
+        && (e_target.parentElement                              )
+        && (e_target.parentElement.firstElementChild == e_target)
+    ;
+    let click4_stop
         =   handled_xpath
         && !div_xpaths_child_on_cooldown
     ;
-    let click4_start
-        =  !click2_cmd_add_or_delete
-        && !click3_stop
+    let click5_start
+        =  !click3_cmd_add_or_delete
+        && !click4_stop
         && !click1_oncooldown
     ;
 
@@ -594,8 +614,8 @@ let log_this = xpath_content.options.LOG5_XPATH;
 
     }
     /*}}}*/
-    /* [click2_cmd_add_or_delete] - CLICK [+] OR [X] .. SEND XPATH COMMAND TO SERVER {{{*/
-    if(!consumed_by && click2_cmd_add_or_delete)
+    /* [click3_cmd_add_or_delete] - CLICK [+] OR [X] .. SEND XPATH COMMAND TO SERVER {{{*/
+    if(!consumed_by && click3_cmd_add_or_delete)
     {
         let cmd
             = div_xpaths_child.classList.contains(config.CMD_DELETE ) ? config.CMD_DELETE
@@ -615,17 +635,15 @@ let log_this = xpath_content.options.LOG5_XPATH;
         }
     }
     /*}}}*/
-    /* [click3_stop.............] - STOP WHEEL FROM [handled_xpath] {{{*/
-    if(!consumed_by && click3_stop)
+    /* [click4_stop.............] - STOP WHEEL FROM [handled_xpath] {{{*/
+    if(!consumed_by && click4_stop)
     {
         consumed_by     = "STOP HANDLING WHEEL .. handled_xpath=["+handled_xpath+"]";
         lxx             = 5;
-
-        div_mask_onclick_handler(e);
     }
     /*}}}*/
-    /* [click4_start............] - START WHEEL FROM [CLICKED XPATH] .. [WHEEL OFFSET] {{{*/
-    if(!consumed_by && click4_start)
+    /* [click5_start............] - START WHEEL FROM [CLICKED XPATH] .. [WHEEL OFFSET] {{{*/
+    if(!consumed_by && click5_start && div_xpaths_child)
     {
 //log(caller+": "+lib_util.get_id_or_tag(e_target)+" WHEELING XPATH HIERARCHY")
 
@@ -645,19 +663,20 @@ let log_this = xpath_content.options.LOG5_XPATH;
 /*{{{*/
 if(xpath_content.options.LOG1_STEP) xpath_content.log_query_step("XPATH CLICK", consumed_by);
 
-if( log_this) log_key_val_group( caller +" "+consumed_by
-                                 , {   div_xpaths_child_on_cooldown
-                                     , div_xpaths_child : lib_util.get_id_or_tag( div_xpaths_child )
-                                     ,    handled_xpath : lib_util.get_id_or_tag(    handled_xpath )
-                                     ,         e_target : lib_util.get_id_or_tag(         e_target )
-                                     , click1_oncooldown
-                                     , click2_cmd_add_or_delete
-                                     , click3_stop
-                                     , click4_start
-                                 }
-                                 , lxx
-                                 , true
-                               );
+if( log_this)
+    log_key_val_group( caller +" "+consumed_by
+                     , {   div_xpaths_child_on_cooldown
+                       , div_xpaths_child : lib_util.get_id_or_tag_and_className( div_xpaths_child ) +" .. "+ div_xpaths_child_WAS
+                       ,         e_target : lib_util.get_id_or_tag_and_className(         e_target ) +" .. "+         e_target_WAS
+                       ,    handled_xpath
+                       , click1_oncooldown
+                       , click2_cmd_confirm
+                       , click3_cmd_add_or_delete
+                       , click4_stop
+                       , click5_start
+                       , callers : lib_log.get_callers()
+                     }
+                     , lxx, false);
 
 /*}}}*/
 };
@@ -699,9 +718,13 @@ if(xpath_content.options.LOG1_STEP) log("%c DELETING ALL x"+data_num_xpath_array
 let data_num_xpath_load_array = function(_data_num_xpath_array)
 {
 /*{{{*/
+let  caller = "data_num_xpath_load_array";
 let log_this = xpath_content.options.LOG1_STEP;
 
-if( log_this && _data_num_xpath_array) log("%c LOADING %c "+(_data_num_xpath_array ? (_data_num_xpath_array.length) : "0")+" XPATHS" , lbB+lbL+lf2 , lbB+lbR+lf3 );
+if( log_this && _data_num_xpath_array) {
+    lib_log.log_sep_top("XPATH LOADING", 6);
+    log("%c"+  _data_num_xpath_array.length+ " XPATH ITEMS\n", lbb+lbH+lf3,  _data_num_xpath_array);
+}
 /*}}}*/
     data_num_xpath_array.splice(0); // NO MUTATION
 
@@ -722,6 +745,7 @@ if( log_this && _data_num_xpath_array) log("%c LOADING %c "+(_data_num_xpath_arr
     div_xpaths_rebuild("XPATH ONLOAD");
 
 if(!_data_num_xpath_array) page_refresh();
+if(log_this) lib_log.log_sep_bot(caller, 6);
 };
 /*}}}*/
 /*_ data_num_xpath_keep_from_server_only {{{*/
@@ -1104,6 +1128,14 @@ let wheelable_target_xpath;
 /*_ wheel_add_listener {{{*/
 let wheel_add_listener = function(lit_node)
 {
+/*{{{*/
+let   caller = "wheel_add_listener";
+let log_this = xpath_content.options.LOG1_EVENT;
+
+if( log_this) log("%c"+caller, lbH+lf6);
+if( log_this) log_caller();
+/*}}}*/
+
     wheelable_lit_node      = lit_node;
     wheel_handler_time      = undefined;
     wheel_handler_factor    = 1;
@@ -1111,27 +1143,25 @@ let wheel_add_listener = function(lit_node)
 
     xpath_content.div_tools_preventScrolling();
 
-   /*  [div_mask] ADD listeners .. (will be shown by log_popup_follow_mask_el) {{{*/
+   /*  [div_mask] ADD listeners .. (will be shown by log_popup_follow_mask_el) */
     if(!div_mask           ) div_mask_get();
 
     let shadow_host        = lib_util.get_shadow_host();
 
     if( lib_util.get_touch_behavior() ) {
-        div_mask         .addEventListener("touchstart", wheel_pointerdown , CAPTURE_TRUE_PASSIVE_FALSE);
-        div_mask         .addEventListener("touchmove" , wheel_pointermove , CAPTURE_TRUE_PASSIVE_FALSE);
-        div_mask         .addEventListener("touchend"  , wheel_stop_handler, CAPTURE_TRUE_PASSIVE_FALSE);
-        shadow_host      .addEventListener("touchend"  , wheel_stop_handler, CAPTURE_TRUE_PASSIVE_FALSE);
+        div_mask           .addEventListener("touchstart", wheel_pointerdown , CAPTURE_TRUE_PASSIVE_FALSE);
+        div_mask           .addEventListener("touchmove" , wheel_pointermove , CAPTURE_TRUE_PASSIVE_FALSE);
+        div_mask           .addEventListener("touchend"  , wheel_stop_handler, CAPTURE_TRUE_PASSIVE_FALSE);
+        shadow_host        .addEventListener("touchend"  , wheel_stop_handler, CAPTURE_TRUE_PASSIVE_FALSE);
     }
     else {
-        div_mask         .addEventListener("wheel"     , wheel_handler     , CAPTURE_TRUE_PASSIVE_FALSE);
-        shadow_host      .addEventListener("wheel"     , wheel_handler     , CAPTURE_TRUE_PASSIVE_FALSE);
-        lib_popup.log_popup_addEventListener("wheel"     , wheel_handler);
+/**/div_mask               .addEventListener("mouseup"   , wheel_stop_handler, CAPTURE_TRUE_PASSIVE_FALSE);
+/**/shadow_host            .addEventListener("mouseup"   , wheel_stop_handler, CAPTURE_TRUE_PASSIVE_FALSE);
+        div_mask           .addEventListener("wheel"     , wheel_handler     , CAPTURE_TRUE_PASSIVE_FALSE);
+        shadow_host        .addEventListener("wheel"     , wheel_handler     , CAPTURE_TRUE_PASSIVE_FALSE);
+        lib_popup.log_popup_addEventListener("wheel"     , wheel_handler     , CAPTURE_TRUE_PASSIVE_FALSE);
     }
 
-    div_mask             .addEventListener("mouseup"   , wheel_stop_handler, CAPTURE_TRUE_PASSIVE_FALSE);
-    shadow_host          .addEventListener("mouseup"   , wheel_stop_handler, CAPTURE_TRUE_PASSIVE_FALSE);
-
-    /*}}}*/
 };
 /*}}}*/
 /*_ wheel_del_listener {{{*/
@@ -1142,6 +1172,7 @@ let   caller = "wheel_del_listener";
 let log_this = xpath_content.options.LOG1_EVENT;
 
 if( log_this) log("%c"+caller, lbH+lf6);
+if( log_this) log_caller();
 /*}}}*/
 
     if(!div_mask    ) div_mask_get();
@@ -1154,14 +1185,11 @@ if( log_this) log("%c"+caller, lbH+lf6);
         shadow_host .removeEventListener("touchend"  , wheel_stop_handler, CAPTURE_TRUE_PASSIVE_FALSE);
     }
     else {
+/**/div_mask        .removeEventListener("mouseup"   , wheel_stop_handler, CAPTURE_TRUE_PASSIVE_FALSE);
+/**/shadow_host     .removeEventListener("mouseup"   , wheel_stop_handler, CAPTURE_TRUE_PASSIVE_FALSE);
         div_mask    .removeEventListener("wheel"     , wheel_handler     , CAPTURE_TRUE_PASSIVE_FALSE);
         shadow_host .removeEventListener("wheel"     , wheel_handler     , CAPTURE_TRUE_PASSIVE_FALSE);
     }
-
-    div_mask        .removeEventListener("mouseup"   , wheel_stop_handler, CAPTURE_TRUE_PASSIVE_FALSE);
-    shadow_host     .removeEventListener("mouseup"   , wheel_stop_handler, CAPTURE_TRUE_PASSIVE_FALSE);
-
-    div_mask_hide();
 
     wheel_div_xpaths_child  = wheelable_div_xpaths_child;
 if( log_this) log("%c...STARTING WHEEL COOLDOWN .. wheel_div_xpaths_child=["+lib_util.get_id_or_tag(wheel_div_xpaths_child)+"]", lf8);
@@ -1406,8 +1434,8 @@ let log_this = xpath_content.options.LOG2_WHEEL;  /* eslint-disable-line no-unus
         logBIG(msg);
         return null;
     }
-if( log_this) log_key_val(caller+": #"+div_xpaths_child.dataset.num+" .. xpath=["+xpath+"]", data_num_xpath_array[div_xpaths_child.dataset.num], lb4);
-if( log_this) console.table(data_num_xpath_array);
+if( log_this) log_key_val(caller+": #"+div_xpaths_child.dataset.num+" .. xpath=["+xpath+"]", data_num_xpath_array[div_xpaths_child.dataset.num], lf4);
+if( log_this) log("...data_num_xpath_array:", data_num_xpath_array);
     /*}}}*/
     /* SELECT WHEEL XPATH TARGET .. or [return null] {{{*/
     let lit_node = page_wheel_from_xpath( xpath );
@@ -1584,12 +1612,17 @@ if(e. altKey) return;
 let   caller = "wheel_stop_handler";
 let log_this = xpath_content.options.LOG2_WHEEL;
 
-let has_moved = lib_util.get_has_moved_since_onDown_XY();
+    /* DRAGGING on touch-device instead of wheel handling */
+    if( lib_util.get_touch_behavior() )
+    {
+        let has_moved = lib_util.get_has_moved_since_onDown_XY();
+
 if( log_this && has_moved) log("%c"+caller+": .. has_moved=["+has_moved+"]", lbH+lf8);
-if( has_moved ) return;
+        if( has_moved ) return;
+    }
 
 let e_target = lib_util.get_event_target(e);
-if( log_this) logBIG(caller+"("+e.type+" "+lib_util.get_id_or_tag(e_target)+"): ...has_moved=["+has_moved+"]", 6);
+if( log_this) logBIG(caller+"("+e.type+" "+lib_util.get_id_or_tag(e_target)+")", 6);
 /*}}}*/
     /* REMOVE WHEEL LISTENERS and HIDE [div_mask] {{{*/
     wheel_del_listener();
@@ -1657,6 +1690,9 @@ if(log_this) logBIG("WHEEL XPATH NOT CONFIRMED", 2);
     cancel_pending_event( div_xpaths_child );
 
     page_refresh(caller);
+
+    /* MAY START ADJUSTING XPATH OF A CLICKED div_xpaths_child (220101) */
+    div_xpaths_click_handler(e_target,e);
 
 if(log_this) lib_log.log_sep_bot("WHEEL STOP ["+cmd+"]", 6);
 };
@@ -1793,12 +1829,6 @@ let div_mask_get = function()
     return div_mask;
 };
 /*}}}*/
-/*_ div_mask_hide {{{*/
-let div_mask_hide = function()
-{
-    lib_popup.div_mask_hide();
-};
-/*}}}*/
 /*_ div_mask_set_wheeling_title {{{*/
 let div_mask_set_wheeling_title = function()
 {
@@ -1813,14 +1843,14 @@ let div_mask_onclick_handler = function(e)
 let caller = "div_mask_onclick_handler"; // eslint-disable-line no-unused-vars
 let log_this = (xpath_content.options.LOG3_MASK || xpath_content.options.LOG1_EVENT);
 
-if( log_this) logBIG("CLICK: div_mask", 9);
+if( log_this) logBIG("div_mask_onclick_handler: div_mask", 9);
 /*}}}*/
     div_mask_onclick_preventDefault(e);
     /* HIDE [div_mask] {{{*/
     lib_util.cancel_event(e);
     lib_popup.log_popup(null);
 
-    div_mask_hide();
+    lib_popup.div_mask_hide();
     /*}}}*/
     /* 1/2 DIV_MASK CURRENT ACTION: USER SINGLE XPATH SELECTION {{{*/
     if( div_outline_pick_button_clicked )

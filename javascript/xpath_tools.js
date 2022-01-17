@@ -1,19 +1,21 @@
 // ┌───────────────────────────────────────────────────────────────────────────┐
-// │ [div_tools_html_js] ...................... DIV_TOOLS XPATH CONTENT SCRIPT │
+// │ [xpath_tools] ......................... DIV_TOOLS XPATH CONTENT SCRIPT │
 // └───────────────────────────────────────────────────────────────────────────┘
 /* jshint eslint {{{*/
 /* jshint esversion: 9, laxbreak:true, laxcomma:true, boss:true */
 
-/* globals console       */
-/* globals window        */
-/* globals document      */
-/* globals lib_log       */
-/* globals lib_util      */
-/* globals setTimeout    */ // eslint-disable-line no-unused-vars
-/* globals xpath_outline */
-/* globals xpath_content */
+/* globals console         */
+/* globals window          */
+/* globals document        */
+/* globals lib_log         */
+/* globals lib_util        */
+/* globals setTimeout      */ // eslint-disable-line no-unused-vars
+/* globals xpath_outline   */
+/* globals xpath_content   */
+/* globals taxo_content    */
+/* globals event_listeners */
 
-/* exported div_tools_html_js, DIV_TOOLS_HTML_JS_TAG */
+/* exported xpath_tools, XPATH_TOOLS_JS_TAG */
 
 /* eslint-disable no-global-assign    */
 /* eslint-disable no-implicit-globals */
@@ -21,24 +23,141 @@
 /* eslint-disable no-warning-comments */
 /* eslint-disable no-mixed-operators  */
 
-const DIV_TOOLS_HTML_JS_ID     = "div_tools_html_js";
-const DIV_TOOLS_HTML_JS_TAG    =  DIV_TOOLS_HTML_JS_ID  +" (211225:04h:12)";
+const XPATH_TOOLS_JS_ID     = "xpath_tools";
+const XPATH_TOOLS_JS_TAG    =  XPATH_TOOLS_JS_ID  +" (220112:23h:23)";
 /*}}}*/
-let       div_tools_html_js = (function() {
+let       xpath_tools = (function() {
 "use strict";
 
+    // ┌───────────────────────────────────────────────────────────────────────┐
+    // │ TOOLS ............................................................... │
+    // └───────────────────────────────────────────────────────────────────────┘
+/*_ [tools] {{{*/
+const tools = { loaded  : false };
+/*{{{
+ ┌───────────────────┐
+ | XPATH [div_tools] |
+ ├───────────────────┴─────────────────────────────────────────────────────────────────────┐
+ |                                                                                         |
+ |  tools.id                                                                               |
+ |  tools.loaded                                                                           |
+ |                                                                                         |
+ | ROW 1 ➔ [reload] [magnify] [options]                                                    |
+ |                                                                                         |
+ | ROW 2 ➔ DOMAINS                                                                         |
+ |  tools.div_domains                handler: xpath_content.get_domains                    |
+ |                                                                                         |
+ | ROW 3 ➔ URLS                                                                            |
+ |  tools.div_urls                   handler: xpath_content.get_urls                       |
+ |                                                                                         |
+ | ROW 4 ➔ OPTIONS                                                                         |
+ |  tools.details_options                                                                  |
+ |  tools.xpath_expand               handler: xpath_outline.outline_option_toggle_e_target |
+ |  tools.outline_log_dot            handler: xpath_outline.outline_dots_toggle_handler    |
+ |  tools.outline_log_frame          handler: xpath_outline.outline_frames_toggle_handler  |
+ |  tools.smooth_scroll              handler: xpath_content.smooth_scroll_toggle_handler   |
+ |  tools.use_lib_shadow_root        handler: xpath_content.shadow_root_toggle_handler     |
+ |                                                                                         |
+ | ROW 5 ➔ TOGGLE [XPATH TAXO]                                                             |
+ |  tools.div_activity               handler: div_activity_handler                         |
+ |                                                                                         |
+ | ROW 6 ➔ PICK                                                                            |
+ |  tools.div_outline_pick           handler: xpath_outline.pick_xpath_e_target            |
+ |                                                                                         |
+ | ROW 7 ➔ SAMPLE                                                                          |
+ |  tools.div_outline_sample         handler: xpath_outline.sampling_pick_some_xpath       |
+ |                                                                                         |
+ | ROW 8 ➔ XPATHS                                                                          |
+ |    tools.div_xpaths              handler: xpath_outline.div_xpaths_click_handler        |
+ |                                                                                         |
+ └─────────────────────────────────────────────────────────────────────────────────────────┘
+
+/*}}}
+/*}}}*/
+/*_ load_tools {{{*/
+let load_tools = function() // eslint-disable-line complexity
+{
+/*{{{*/
+let log_this = xpath_content.options.LOG5_DIV_TOOLS;
+
+if( log_this) lib_log.log("load_tools");
+/*}}}*/
+    /* ID ➔ [handler] {{{*/
+
+    // ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+    // │                  TOOLS_GUI =             BUTTON_ID           ➔ CALLBACK                                                  │
+    // └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+    /* grid row 1 ➔ DOMAINS */
+    tools.div_domains               = { id: "div_domains"          , handler: xpath_content.get_domains                    };
+
+    /* grid row 2 ➔ URLS */
+    tools.div_urls                  = { id: "div_urls"             , handler: xpath_content.get_urls                       };
+
+    /* div_options➔ OPTIONS */
+    tools.xpath_expand              = { id:  "xpath_expand"        , handler: xpath_outline.outline_option_toggle_e_target };
+    tools.outline_log_dot           = { id:  "outline_log_dot"     , handler: xpath_outline.outline_dots_toggle_handler    };
+    tools.outline_log_frame         = { id:  "outline_log_frame"   , handler: xpath_outline.outline_frames_toggle_handler  };
+    tools.smooth_scroll             = { id:  "smooth_scroll"       , handler: xpath_content.smooth_scroll_toggle_handler   };
+    tools.use_lib_shadow_root       = { id:  "use_lib_shadow_root" , handler: xpath_content.shadow_root_toggle_handler     };
+    tools.details_options           = { id: "details_options"      , handler: null }; /* checked after its children */
+
+    /* grid row 3 ➔ TOGGLE */
+    tools.div_activity              = { id: "div_activity"         , handler: div_activity_handler                         };
+
+    /* grid row 4 ➔ PICK */
+    tools.div_outline_pick          = { id: "div_outline_pick"     , handler: xpath_outline.pick_xpath_e_target            };
+
+    /* grid row 5 ➔ SAMPLE */
+    tools.div_outline_sample        = { id: "div_outline_sample"   , handler: xpath_outline.sampling_pick_some_xpath       };
+
+    /* grid row 6 ➔ XPATHS */
+    tools.div_xpaths                = { id: "div_xpaths"           , handler: xpath_outline.div_xpaths_click_handler       };
+
+    /*}}}*/
+    /* ID ➔ [el] .. (warn about GUI missing tools) {{{*/
+    let missing = "";
+
+    /* OPTION */
+    if( !tools.xpath_expand       .el ) { tools.id =  "xpath_expand"       ; tools.xpath_expand       .el = lib_util.get_tool(tools.id); if( !tools.xpath_expand       ) missing += " "+tools.id; }
+    if( !tools.outline_log_dot    .el ) { tools.id =  "outline_log_dot"    ; tools.outline_log_dot    .el = lib_util.get_tool(tools.id); if( !tools.outline_log_dot    ) missing += " "+tools.id; }
+    if( !tools.outline_log_frame  .el ) { tools.id =  "outline_log_frame"  ; tools.outline_log_frame  .el = lib_util.get_tool(tools.id); if( !tools.outline_log_frame  ) missing += " "+tools.id; }
+    if( !tools.smooth_scroll      .el ) { tools.id =  "smooth_scroll"      ; tools.smooth_scroll      .el = lib_util.get_tool(tools.id); if( !tools.smooth_scroll      ) missing += " "+tools.id; }
+    if( !tools.use_lib_shadow_root.el ) { tools.id =  "use_lib_shadow_root"; tools.use_lib_shadow_root.el = lib_util.get_tool(tools.id); if( !tools.use_lib_shadow_root) missing += " "+tools.id; }
+    if( !tools.details_options    .el ) { tools.id = "details_options"     ; tools.details_options    .el = lib_util.get_tool(tools.id); if( !tools.details_options    ) missing += " "+tools.id; }
+
+    /* DOMAINS .. URLS */
+    if( !tools.div_domains        .el ) { tools.id = "div_domains"         ; tools.div_domains        .el = lib_util.get_tool(tools.id); if( !tools.div_domains        ) missing += " "+tools.id; }
+    if( !tools.div_urls           .el ) { tools.id = "div_urls"            ; tools.div_urls           .el = lib_util.get_tool(tools.id); if( !tools.div_urls           ) missing += " "+tools.id; }
+
+    /* TOGGLE */
+    if( !tools.div_activity.el ) { tools.id = "div_activity" ; tools.div_activity.el = lib_util.get_tool(tools.id); if( !tools.div_activity) missing += " "+tools.id; }
+
+    /* XPATHS */
+    if( !tools.div_outline_pick   .el ) { tools.id = "div_outline_pick"    ; tools.div_outline_pick   .el = lib_util.get_tool(tools.id); if( !tools.div_outline_pick   ) missing += " "+tools.id; }
+    if( !tools.div_outline_sample .el ) { tools.id = "div_outline_sample"  ; tools.div_outline_sample .el = lib_util.get_tool(tools.id); if( !tools.div_outline_sample ) missing += " "+tools.id; }
+    if( !tools.div_xpaths         .el ) { tools.id = "div_xpaths"          ; tools.div_xpaths         .el = lib_util.get_tool(tools.id); if( !tools.div_xpaths         ) missing += " "+tools.id; }
+
+    /*}}}*/
+    /* MISSING TOOLS {{{*/
+    tools.loaded = !missing;
+if(!tools.loaded)
+        lib_log.logBIG("MISSING TOOLS: "+missing);
+    /*}}}*/
+};
+/*}}}*/
 
     // ┌───────────────────────────────────────────────────────────────────────┐
-    // │ CSS .. DYNAMIC JS-INLINING ............ [../stylesheet/div_tools.css] │
+    // │ CSS .. DYNAMIC JS-INLINING .......... [../stylesheet/xpath_tools.css] │
     // └───────────────────────────────────────────────────────────────────────┘
   /** [div_tools_css_data] {{{*/
 /*
-../stylesheet/div_tools.css
+../stylesheet/xpath_tools.css
 */
 let div_tools_css_data ="data:text/css,"+ escape(`
 /*INLINE{{{*/
 
-   #div_tools_css_tag { content: "dom_tools_css (211216:16h:36)";           }
+   #xpath_tools.css        { content: "dom_tools_html_css (220110:15h:40)"; }
 .waiting_animation SPAN {
     display                   : inline-block;
     font-size                 : 150%;
@@ -124,12 +243,15 @@ DIV.folded        OL {   width: 0; height: 0; min-width: 0; min-height: 0; };
           #div_magnify        { grid-column-start: 2; grid-column-end: 3; grid-row-start        : 1; margin: 0; }
           #div_options.hidden { position: unset   ; grid-column-start: 3; grid-column-end: 4; grid-row-start        : 1; margin: 0; }
           #div_options        { position: absolute; top: 0.5em; left: 100%;                          margin: 0; }
+
           #div_domains        {                                           grid-row-start        : 2; }
           #div_urls           {                                           grid-row-start        : 3; }
+
       #details_options        {                                           grid-row-start        : 4; }
-          #div_outline_pick   {                                           grid-row-start        : 5; }
-          #div_outline_sample {                                           grid-row-start        : 6; }
-          #div_xpaths         {                                           grid-row-start        : 7; }
+          #taxo_tools         {                                           grid-row-start        : 5; }
+          #div_outline_pick   {                                           grid-row-start        : 6; }
+          #div_outline_sample {                                           grid-row-start        : 7; }
+          #div_xpaths         {                                           grid-row-start        : 8; }
 #help {
     position       : absolute; top: 2em; left: 100%;
     pointer-events : none;
@@ -306,8 +428,8 @@ DIV.folded        OL {   width: 0; height: 0; min-width: 0; min-height: 0; };
     .p_input                          {                                            margin-top:   0.2em; }
     .p_input LABEL                    {                                            margin-left:  1.0em; }
     .p_input LABEL.selected::before   { content: "\\2714"; position: absolute;      margin-left: -1.0em; }
-#div_tools.magnify   { transform       : scale(1.5); }
 #div_tools           { transform-origin: 0 0;        }
+#div_tools.magnify   { transform       : scale(1.5); }
 
 #div_tools {
 
@@ -343,15 +465,17 @@ DIV.folded        OL {   width: 0; height: 0; min-width: 0; min-height: 0; };
     vertical-align    : middle;
     font-weight       : bolder;
 }
-          #xpath_expand.selected::before      { content     : "\\2714"; position: absolute; margin-left: -1em; }
-          #outline_log_dot.selected::before   { content     : "\\2714"; position: absolute; margin-left: -1em; }
-          #outline_log_frame.selected::before { content     : "\\2714"; position: absolute; margin-left: -1em; }
-          #smooth_scroll.selected::before     { content     : "\\2714"; position: absolute; margin-left: -1em; }
+          #xpath_expand.selected::before        { content     : "\\2714"; position: absolute; margin-left: -1em; }
+          #outline_log_dot.selected::before     { content     : "\\2714"; position: absolute; margin-left: -1em; }
+          #outline_log_frame.selected::before   { content     : "\\2714"; position: absolute; margin-left: -1em; }
+          #smooth_scroll.selected::before       { content     : "\\2714"; position: absolute; margin-left: -1em; }
+          #use_lib_shadow_root.selected::before { content     : "\\2714"; position: absolute; margin-left: -1em; }
 
-          #xpath_expand                       { text-align  : right; line-height : 1.0em; }
-          #outline_log_dot                    { text-align  : right; line-height : 1.0em; }
-          #outline_log_frame                  { text-align  : right; line-height : 1.0em; }
-          #smooth_scroll                      { text-align  : right; line-height : 1.0em; }
+          #xpath_expand                         { text-align  : right; line-height : 1.0em; }
+          #outline_log_dot                      { text-align  : right; line-height : 1.0em; }
+          #outline_log_frame                    { text-align  : right; line-height : 1.0em; }
+          #smooth_scroll                        { text-align  : right; line-height : 1.0em; }
+          #use_lib_shadow_root                  { text-align  : right; line-height : 1.0em; }
 .wheelable    { background-color : rgba(128,128,128,0.5) !important; color: #FFF !important; }
 
           .lit{ outline-offset   : 7px;                              }
@@ -384,8 +508,46 @@ DIV.folded        OL {   width: 0; height: 0; min-width: 0; min-height: 0; };
 #div_mask.bg8 { background-color : rgba(160,160,160,0.9) !important; }
 #div_mask.bg9 { background-color : rgba(255,255,255,0.9) !important; }
 #div_mask.bg0 { background-color : rgba(032,032,032,0.9) !important; }
+#div_activity                   { display               : grid !important; }
+#div_activity                   { grid-gap              : 0;               }
+#div_activity                   { grid-template-columns : 3fr 1fr 3fr;     }
+#div_activity>*                 { margin                : 0 0.5em;         }
+#div_activity>*                 { text-align            : center;          }
+
+#div_activity>BUTTON                { margin           : 3px;   }
+#div_activity>BUTTON:nth-of-type(1) { background-color : rgba(255,000,000,0.5); }
+#div_activity>BUTTON:nth-of-type(2) { background-color : rgba(000,255,000,0.5); }
+
+#div_activity>BUTTON                { opacity          :   50%; }
+#div_activity>BUTTON.selected       { opacity          :  100%; }
+
+#div_activity>BUTTON                { box-shadow       : none;                    }
+#div_activity>BUTTON.selected       { box-shadow       : 2px 2px 3px #000 inset;  }
+
+#div_activity>BUTTON                { outline          : none;             }
+#div_activity>BUTTON.selected       { outline          : 2px solid white;  }
+
+#div_activity>BUTTON                { margin           :   3px; }
+#div_activity>BUTTON:nth-of-type(1) { background-color : rgba(255,000,000,0.5); }
+#div_activity>BUTTON:nth-of-type(2) { background-color : rgba(000,255,000,0.5); }
+
+#div_activity>BUTTON                { opacity          :  50%; }
+#div_activity>BUTTON.selected       { opacity          : 100%; }
+
+#div_activity>BUTTON                { box-shadow       : none;                   }
+#div_activity>BUTTON.selected       { box-shadow       : 2px 2px 3px #000 inset; }
+
+#div_activity>BUTTON                { outline          : none;            }
+#div_activity>BUTTON.selected       { outline          : 2px solid white; }
+#div_outline_pick.hidden   { display : none !important; }
+#div_outline_pick.hidden   { display : none !important; }
+#div_outline_sample.hidden { display : none !important; }
+
+#div_xpaths.hidden         { display : none !important; }
+#taxo_tools.hidden         { display : none !important; }
+.buttons_pod.hidden        { display : none !important; }
 /*INLINE}}}*/
-/*# sourceURL=div_tools.css */
+/*# sourceURL=xpath_tools.css */
 `
 )
  .replace(/\\(\\x+)/g,"\\\\$1")
@@ -405,17 +567,17 @@ let dom_load = function(html_fragment)
         {
             let error_msg = "[div_tools_css_data] IS MISSING";
             console.log   ("%c *** "+error_msg+" *** ", "font-size:200%; background-color:red;");
-            console.error (DIV_TOOLS_HTML_JS_ID+": "+error_msg);
+            console.error (XPATH_TOOLS_JS_ID+": "+error_msg);
         }
 
         html_fragment.appendChild( div_tools_css );
     }
     catch(ex) {
-        console.log(DIV_TOOLS_HTML_JS_ID+": LOADING DATA .. catch");
+        console.log(XPATH_TOOLS_JS_ID+": LOADING DATA .. catch");
         console.dir(ex);
     }
     finally {
-//console.log(DIV_TOOLS_HTML_JS_ID+": LOADING DATA .. finally: div_tools_css.length=["+div_tools_css.length+"]")
+//console.log(XPATH_TOOLS_JS_ID+": LOADING DATA .. finally: div_tools_css.length=["+div_tools_css.length+"]")
         window.removeEventListener("error", load_onerror, false);
     }
 };
@@ -424,7 +586,7 @@ let dom_load = function(html_fragment)
 let load_onerror_count = 0;
 let load_onerror = function(e)
 {
-    console.log("%c "+DIV_TOOLS_HTML_JS_TAG      +" %c * load_onerror #"+(++load_onerror_count)
+    console.log("%c "+XPATH_TOOLS_JS_TAG      +" %c * load_onerror #"+(++load_onerror_count)
                 ,"background-color:#111",  "background-color:#500"                    );
     console.dir( e );
 
@@ -452,13 +614,13 @@ let load_css_EL = function(id, scheme_arg) {
 /*}}}*/
 
     // ┌───────────────────────────────────────────────────────────────────────┐
-    // │ CSS (INLINED) ......................... [../stylesheet/div_tools.css] │
+    // │ CSS (INLINED) ....................... [../stylesheet/xpath_tools.css] │
     // └───────────────────────────────────────────────────────────────────────┘
-/* INLINING FROM VIM .. XPH/stylesheet/div_tools.css stylesheet/div_tools.css {{{*/
+/* INLINING FROM VIM .. XPH/stylesheet/xpath_tools.css stylesheet/xpath_tools.css {{{*/
 /*
-:/^<style>/+,/<\/style>/-d|-read!sed -e 's;\\\\;\\\\\\\\;g' %:h/../stylesheet/div_tools.css
+:/^<style>/+,/<\/style>/-d|-read!sed -e 's;\\\\;\\\\\\\\;g' %:h/../stylesheet/xpath_tools.css
 :/^<style>/+,/<\/style>/-d|s/^/\r/
-:e %:h/../stylesheet/div_tools.css
+:e %:h/../stylesheet/xpath_tools.css
 */
 const DIV_TOOLS_CSS =
 `
@@ -484,7 +646,7 @@ const MISSING_INLINE_CSS = /* eslint-disable-line no-unused-vars */
  background       : #222;
  font-size        : 32px !important;
  color            : red;
- content          : "MISSING INLINE: XPH/stylesheet/div_tools.css";
+ content          : "MISSING INLINE: XPH/stylesheet/xpath_tools.css";
 }
 </style>
 `;
@@ -531,10 +693,11 @@ let get_div_tools_innerHTML = function()
  <details  id="details_options">
   <summary><em>OPTIONS </em></summary>
   <div>
-   <button id="xpath_expand"     > EXPAND XPATH  </button> <span> expand <b>SELECTED XPath</b>     </span>
-   <button id="outline_log_dot"  > LOG DOTS      </button> <span> trace containers detection point </span>
-   <button id="outline_log_frame"> LOG FRAMES    </button> <span> trace containers border          </span>
-   <button id="smooth_scroll"    > SMOOTH SCROLL </button> <span> ... or instant scroll behavior   </span>
+   <button id="xpath_expand"       > EXPAND XPATH        </button> <span> expand <b>SELECTED XPath</b>     </span>
+   <button id="outline_log_dot"    > LOG DOTS            </button> <span> trace containers detection point </span>
+   <button id="outline_log_frame"  > LOG FRAMES          </button> <span> trace containers border          </span>
+   <button id="smooth_scroll"      > SMOOTH SCROLL       </button> <span> ... or instant scroll behavior   </span>
+   <button id="use_lib_shadow_root"> use_lib_shadow_root </button> <span> single top-level menu            </span>
   </div>
  </details>
 
@@ -550,8 +713,8 @@ let get_div_tools_innerHTML = function()
  </details>
 
  <details>
-  <summary><em>OUTLINE</em></summary>
-  <div class="p_input"> <label id= "LOG_OUTLINE"   > LOG_OUTLINE    </label></div>
+  <summary><em>ACTION</em></summary>
+  <div class="p_input"> <label id= "LOG_ACTION"   > LOG_ACTION    </label></div>
   <div class="p_input fg1"> <label id= "LOG1_EVENT"    > LOG1_EVENT     </label></div>
   <div class="p_input fg2"> <label id= "LOG2_WHEEL"    > LOG2_WHEEL     </label></div>
   <div class="p_input fg3"> <label id= "LOG3_MASK"     > LOG3_MASK      </label></div>
@@ -583,6 +746,16 @@ let get_div_tools_innerHTML = function()
     ;
 
     /*}}}*/
+    /*  div_activity {{{*/
+    let div_activity_innerHTML
+        = "<div id='div_activity'>"
+        + "  <button id='activity_xpath'   >XPATH</button>"
+        + "  <b>&#x25CF;</b>"
+        + "  <button id='activity_taxonomy'>TAXO</button>"
+        + "</div>"
+    ;
+
+    /*}}}*/
     /* div_xpaths_innerHTML {{{*/
     let div_xpaths_innerHTML
         = "<div id='div_xpaths'>... ➔</div>"
@@ -606,8 +779,8 @@ let get_div_tools_innerHTML = function()
 
     /*}}}*/
 
-    let is_embedded = lib_log.is_embedded(DIV_TOOLS_HTML_JS_ID);
-    let    css_link = "<link href='stylesheet/div_tools.css' rel='stylesheet' type='text/css' />"; // wont work with manifest.json
+    let is_embedded = lib_log.is_embedded(XPATH_TOOLS_JS_ID);
+    let    css_link = "<link href='stylesheet/xpath_tools.css' rel='stylesheet' type='text/css' />"; // wont work with manifest.json
     let tools_css
         = (DIV_TOOLS_CSS.length > 64) ?  DIV_TOOLS_CSS
         : is_embedded                 ?  css_link
@@ -626,13 +799,13 @@ let get_div_tools_innerHTML = function()
     // --------------------------------
         +  div_urls_innerHTML           // .. grid row 3
     // --------------------------------
-//      +  details_options_innerHTML    // .. grid row 4
+        +  div_activity_innerHTML       // .. grid row 4
     // --------------------------------
-        +  div_outline_pick_innerHTML   // .. grid row 4
+        +  div_outline_pick_innerHTML   // .. grid row 5
     // --------------------------------
-        +  div_outline_sample_innerHTML // .. grid row 5
+        +  div_outline_sample_innerHTML // .. grid row 6
     // --------------------------------
-        +  div_xpaths_innerHTML         // .. grid row 6
+        +  div_xpaths_innerHTML         // .. grid row 7
     // --------------------------------
         + "</div>"
     ;
@@ -646,33 +819,44 @@ let update_div_tools_innerHTML = function(options={}) // eslint-disable-line com
 let caller = "update_div_tools_innerHTML";
 let log_this = xpath_content.options.LOG5_DIV_TOOLS;
 
-if(log_this) lib_log.log_key_val(caller+"(options)", options);
+if(log_this) lib_log.log_key_val_group(caller+"(options)", options);
 /*}}}*/
-    /* div_options LOG_TOOLS .. LOG_OUTLINE .. details_options {{{*/
+    /* div_options LOG_TOOLS .. LOG_ACTION .. details_options {{{*/
     let id;              let el;
 
-    /* OPTIONS */
-    id ="xpath_expand"     ; el = lib_util.get_tool(id); el         .className = get_option(id) ? "option selected" : "option" ;
-    id ="outline_log_dot"  ; el = lib_util.get_tool(id); el         .className = get_option(id) ? "option selected" : "option" ;
-    id ="outline_log_frame"; el = lib_util.get_tool(id); el         .className = get_option(id) ? "option selected" : "option" ;
-    id ="smooth_scroll"    ; el = lib_util.get_tool(id); el         .className = get_option(id) ? "option selected" : "option" ;
+    /* ACTIVITY */
+    id ="activity_xpath"      ;
+    el = lib_util.get_tool(id);
+    el         .className = get_option(id) ? "option selected" : "option" ;
 
-    id ="details_options"  ; el = lib_util.get_tool(id); el.setAttribute("open", get_option(id) ?            "true" : "false" );
+    id ="activity_taxonomy"   ;
+    el = lib_util.get_tool(id);
+    el         .className = get_option(id) ? "option selected" : "option" ;
+
+
+    /* OPTIONS */
+    id ="xpath_expand"        ; el = lib_util.get_tool(id); el         .className = get_option(id) ? "option selected" : "option" ;
+    id ="outline_log_dot"     ; el = lib_util.get_tool(id); el         .className = get_option(id) ? "option selected" : "option" ;
+    id ="outline_log_frame"   ; el = lib_util.get_tool(id); el         .className = get_option(id) ? "option selected" : "option" ;
+    id ="smooth_scroll"       ; el = lib_util.get_tool(id); el         .className = get_option(id) ? "option selected" : "option" ;
+    id ="use_lib_shadow_root" ; el = lib_util.get_tool(id); el         .className = get_option(id) ? "option selected" : "option" ;
+
+    id ="details_options"     ; el = lib_util.get_tool(id); el.setAttribute("open", get_option(id) ?            "true" : "false" );
 
     /* LOG_TOOLS */
-    id ="LOG1_STEP"         ; el = lib_util.get_tool(id); el         .className = get_option(id) ? "option selected" : "option" ;
-    id ="LOG2_MESSAGE"      ; el = lib_util.get_tool(id); el         .className = get_option(id) ? "option selected" : "option" ;
-    id ="LOG3_SERVER"       ; el = lib_util.get_tool(id); el         .className = get_option(id) ? "option selected" : "option" ;
-    id ="LOG4_XHR"          ; el = lib_util.get_tool(id); el         .className = get_option(id) ? "option selected" : "option" ;
-    id ="LOG5_DIV_TOOLS"    ; el = lib_util.get_tool(id); el         .className = get_option(id) ? "option selected" : "option" ;
-    id ="LOG6_MOVE_TOOL"    ; el = lib_util.get_tool(id); el         .className = get_option(id) ? "option selected" : "option" ;
+    id ="LOG1_STEP"           ; el = lib_util.get_tool(id); el         .className = get_option(id) ? "option selected" : "option" ;
+    id ="LOG2_MESSAGE"        ; el = lib_util.get_tool(id); el         .className = get_option(id) ? "option selected" : "option" ;
+    id ="LOG3_SERVER"         ; el = lib_util.get_tool(id); el         .className = get_option(id) ? "option selected" : "option" ;
+    id ="LOG4_XHR"            ; el = lib_util.get_tool(id); el         .className = get_option(id) ? "option selected" : "option" ;
+    id ="LOG5_DIV_TOOLS"      ; el = lib_util.get_tool(id); el         .className = get_option(id) ? "option selected" : "option" ;
+    id ="LOG6_MOVE_TOOL"      ; el = lib_util.get_tool(id); el         .className = get_option(id) ? "option selected" : "option" ;
 
-    /* LOG_OUTLINE */
-    id ="LOG1_EVENT"        ; el = lib_util.get_tool(id); el         .className = get_option(id) ? "option selected" : "option" ;
-    id ="LOG2_WHEEL"        ; el = lib_util.get_tool(id); el         .className = get_option(id) ? "option selected" : "option" ;
-    id ="LOG3_MASK"         ; el = lib_util.get_tool(id); el         .className = get_option(id) ? "option selected" : "option" ;
-    id ="LOG4_FRAMES"       ; el = lib_util.get_tool(id); el         .className = get_option(id) ? "option selected" : "option" ;
-    id ="LOG5_XPATH"        ; el = lib_util.get_tool(id); el         .className = get_option(id) ? "option selected" : "option" ;
+    /* LOG_ACTION */
+    id ="LOG1_EVENT"          ; el = lib_util.get_tool(id); el         .className = get_option(id) ? "option selected" : "option" ;
+    id ="LOG2_WHEEL"          ; el = lib_util.get_tool(id); el         .className = get_option(id) ? "option selected" : "option" ;
+    id ="LOG3_MASK"           ; el = lib_util.get_tool(id); el         .className = get_option(id) ? "option selected" : "option" ;
+    id ="LOG4_FRAMES"         ; el = lib_util.get_tool(id); el         .className = get_option(id) ? "option selected" : "option" ;
+    id ="LOG5_XPATH"          ; el = lib_util.get_tool(id); el         .className = get_option(id) ? "option selected" : "option" ;
 
     /*}}}*/
 };
@@ -694,11 +878,11 @@ let div_tools;
 // │ 3. content_script is loaded by embedding html page                        │
 // │ 4. setTimeout calls shadow_host_addEventListener reference content_script │
 // └───────────────────────────────────────────────────────────────────────────┘
-let inject_shadow_root = function()
+let inject_shadow_root = function(_log_this)
 {
 /*{{{*/
-let caller = "inject_shadow_root";
-let log_this = xpath_content.options.LOG5_DIV_TOOLS;
+let caller = XPATH_TOOLS_JS_ID+".inject_shadow_root";
+let log_this = _log_this || xpath_content.options.LOG1_STEP;
 
 /*}}}*/
 //lib_log.log_caller()
@@ -707,14 +891,14 @@ let log_this = xpath_content.options.LOG5_DIV_TOOLS;
     tools.loaded = false;
 
     /* [html_fragment] .. [shadow_host] .. [shadowRoot] {{{*/
-    let html_fragment;// = document.getElementById( SHADOW_HOST_ID ).shadowRoot;
-    let shadow_host      = document.getElementById( lib_util.SHADOW_HOST_ID );
+    let html_fragment;// = document.getElementById( xpath_content.SHADOW_HOST_ID ).shadowRoot;
+    let shadow_host      = document.getElementById( xpath_content.SHADOW_HOST_ID );
     if(!shadow_host)
     {
 //lib_log.logBIG("➔ ADDING [shadow_host]", 1)
 
         shadow_host                = document.createElement("DIV");
-        shadow_host.id             = lib_util.SHADOW_HOST_ID;
+        shadow_host.id             = xpath_content.SHADOW_HOST_ID;
         shadow_host.style.revert   =     "all";
         shadow_host.style.fontSize =  "revert !important";
       //shadow_host.style.fontSize = "initial !important"; // OK: wikipedia.org
@@ -743,9 +927,9 @@ if(log_this) lib_log.logBIG(caller+"...OK [shadow_host]", 1);
 
     update_div_tools_innerHTML( xpath_content.options );
 
-    div_tools = html_fragment.getElementById("div_tools");
+    div_tools = html_fragment.getElementById(xpath_content.DIV_TOOLS_ID);
 
-//console.log("%c div_tools_html", "font-size:200%;");
+//console.log("%c xpath_tools", "font-size:200%;");
 //console.dir(div_tools);
 //console.log("div_tools.parentElement:", div_tools.parentElement);
 
@@ -753,8 +937,9 @@ if(log_this) lib_log.logBIG(caller+"...OK [shadow_host]", 1);
 
     shadow_host_addEventListener();
 
-    let div_options = html_fragment.getElementById("div_options");
-    div_options.addEventListener("click", xpath_content.log_toggle, CAPTURE_TRUE_PASSIVE_FALSE);
+//  let div_options = html_fragment.getElementById("div_options");
+//console.log("xpath_tools.inject_shadow_root.div_options:",div_options)
+//  div_options.addEventListener("click", xpath_content.log_toggle, CAPTURE_TRUE_PASSIVE_FALSE);
 
     /* [DETAILS] RESTORE OPEN STATE SAVED IN localStorage {{{*/
     details_load_open_state();
@@ -806,8 +991,11 @@ let details_ontoggle = function(event)
 /*_ shadow_host_addEventListener {{{*/
 let shadow_host_addEventListener = function() // eslint-disable-line no-unused-vars
 {
-    let shadow_host = document.getElementById( lib_util.SHADOW_HOST_ID );
-    shadow_host.addEventListener("click", shadow_host_click_handler, CAPTURE_TRUE_PASSIVE_FALSE);
+    let     shadow_host = document.getElementById( xpath_content.SHADOW_HOST_ID );
+    let on_touch_device = ("ontouchstart" in document.documentElement);
+
+    if( on_touch_device ) shadow_host.addEventListener("touchend", shadow_host_click_handler, CAPTURE_TRUE_PASSIVE_FALSE);
+    else                  shadow_host.addEventListener("mouseup" , shadow_host_click_handler, CAPTURE_TRUE_PASSIVE_FALSE);
 
 };
 /*}}}*/
@@ -830,7 +1018,8 @@ if(log_this) lib_log.logBIG("SHADOW_HOST MOVED", 8);
         return;
     }
 
-if( log_this) lib_log.logBIG(caller);
+if( log_this) lib_log.logBIG(caller+"( "+lib_util.get_id_or_tag_and_className(event.path[0])+" )");
+//lib_log.log_caller()
 /*}}}*/
 
     let { tool_id, e_target, handler} = get_event_tool_target_handler( event );
@@ -852,108 +1041,126 @@ if(log_this) lib_log.log_key_val(caller, { tool_id , handler , e_target, callers
 //  else console.log("NO HANDLER FOR ["+e_target+"]")
 };
 /*}}}*/
-/*_ get_event_tool_target_handler {{{*/
-let get_event_tool_target_handler = function(event) // eslint-disable-line complexity
+/*_ div_activity_handler {{{*/
+let div_activity_handler = function(e_target,e)
 {
+    /* TOGGLE [activated] ON [button_xpath] OR [button_taxonomy] */
+/*{{{
+//  let em_array = e_target.parentElement.querySelectorAll("EM");
+//  Array.from(em_array).forEach( (el) => {
+//      if(     el == e_target) el.classList.toggle("selected");
+//  });
+}}}*/
+    let        key      = e_target.id;
+    /*.................*/ e_target.classList.toggle  ("selected");
+    let             val = e_target.classList.contains("selected");
+    set_option(key, val);
+
+    div_activity_apply(e);
+};
+/*}}}*/
+/*_ div_activity_apply {{{*/
+let div_activity_apply = function(e)
+{
+    if(!tools.loaded) load_tools();
+//    /* [XPATH ● TAXO] .. CHECK BUTTONS STATE {{{*/
+//    let button = tools.div_activity.el;
+//
+//    /* [button_xpath] .. [button_taxonomy] */
+//    let button_xpath;
+//    let button_taxonomy;
+//
+//    let em_array = button.querySelectorAll("EM");
+//    Array.from(em_array).forEach( (el) => {
+//        if     (el.innerText.toLowerCase().includes("taxo"    )) button_taxonomy = el;
+//        else if(el.innerText.toLowerCase().includes("xpath"   )) button_xpath    = el;
+//    });
+//    /*}}}*/
+    /* [XPATH  TOOLS] .. [div_tools] [outline-pick] [outline-sample] [xpths] {{{*/
+ // if(button_xpath   .classList.contains("selected"))
+//  if(e.target.id == "activity_xpath")
+    if( get_option("activity_xpath") )
+    {
+        tools.div_outline_pick  .el.classList.remove("hidden");
+        tools.div_outline_sample.el.classList.remove("hidden");
+        tools.div_xpaths        .el.classList.remove("hidden");
+    }
+    else {
+        tools.div_outline_pick  .el.classList.add   ("hidden");
+        tools.div_outline_sample.el.classList.add   ("hidden");
+        tools.div_xpaths        .el.classList.add   ("hidden");
+    }
+    /*}}}*/
+    /* [TAXO   TOOLS] .. [UNHIDE] .. f[XPATH ● TAXO] {{{*/
+    let  taxo_div_tools  = taxo_content.get_div_tools();
+//  if(button_taxonomy.classList.contains("selected"))
+//  if(e.target.id == "activity_taxonomy")
+    if( get_option("activity_taxonomy") )
+    {
+        if(taxo_div_tools) taxo_div_tools.classList.remove("hidden");
+
+        taxo_content.show_top_menu ();//FIXME
+//      setTimeout(taxo_content.show_top_menu, 1000);//FIXME
+    }
+    else {
+        if(taxo_div_tools) taxo_div_tools.classList.add("hidden");
+
+        taxo_content.hide_taxo_menu();
+    }
+    /*}}}*/
+    /* REVALIDATE TOOLS GUI */
+    event_listeners.on_resize(e);
+
+/*{{{
+    lib_log.log_key_val("div_activity_apply"
+                        , {   button_taxonomy : lib_util.get_id_or_tag_and_className( button_taxonomy )
+                            , button_xpath    : lib_util.get_id_or_tag_and_className( button_xpath    )
+                            , xpath_taxo_tools
+                            , xpath_div_tools
+                        });
+}}}*/
+};
+/*}}}*/
+/*_ get_event_tool_target_handler {{{*/
+let get_event_tool_target_handler = function(e) // eslint-disable-line complexity
+{
+//console.log("get_event_tool_target_handler")
+
     /* [tools.loaded] {{{*/
     if(!tools.loaded) load_tools();
 
     /*}}}*/
     /* [e_target] {{{*/
 
-    let e_target = lib_util.get_event_target(event);
+    let e_target = lib_util.get_event_target(e);
+//console.log("e_target=["+e_target+"]")
     let     tool;
-
     /* DOMAINS */
-    if     ( lib_util.is_el_child_of_el(e_target, tools.div_domains       .el) ) { tool = tools.div_domains       ; }
+    if     ( lib_util.is_el_child_of_el(e_target, tools.div_domains         .el) ) { tool = tools.div_domains        ; }
 
     /* URLS */
-    else if( lib_util.is_el_child_of_el(e_target, tools.div_urls          .el) ) { tool = tools.div_urls          ; }
+    else if( lib_util.is_el_child_of_el(e_target, tools.div_urls            .el) ) { tool = tools.div_urls           ; }
 
     /* OPTION */
-    else if( lib_util.is_el_child_of_el(e_target, tools.xpath_expand      .el) ) { tool = tools.xpath_expand      ; }
-    else if( lib_util.is_el_child_of_el(e_target, tools.outline_log_dot   .el) ) { tool = tools.outline_log_dot   ; }
-    else if( lib_util.is_el_child_of_el(e_target, tools.outline_log_frame .el) ) { tool = tools.outline_log_frame ; }
-    else if( lib_util.is_el_child_of_el(e_target, tools.smooth_scroll     .el) ) { tool = tools.smooth_scroll     ; }
-    else if( lib_util.is_el_child_of_el(e_target, tools.details_options   .el) ) { tool = tools.details_options   ; }
+    else if( lib_util.is_el_child_of_el(e_target, tools. xpath_expand       .el) ) { tool = tools.xpath_expand       ; }
+    else if( lib_util.is_el_child_of_el(e_target, tools. outline_log_dot    .el) ) { tool = tools.outline_log_dot    ; }
+    else if( lib_util.is_el_child_of_el(e_target, tools. outline_log_frame  .el) ) { tool = tools.outline_log_frame  ; }
+    else if( lib_util.is_el_child_of_el(e_target, tools. smooth_scroll      .el) ) { tool = tools.smooth_scroll      ; }
+    else if( lib_util.is_el_child_of_el(e_target, tools. use_lib_shadow_root.el) ) { tool = tools.use_lib_shadow_root; }
+    else if( lib_util.is_el_child_of_el(e_target, tools.details_options     .el) ) { tool = tools.details_options    ; }
+
+    /* TOGGLE TAXO-XPATH */
+    else if( lib_util.is_el_child_of_el(e_target, tools.div_activity .el) ) { tool = tools.div_activity; }
 
     /* XPATHS */
-    else if( lib_util.is_el_child_of_el(e_target, tools.div_outline_pick  .el) ) { tool = tools.div_outline_pick  ; }
-    else if( lib_util.is_el_child_of_el(e_target, tools.div_outline_sample.el) ) { tool = tools.div_outline_sample; }
-    else if( lib_util.is_el_child_of_el(e_target, tools.div_xpaths        .el) ) { tool = tools.div_xpaths        ; }
+    else if( lib_util.is_el_child_of_el(e_target, tools.div_outline_pick    .el) ) { tool = tools.div_outline_pick   ; }
+    else if( lib_util.is_el_child_of_el(e_target, tools.div_outline_sample  .el) ) { tool = tools.div_outline_sample ; }
+    else if( lib_util.is_el_child_of_el(e_target, tools.div_xpaths          .el) ) { tool = tools.div_xpaths         ; }
     else {
         return {};
     }
     /*}}}*/
     return { tool_id: tool.id , e_target , handler: tool.handler };
-};
-/*}}}*/
-/*_ load_tools {{{*/
-/*{{{*/
-const tools = { loaded  : false };
-
-/*}}}*/
-let load_tools = function() // eslint-disable-line complexity
-{
-/*{{{*/
-let log_this = xpath_content.options.LOG5_DIV_TOOLS;
-
-if( log_this) lib_log.log("load_tools");
-/*}}}*/
-    /* ID ➔ [handler] {{{*/
-
-    // ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
-    // │                  TOOLS_GUI =             BUTTON_ID           ➔ CALLBACK                                                  │
-    // └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
-
-    /* grid row 1 ➔ DOMAINS */
-    tools.div_domains               = {       id: "div_domains"       , handler: xpath_content.get_domains                    };
-
-    /* grid row 2 ➔ URLS */
-    tools.div_urls                  = {       id: "div_urls"          , handler: xpath_content.get_urls                       };
-
-    /* div_options➔ OPTIONS */
-    tools.details_options           = {       id: "details_options"   , handler: null                                            };
-    tools.xpath_expand              = {       id: "xpath_expand"      , handler:          xpath_outline.outline_option_toggle_e_target };
-    tools.outline_log_dot           = {       id: "outline_log_dot"   , handler:          xpath_outline.outline_dots_toggle_handler    };
-    tools.outline_log_frame         = {       id: "outline_log_frame" , handler:          xpath_outline.outline_frames_toggle_handler  };
-    tools.smooth_scroll             = {       id: "smooth_scroll"     , handler: xpath_content.smooth_scroll_toggle_handler   };
-
-    /* grid row 3 ➔ PICK */
-    tools.div_outline_pick          = {       id: "div_outline_pick"  , handler:          xpath_outline.pick_xpath_e_target            };
-
-    /* grid row 4 ➔ SAMPLE */
-    tools.div_outline_sample        = {       id: "div_outline_sample", handler:          xpath_outline.sampling_pick_some_xpath       };
-
-    /* grid row 5 ➔ XPATHS */
-    tools.div_xpaths                = {       id: "div_xpaths"        , handler:          xpath_outline.div_xpaths_click_handler       };
-
-    /*}}}*/
-    /* ID ➔ [el] .. (warn about GUI missing tools) {{{*/
-    let missing = "";
-
-    /* OPTION */
-    if( !tools.details_options   .el ) { tools.id = "details_options"   ; tools.details_options   .el = lib_util.get_tool(tools.id); if( !tools.details_options   ) missing += " "+tools.id; }
-    if( !tools.xpath_expand      .el ) { tools.id = "xpath_expand"      ; tools.xpath_expand      .el = lib_util.get_tool(tools.id); if( !tools.xpath_expand      ) missing += " "+tools.id; }
-    if( !tools.outline_log_dot   .el ) { tools.id = "outline_log_dot"   ; tools.outline_log_dot   .el = lib_util.get_tool(tools.id); if( !tools.outline_log_dot   ) missing += " "+tools.id; }
-    if( !tools.outline_log_frame .el ) { tools.id = "outline_log_frame" ; tools.outline_log_frame .el = lib_util.get_tool(tools.id); if( !tools.outline_log_frame ) missing += " "+tools.id; }
-    if( !tools.smooth_scroll     .el ) { tools.id = "smooth_scroll"     ; tools.smooth_scroll     .el = lib_util.get_tool(tools.id); if( !tools.smooth_scroll     ) missing += " "+tools.id; }
-
-    /* DOMAINS .. URLS */
-    if( !tools.div_domains       .el ) { tools.id = "div_domains"       ; tools.div_domains       .el = lib_util.get_tool(tools.id); if( !tools.div_domains       ) missing += " "+tools.id; }
-    if( !tools.div_urls          .el ) { tools.id = "div_urls"          ; tools.div_urls          .el = lib_util.get_tool(tools.id); if( !tools.div_urls          ) missing += " "+tools.id; }
-
-    /* XPATHS */
-    if( !tools.div_outline_pick  .el ) { tools.id = "div_outline_pick"  ; tools.div_outline_pick  .el = lib_util.get_tool(tools.id); if( !tools.div_outline_pick  ) missing += " "+tools.id; }
-    if( !tools.div_outline_sample.el ) { tools.id = "div_outline_sample"; tools.div_outline_sample.el = lib_util.get_tool(tools.id); if( !tools.div_outline_sample) missing += " "+tools.id; }
-    if( !tools.div_xpaths        .el ) { tools.id = "div_xpaths"        ; tools.div_xpaths        .el = lib_util.get_tool(tools.id); if( !tools.div_xpaths        ) missing += " "+tools.id; }
-
-    /*}}}*/
-    /* MISSING TOOLS {{{*/
-    tools.loaded = !missing;
-if(!tools.loaded)
-        lib_log.logBIG("MISSING TOOLS: "+missing);
-    /*}}}*/
 };
 /*}}}*/
 
@@ -994,6 +1201,7 @@ let caller = "div_tools_layout";
     case "div_domains"        : cmd = "domains"; break;
     case "div_urls"           : cmd = "urls"   ; break;
     case "details_options"    : cmd = "options"; break;
+    case "div_activity"       : cmd = "toggle" ; break;
     case "div_outline_pick"   : cmd = "xpaths" ; break;
     case "div_outline_sample" : cmd = "xpaths" ; break;
     case "div_xpaths"         : cmd = "xpaths" ; break;
@@ -1039,13 +1247,14 @@ if(log_this) lib_log.logBIG(caller+": "+ msg);
 /*_ get_div_tools_child_for_el {{{*/
 let get_div_tools_child_for_el = function(el)
 {
-    if( lib_util.is_parent_or_child(tools.div_domains        .el, el) ) return tools.div_domains       ;
-    if( lib_util.is_parent_or_child(tools.div_urls           .el, el) ) return tools.div_urls          ;
-    if( lib_util.is_parent_or_child(tools.details_options    .el, el) ) return tools.details_options   ;
-    if( lib_util.is_parent_or_child(tools.div_outline_pick   .el, el) ) return tools.div_outline_pick  ;
-    if( lib_util.is_parent_or_child(tools.div_outline_sample .el, el) ) return tools.div_outline_sample;
-    if( lib_util.is_parent_or_child(tools.div_xpaths         .el, el) ) return tools.div_xpaths        ;
-    /*..............................................................*/ return null;
+    if( lib_util.is_parent_or_child(tools.div_domains        .el, el) ) return tools.div_domains        ;
+    if( lib_util.is_parent_or_child(tools.div_urls           .el, el) ) return tools.div_urls           ;
+    if( lib_util.is_parent_or_child(tools.details_options    .el, el) ) return tools.details_options    ;
+    if( lib_util.is_parent_or_child(tools.div_activity       .el, el) ) return tools.div_activity       ;
+    if( lib_util.is_parent_or_child(tools.div_outline_pick   .el, el) ) return tools.div_outline_pick   ;
+    if( lib_util.is_parent_or_child(tools.div_outline_sample .el, el) ) return tools.div_outline_sample ;
+    if( lib_util.is_parent_or_child(tools.div_xpaths         .el, el) ) return tools.div_xpaths         ;
+    /*...............................................................*/ return null;
 };
 /*}}}*/
 
@@ -1060,9 +1269,11 @@ let set_option = function(key,val) {           xpath_content.set_option(key,val)
 
 /* EXPORT {{{*/
 return { inject_shadow_root
+    ,    div_activity_handler
     ,    div_tools_layout_cmd
     ,    update_div_tools_innerHTML
     ,    details_load_open_state
+    ,    div_activity_apply
 };
 
 /*}}}*/
