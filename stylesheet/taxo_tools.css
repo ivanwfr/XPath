@@ -1,5 +1,5 @@
 /* ┌────────────────────────────────────────────────────────────────────────┐ */
-   #taxo_tools_css_tag         { content: "taxo_tools_css (220117:18h:20)"; }
+   #taxo_tools_css_tag         { content: "taxo_tools_css (220118:13h:54)"; }
 /* └────────────────────────────────────────────────────────────────────────┘ */
 button                 { font-size : unset; }
 /* div_tools {{{*/
@@ -109,11 +109,11 @@ button                 { font-size : unset; }
 /*}}}*/
 /* taxo_<tree single clear multi> {{{*/
 
-#taxo_tools                     { display               : grid;         }
-#taxo_tools                     { grid-template-columns : 1fr 5fr 1fr;  }
-#taxo_tools                     { align-items           : center;       }
+#taxo_tools                     { display               :    grid; }
+#taxo_tools                     { grid-template-columns : 1fr 1fr; }
+#taxo_tools                     { align-items           :  center; }
 
-#taxo_tools>*                   { pointer-events        : initial;      }
+#taxo_tools>*                   { pointer-events        : initial; }
 
 #taxo_tools_shadow_host          { position  : fixed; top:0; left:0; }
 #taxo_tools_shadow_host          { z-index   : 2147483600; }
@@ -122,10 +122,10 @@ button                 { font-size : unset; }
 #taxo_clear                     { user-select  : none; white-space : nowrap; cursor:auto; }
 #taxo_multi                     { user-select  : none; white-space : nowrap; cursor:auto; }
 
-#taxo_single                    { grid-column-start: 1; grid-column-end: 2; grid-row-start: 1; grid-row-end: 2; }
-#taxo_clear                     { grid-column-start: 1; grid-column-end: 2; grid-row-start: 2; grid-row-end: 3; }
-#taxo_multi                     { grid-column-start: 1; grid-column-end: 2; grid-row-start: 3; grid-row-end: 4; }
-#taxo_check                     { grid-column-start: 2; grid-column-end: 3; grid-row-start: 2; grid-row-end: 3; }
+#taxo_clear                     { grid-column-start: 1; grid-column-end: 2; grid-row-start: 1; grid-row-end: 4; }
+#taxo_single                    { grid-column-start: 2; grid-column-end: 3; grid-row-start: 1; grid-row-end: 2; }
+#taxo_multi                     { grid-column-start: 2; grid-column-end: 3; grid-row-start: 2; grid-row-end: 3; }
+#taxo_check                     { grid-column-start: 2; grid-column-end: 3; grid-row-start: 3; grid-row-end: 4; }
 
 #taxo_single                    { box-shadow : none; margin : 0; padding: 0; border : none !important; }
 #taxo_clear                     { box-shadow : none; margin : 0; padding: 0; border : none !important; }
@@ -194,8 +194,8 @@ button                 { font-size : unset; }
 .buttons_pod.r_to_l>*:nth-child(10n+9)  { color: #000; background : linear-gradient(to  left, rgba(136,136,136,0.3), rgba(255,255,255,0.1) 97%, #FFFFFF); }
 .buttons_pod.r_to_l>*:nth-child(10n+0)  { color: #000; background : linear-gradient(to  left, rgba(136,136,136,0.3), rgba(255,255,255,0.1) 97%, #202020); }
 
-.buttons_pod>*.selected          { background       : #FFF !important; }
-.buttons_pod>*.selected.leaf     { background       : #FFF !important; }
+.buttons_pod>*.selected          { background       : #FFF; }
+.buttons_pod>*.selected.leaf     { background       : #FFF; }
 
 .buttons_pod>*.selected          { box-shadow       : 2px 2px 2px 1px #888;              }
 
@@ -245,10 +245,16 @@ button                 { font-size : unset; }
 .buttons_pod.r_to_l>*.collected::before { content          : '\2B31'           !important; } /* →→→ */
 
 /*____________________visited_____________________________________________________________*/
-.buttons_pod       >*.visited   { text-shadow      : 1px 1px 2px #000;                     }
-.buttons_pod       >*.visited   { background-color : rgba(136,136,255,0.3)     !important; }
-.buttons_pod       >*.clicked   { background-color : rgba(255,255,255,0.5)     !important; }
-.buttons_pod       >*.collected { background-color : rgba(034,034,034,1.0)     !important; }
+.buttons_pod       >*.visited   { text-shadow      : 1px 1px 2px #000;      }
+.buttons_pod       >*.visited   { background-color : rgba(136,136,255,0.3); }
+.buttons_pod       >*.clicked   { background-color : rgba(255,255,255,0.5); }
+.buttons_pod       >*.collected { background-color : rgba(034,034,034,1.0); }
 
 /*}}}*/
+.collected.checked { background-color : #F00 !important; }
+.collected.checked {            color : #FFF !important; }
+ .selected.checked { background-color : #FF0 !important; }
+ .selected.checked {            color : #F00 !important; }
+          .checked {       font-weight:  900 !important; }
+          .checked {       transition : background-color 450ms 50ms !important; }
 /* TO BE INJECTED INTO: javascript/taxo_tools.js */
