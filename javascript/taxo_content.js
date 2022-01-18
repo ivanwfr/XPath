@@ -19,7 +19,7 @@
 /* eslint-disable      no-warning-comments */
 
 const TAXO_CONTENT_SCRIPT_ID   = "taxo_content";
-const TAXO_CONTENT_SCRIPT_TAG  =  TAXO_CONTENT_SCRIPT_ID  +" (220117:19h:33)";
+const TAXO_CONTENT_SCRIPT_TAG  =  TAXO_CONTENT_SCRIPT_ID  +" (220118:01h:57)";
 /*}}}*/
 let   taxo_content = (function() {
 "use strict";
@@ -332,7 +332,9 @@ let click_taxo_id_array = function(taxo_id_array)
 
         let leaf_el = shadow_root.getElementById( taxo_id );
 
-        add_el_class(leaf_el, CSS_CLICKED);
+        let             is_a_leaf = has_el_class(leaf_el, "leaf");
+        if(!is_a_leaf) add_el_class(leaf_el, CSS_CLICKED);
+//      add_el_class(leaf_el, CSS_CLICKED);
     }
 };
 /*}}}*/
@@ -421,21 +423,21 @@ let caller = "set_taxo_id_path_CSS";
 let log_this = options.LOG1_STEP;
 
 /*}}}*/
-if( log_this) log("%c "+caller+"%c"+className+"%c x"+taxo_id_CSV.length+"\n"
-                  ,lbb+lbL+lf3 ,lbb+lbC       ,lbb+lbR              , taxo_id_CSV);
+    let pods_path   = String(taxo_id_CSV).split(",");
+if( log_this) log("%c "+caller+"%c"+className+"%c x"+pods_path.length+"\n"
+                  ,lbb+lbL+lf3 ,lbb+lbC       ,lbb+lbR       , taxo_id_CSV);
 if( log_this) log("%c●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●", lf0);
 
     let shadow_root = get_shadow_root();
-    let pods_path   = String(taxo_id_CSV).split(",");
     for(let i= 0; i < pods_path.length; ++i)
     {
         /* ADD ALL LEADING MENU TO THIS MENU ITEM */
-        let path_string         = pods_path[i];
-        let path_array          = path_string.split(".");
-        let              m_leaf = path_array.length-1;
+        let path_string = pods_path[i];
+        let path_array  = path_string.split(".");
+        let m_leaf_idx  = path_array.length-1;
         let menu_EL;
         let lead_taxo_id;
-        for(let m=0; m < m_leaf; ++m)
+        for(let m=0; m < m_leaf_idx; ++m)
         {
             lead_taxo_id = path_array[m];
 if( log_this) log("%c \u21F6 ["+                            lead_taxo_id+"]", lfX[i+1]);
@@ -446,7 +448,7 @@ if( log_this) log("%c \u21F6 ["+                            lead_taxo_id+"]", lf
         }
 
         /* SET ITEM [className] */
-        let tail_taxo_id = path_array[m_leaf];
+        let tail_taxo_id = path_array[m_leaf_idx];
 if( log_this) log("%c ● ["+tail_taxo_id+"]", lfX[i+1]);
         let taxo_id      = tail_taxo_id;
         let taxo_id_el   = shadow_root.getElementById( taxo_id );
@@ -610,10 +612,13 @@ let get_selected_taxo_id_path_array = function()
 //log("%c SELECTED", lbH+lf5)
     let selected_taxo_id_path_array = [];
 
-    get_selected_EL_array()
+    let selected_EL_array = get_selected_EL_array();
+//log("selected_EL_array:",selected_EL_array)
+
+    selected_EL_array
         .forEach( (el) => {
             let taxo_id_path = taxo_menu.get_taxo_id_path(el.id);
-//log(taxo_id_path)
+//log("taxo_id_path:",taxo_id_path)
 
             selected_taxo_id_path_array.push( taxo_id_path );
         });
@@ -1346,7 +1351,11 @@ if( _log_this )
     log("%c"+                          TAXO_CONTENT_SCRIPT_TAG, lbb+lbH+lf3);
     log("%c"+  clicked_DOM_EL_array.length +" CLICKED.....:\n", lf4,   clicked_DOM_EL_array);
     log("%c"+collected_DOM_EL_array.length +" COLLECTED...:\n", lf7, collected_DOM_EL_array);
+    log("path_array:", get_collected_taxo_id_path_array());
+
     log("%c"+ selected_DOM_EL_array.length +" SELECTED....:\n", lf5,  selected_DOM_EL_array);
+    log("path_array:", get_selected_taxo_id_path_array());
+
     log("%c"+  visited_DOM_EL_array.length +" VISITED.....:\n", lf6,   visited_DOM_EL_array);
 }
 /*}}}*/
@@ -3270,8 +3279,8 @@ let get_node_path_of_taxo_id = function(id)
     return node_path;
 
 /*{{{
-j0"*y}
-id="BATHING_SUIT_MEN"; taxo_content.get_node_path_of_taxo_id(id);
+j:.,/^$/y"*
+id=,"BATHING_SUIT_MEN"; taxo_content.get_node_path_of_taxo_id(id);
 id="BATHING_SUIT"    ; taxo_content.get_node_path_of_taxo_id(id);
 id="BOTTOM_WEAR"     ; taxo_content.get_node_path_of_taxo_id(id);
 id="FASHION"         ; taxo_content.get_node_path_of_taxo_id(id);
@@ -3533,22 +3542,22 @@ let get_taxo_id_path = function(taxo_id)
     let            leaf_EL = shadow_root.querySelector("#"+taxo_id);
     let       taxo_id_path = leaf_EL.id;                                     // .. [RING_MEN]
 
-    let            menu_EL = leaf_EL.parentElement;
-
     /* CONTAINING MENU ID FROM [data-menu] ATTRIBUTE */
-    let     parent_taxo_id = menu_EL.getAttribute("data-menu");              // .. [RING]
+    let     parent_taxo_id = leaf_EL.getAttribute("data-menu");              // .. [RING]
     if(     parent_taxo_id ) taxo_id_path = parent_taxo_id+"."+taxo_id_path; // .. [RING.RING_MEN]
 
     /* PREPEND ALL PARENT MENU PATH */
-    let   parent_node      = menu_EL.parent_node;
-
-    while(parent_node && (parent_node.id != taxo_json.id))
+    let    menu_EL         = leaf_EL.parentElement;
+    let    parent_node     = menu_EL.parent_node;
+    while( parent_node )
     {
         taxo_id_path       =   parent_node.id+"."+taxo_id_path;              // .. [FASHION_ACCESSORIES] [FASHION] [ALL]
         let menu_id        =   "#menu_"+parent_node.id;
         menu_EL            =   shadow_root.querySelector( menu_id );
         parent_node        =   menu_EL ? menu_EL.parent_node : null;
+        if(parent_node.id == taxo_json.id) break;
     }
+    taxo_id_path           =   taxo_json.id+"."+taxo_id_path;              // .. [ALL] [FASHION_ACCESSORIES] [FASHION] [ALL]
 
 //log("get_taxo_id_path("+taxo_id+") ...return taxo_id_path:",taxo_id_path)
     return taxo_id_path;
@@ -3650,70 +3659,83 @@ let   check_taxo_json_id_interval;
 /*}}}*/
 let check_taxo_json = function()
 {
-log("taxo_json:");
-console.dir( taxo_json  );
-
+console.clear();
     if(typeof taxo_json != "undefined")
+    {
         log("%c check_taxo_json: TAXO_JSON LOAD OK", lbH+lf5);
+        log("%c taxo_json:"                        , lbH+lf5, taxo_json);
+    }
+    /* [sample_id_array] .. f(TAX/javascript/taxo_json_211218.js] {{{*/
+    let sample_id_array
+        =       taxo_pods.get_selected_taxo_id_path_array ()
+        .concat(taxo_pods.get_collected_taxo_id_path_array());
+
+    if( sample_id_array.length == 0)
+        sample_id_array         =          CHECK_TAXO_JSON_ID_ARRAY ;
+
+    log("%c sample_id_array:", lbH+lf4, sample_id_array);
+    /*}}}*/
+    /* DISPLAY [sample_id_array] {{{*/
 
     /* save [taxo_check_button.textContent] */
     let       shadow_root = get_shadow_root();
     let taxo_check_button = shadow_root.getElementById( "taxo_check" );
     /**/taxo_check_button.innerText_saved = taxo_check_button.innerText;
 
-    /* RAMDOM SAMPLE FROM [TAX/javascript/taxo_json_211218.js] */
     let check_idx = 0;
     check_taxo_json_id_interval
         = setInterval( function() {
-            if(check_idx >= CHECK_TAXO_JSON_ID_ARRAY.length)
+            if(check_idx < sample_id_array.length)
             {
+                /* TRACE IN [taxo_check_button.textContent] */
+                taxo_check_button.innerText
+                    = taxo_check_button.innerText_saved+"\n"
+                    +(check_idx+1)+" / "+sample_id_array.length
+                ;
+                let                        id = sample_id_array[ check_idx ];
+                if(id.indexOf(".") >= 0) {
+                    let idx = id.lastIndexOf(".");
+                    id = id.substring(idx+1);
+                }
+                log_taxo_id              ( id );
 
-                /* restore [taxo_check_button.textContent] */
+                taxo_content.show_taxo_id( id );
+                check_idx += 1;
+            }
+            else {
+                /* RESTORE [taxo_check_button.textContent] */
                 taxo_check_button.textContent = taxo_check_button.innerText_saved;
                 delete taxo_check_button.innerText_saved;
 
                 clearInterval( check_taxo_json_id_interval );
             }
-            else {
-                /* SYNC [taxo_check_button.textContent] */
-                taxo_check_button.innerText
-                    = taxo_check_button.innerText_saved+"\n"
-                    +(check_idx+1)+" / "+CHECK_TAXO_JSON_ID_ARRAY.length
-                ;
-                let                        id = CHECK_TAXO_JSON_ID_ARRAY[ check_idx ];
-                log_taxo_id              ( id );
-                taxo_content.show_taxo_id( id );
-                check_idx += 1;
-            }
         }, CHECK_TAXO_JSON_ID_DELAY);
 
-    /* RAMDOM SAMPLE FROM [TAX/javascript/taxo_json_201118.js] */
-    /*{{{
-        log_taxo_id();
-        log_taxo_id( "interest"          );
-        log_taxo_id( "artsentertainment" );
-        log_taxo_id( "bollywood"         );
-}}}*/
+    /*}}}*/
+/*{{{ // RAMDOM SAMPLE FROM [TAX/javascript/taxo_json_201118.js]
+    log_taxo_id();
+    log_taxo_id( "interest"          );
+    log_taxo_id( "artsentertainment" );
+    log_taxo_id( "bollywood"         );
 
     let iterate_level_samples = iterate( taxo_json );
-
-log(iterate_level_samples);
+    log(iterate_level_samples);
+}}}*/
 };
 /*}}}*/
 /*➔ log_taxo_id {{{*/
 let log_taxo_id = function(id)
 {
-    if(!id) {
-        log("%c taxo_json ", lbF+lb7);
-
-console.dir( taxo_json.list );
+    if(!id)
+    {
+        log("%c taxo_json.list", lbF+lb7, taxo_json.list);
     }
     else {
         let {node , parent_node, level} = get_node_with_taxo_id_from_node(id, taxo_json);
         if(  node ) {
             let parent_node_id = parent_node ? parent_node.id : "";
-            log("%c id=["+id +"] parent_node=["+parent_node_id+"] [level "+level+"]:", lbb+lf4);
-            log(    node );
+            log("%c id=["+id +"] parent_node=["+parent_node_id+"]"+(level ? (" [level "+level+"]"):"")+":", lbb+lf4);
+//          log(    node );
         }
         else {
             log("NO SUCH NODE: node[id "+id+"]");
@@ -3807,7 +3829,7 @@ let config = { "CMD_TAXONOMY" : "taxonomy" };
 
 /*}}}*/
 /*▲▲▲▲ send_report_message .. chrome.runtime.sendMessage {{{*/
-let    send_report_message = function(taxo_id)
+let    send_report_message = function()
 {
 /*{{{*/
 let caller = "send_report_message";
@@ -4186,5 +4208,7 @@ taxo_content.get_node_path_of_taxo_id( "RETAILER"             );
 
 taxo_content.dodisplay_menu_EL_id_path_array( "menu_ALL,menu_FASHION".split(",") );
 
-
+/get_selected_taxo_id_path_array
+/set_taxo_id_path_CSS.*function
+/check_taxo_json.*function
 */
