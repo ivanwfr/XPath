@@ -11,6 +11,8 @@
 /* globals lib_tools */
 
 /* globals config_js */
+/* globals embedded */
+
 /* globals event_listeners */ /* eslint-disable-line no-unused-vars */
 /* globals taxo_content */
 /* globals xpath_outline */
@@ -22,7 +24,7 @@
 /* eslint-disable no-warning-comments */
 
 const XPATH_CONTENT_SCRIPT_ID       = "xpath_content";
-const XPATH_CONTENT_SCRIPT_TAG      =  XPATH_CONTENT_SCRIPT_ID  +" (220114:16h:38)";
+const XPATH_CONTENT_SCRIPT_TAG      =  XPATH_CONTENT_SCRIPT_ID  +" (220118:16h:15)";
 /*}}}*/
 let   xpath_content = (function() {
 "use strict";
@@ -1454,6 +1456,8 @@ if( log_this) log("%c send_message %c"+title, lbb+lbL+lf4, lbb+lbR+lf7);
                         ,  "➔ Cannot send cmd=["+ message_object.cmd   +"]\n"
                          + "… ["                + message_object.xpath +"]");
 
+            log_caller();
+
             cannot_send_cmd_warned_once = true;
         }
         return false;
@@ -1556,13 +1560,20 @@ let caller = "query_taxonomy";
 /*_ simulate_send_message_args {{{*/
 let simulate_send_message_args = function(args,_caller)
 {
-    if(typeof simulate_send_message != "undefined")
-    {
-        setTimeout( function() { simulate_send_message(args, _caller); }, 250);
+    if(typeof                             simulate_send_message != "undefined") {
+        setTimeout( function() {          simulate_send_message(args, _caller); }, 250);
+    }
+    if(typeof                    embedded.simulate_send_message != "undefined") {
+        setTimeout( function() { embedded.simulate_send_message(args, _caller); }, 250);
     }
     else {
-        log_feature(_caller, "&#x26A0; EXTENSION MESSAGING IS OFF\n… Cannot send cmd=["+ args.cmd +"]");
-//lib_log.log_caller()
+        log_feature(_caller, "&#x26A0; EXTENSION MESSAGING IS OFF"
+                    +"\n… Cannot send cmd=["+ args.cmd +"]"
+                    +"\n… [embedded.simulate_send_message]"
+                    +"\n… function is undefined"
+                   );
+
+        lib_log.log_caller();
     }
 };
 /*}}}*/
