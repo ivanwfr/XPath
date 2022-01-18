@@ -19,7 +19,7 @@
 /* eslint-disable      no-warning-comments */
 
 const TAXO_CONTENT_SCRIPT_ID   = "taxo_content";
-const TAXO_CONTENT_SCRIPT_TAG  =  TAXO_CONTENT_SCRIPT_ID  +" (220118:15h:53)";
+const TAXO_CONTENT_SCRIPT_TAG  =  TAXO_CONTENT_SCRIPT_ID  +" (220118:19h:35)";
 /*}}}*/
 let   taxo_content = (function() {
 "use strict";
@@ -3191,6 +3191,7 @@ return { name : "taxo_pods"
     //DEBUG {{{
     , adjust_pods_maxHeight
     , click_taxo_id_array
+    , display_activated_cluster
     , div_tools_move_RESCALE
     , dodisplay_menu_EL_id_path_array
     , get_collected_EL_array
@@ -3572,7 +3573,6 @@ let sel_clear = function(_caller)
 /*{{{*/
 let   caller = "sel_clear";
 let tag_this = TAXO_MENU_TAG || taxo_pods.TAXO_PODS_TAG || options.LOG1_STEP;
-    tag_this=true;//FIXME
 
 /*}}}*/
     /* 1/4 - CLEAR [collected] [selected] [visited] {{{*/
@@ -3597,7 +3597,6 @@ let sel_clear_some = function(_caller)
 /*{{{*/
 let   caller = "sel_clear_some";
 let tag_this = TAXO_MENU_TAG || taxo_pods.TAXO_PODS_TAG || options.LOG1_STEP;
-    tag_this=true;//FIXME
 
 /*}}}*/
     /* 1/5 - CLEAR [collected] [selected] [visited] {{{*/
@@ -3725,7 +3724,7 @@ console.clear();
     let check_idx = 0;
     check_taxo_json_id_interval
         = setInterval( function() {
-if(check_idx == 0) log("%c➔ sample_id_array:", lf6, sample_id_array);
+//if(check_idx == 0) log("%c➔ sample_id_array:", lf6, sample_id_array);
             /* check next sample {{{*/
             if(check_idx < sample_id_array.length)
             {
@@ -3733,7 +3732,7 @@ if(check_idx == 0) log("%c➔ sample_id_array:", lf6, sample_id_array);
                 let taxo_id = sample_id_array[ check_idx ];
                 let     msg = (check_idx+1)+" / "+sample_id_array.length
                     +         "\n"+taxo_id.replace(/\./g,"\n");
-log("%c➔ "+msg, lf6);
+//log("%c➔ "+msg, lf6)
 
                 taxo_check_button.innerText
                     = taxo_check_button.innerText_saved+"\n"+ msg;
@@ -3743,7 +3742,7 @@ log("%c➔ "+msg, lf6);
                     let idx = taxo_id.lastIndexOf(".");
                     taxo_id = taxo_id.substring(idx+1);
                 }
-                log_taxo_id( taxo_id );
+//log_taxo_id( taxo_id );
 
                 taxo_content.show_taxo_id( taxo_id );
                 let  menu_EL = shadow_root.getElementById( taxo_id  );
@@ -3785,6 +3784,8 @@ let check_taxo_json_cleanup = function()
     /* UNCHECK menu_EL sample */
     let el_array = shadow_root.querySelectorAll(".checked");
     /**/el_array.forEach((el) => del_el_class(el, "checked")); // remove invisible menus
+
+    taxo_pods.display_activated_cluster();
 };
 /*}}}*/
 /*➔ log_taxo_id {{{*/
@@ -4154,6 +4155,7 @@ return { SHADOW_HOST_ID
     // taxo_pods
     ,  adjust_pods_maxHeight            : taxo_pods.adjust_pods_maxHeight
     ,  click_taxo_id_array              : taxo_pods.click_taxo_id_array
+    ,  display_activated_cluster        : taxo_pods.display_activated_cluster
     ,  div_tools_move_RESCALE           : taxo_pods.div_tools_move_RESCALE
     ,  dodisplay_menu_EL_id_path_array  : taxo_pods.dodisplay_menu_EL_id_path_array
     ,  get_collected_EL_array           : taxo_pods.get_collected_EL_array
