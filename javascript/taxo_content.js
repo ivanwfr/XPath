@@ -19,7 +19,7 @@
 /* eslint-disable      no-warning-comments */
 
 const TAXO_CONTENT_SCRIPT_ID   = "taxo_content";
-const TAXO_CONTENT_SCRIPT_TAG  =  TAXO_CONTENT_SCRIPT_ID  +" (220118:19h:35)";
+const TAXO_CONTENT_SCRIPT_TAG  =  TAXO_CONTENT_SCRIPT_ID  +" (220118:19h:54)";
 /*}}}*/
 let   taxo_content = (function() {
 "use strict";
@@ -1788,8 +1788,7 @@ if( log_this && (layout_cluster_details_last != pod)) log_console_clear(caller+"
 
     if(pods_cluster.i_next >= visible_menu_EL_array.length)
     {
-//if( log_this)
-lib_log.logBIG("➔ pods_cluster.i_next("+pods_cluster.i_next+")  >= visible_menu_EL_array.length=("+visible_menu_EL_array.length+")", 2);
+if( log_this) lib_log.logBIG("➔ pods_cluster.i_next("+pods_cluster.i_next+")  >= visible_menu_EL_array.length=("+visible_menu_EL_array.length+")", 2);
 
         return;
     }
