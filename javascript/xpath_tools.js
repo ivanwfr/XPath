@@ -24,7 +24,7 @@
 /* eslint-disable no-mixed-operators  */
 
 const XPATH_TOOLS_JS_ID     = "xpath_tools";
-const XPATH_TOOLS_JS_TAG    =  XPATH_TOOLS_JS_ID  +" (220112:23h:23)";
+const XPATH_TOOLS_JS_TAG    =  XPATH_TOOLS_JS_ID  +" (220119:19h:56)";
 /*}}}*/
 let       xpath_tools = (function() {
 "use strict";
@@ -869,7 +869,9 @@ if(log_this) lib_log.log_key_val_group(caller+"(options)", options);
 /*{{{*/
 const CAPTURE_TRUE_PASSIVE_FALSE  = { capture:true , passive:false };
 
-let div_tools;
+const DIV_TOOLS_ZINDEX_TOP        = 2147483647; // @see: amazon.com
+
+let   div_tools;
 /*}}}*/
 // ┌───────────────────────────────────────────────────────────────────────────┐
 // │ LOAD-SEQUENCE FOR EMBEDDED SCRIPT                                         │
@@ -928,6 +930,8 @@ if(log_this) lib_log.logBIG(caller+"...OK [shadow_host]", 1);
     update_div_tools_innerHTML( xpath_content.options );
 
     div_tools = html_fragment.getElementById(xpath_content.DIV_TOOLS_ID);
+
+    div_tools.style.zIndex = DIV_TOOLS_ZINDEX_TOP;
 
 //console.log("%c xpath_tools", "font-size:200%;");
 //console.dir(div_tools);
@@ -1099,8 +1103,8 @@ let div_activity_apply = function(e)
     {
         if(taxo_div_tools) taxo_div_tools.classList.remove("hidden");
 
-        taxo_content.show_top_menu ();//FIXME
-//      setTimeout(taxo_content.show_top_menu, 1000);//FIXME
+        taxo_content.show_top_menu ();
+//      setTimeout(taxo_content.show_top_menu, 1000)
     }
     else {
         if(taxo_div_tools) taxo_div_tools.classList.add("hidden");
