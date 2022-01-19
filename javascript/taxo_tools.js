@@ -1,5 +1,5 @@
 // ┌───────────────────────────────────────────────────────────────────────────┐
-// │ taxo_tools.js ==== CONTENT SCRIPT ============== _TAG (220118:00h:46) === │
+// │ taxo_tools.js ==== CONTENT SCRIPT ============== _TAG (220119:19h:54) === │
 // └───────────────────────────────────────────────────────────────────────────┘
 /* jshint esversion: 9, laxbreak:true, laxcomma:true, boss:true */ /*{{{*/
 
@@ -55,7 +55,9 @@ let   BUTTONS_POD_INLINE_CSS_DATA ="data:text/css,"+ escape(
 let taxo_tools_css_data ="data:text/css,"+ escape(`
 /*INLINE{{{*/
 
-   #taxo_tools_css_tag         { content: "taxo_tools_css (220118:13h:54)"; }
+   #taxo_tools_css_tag         { content: "taxo_tools_css (220119:19h:36)"; }
+
+*                      { font-size :  12px; }
 
 button                 { font-size : unset; }
                        .buttons_pod                { display               : grid;        }
@@ -90,7 +92,7 @@ button                 { font-size : unset; }
 .note     { padding           : 1ex 1em 1ex 1em         ; }
 .note     { font-weight       : 100                     ; }
 .note.warn{ font-weight       : 900                     ; }
-.note     { font-size         : 16px                    ; }
+.note     { font-size         : 120%                    ; }
 .note     { font-family       : cursive                 ; }
 .note     { font-style        : oblique                 ; }
 
@@ -134,17 +136,22 @@ button                 { font-size : unset; }
 
 #taxo_tools>*                   { pointer-events        : initial; }
 
-#taxo_tools_shadow_host          { position  : fixed; top:0; left:0; }
-#taxo_tools_shadow_host          { z-index   : 2147483600; }
+#taxo_tools_shadow_host         { position  : fixed; top:0; left:0; }
+#taxo_tools_shadow_host         { z-index   : 2147483600; }
 
 #taxo_single                    { user-select  : none; white-space : nowrap; cursor:auto; }
 #taxo_clear                     { user-select  : none; white-space : nowrap; cursor:auto; }
 #taxo_multi                     { user-select  : none; white-space : nowrap; cursor:auto; }
 
-#taxo_clear                     { grid-column-start: 1; grid-column-end: 2; grid-row-start: 1; grid-row-end: 4; }
-#taxo_single                    { grid-column-start: 2; grid-column-end: 3; grid-row-start: 1; grid-row-end: 2; }
-#taxo_multi                     { grid-column-start: 2; grid-column-end: 3; grid-row-start: 2; grid-row-end: 3; }
-#taxo_check                     { grid-column-start: 2; grid-column-end: 3; grid-row-start: 3; grid-row-end: 4; }
+          #taxo_clear           { grid-column-start: 1; grid-column-end: 2; grid-row-start: 1; grid-row-end: 4; }
+          #taxo_single          { grid-column-start: 2; grid-column-end: 3; grid-row-start: 1; grid-row-end: 2; }
+          #taxo_multi           { grid-column-start: 2; grid-column-end: 3; grid-row-start: 2; grid-row-end: 3; }
+          #taxo_check           { grid-column-start: 2; grid-column-end: 3; grid-row-start: 3; grid-row-end: 4; }
+.checking #taxo_check           { grid-column-start: 1;                     grid-row-start: 1;                  }
+
+.checking #taxo_clear           { display          : none; }
+.checking #taxo_single          { display          : none; }
+.checking #taxo_multi           { display          : none; }
 
 #taxo_single                    { box-shadow : none; margin : 0; padding: 0; border : none !important; }
 #taxo_clear                     { box-shadow : none; margin : 0; padding: 0; border : none !important; }
@@ -250,16 +257,15 @@ button                 { font-size : unset; }
 .buttons_pod       >*.collected::before { content          : '\\21F6'           !important; }
 .buttons_pod.r_to_l>*.collected::before { content          : '\\2B31'           !important; }
 .buttons_pod       >*.visited   { text-shadow      : 1px 1px 2px #000;      }
-.buttons_pod       >*.visited   { background-color : rgba(136,136,255,0.3); }
-.buttons_pod       >*.clicked   { background-color : rgba(255,255,255,0.5); }
-.buttons_pod       >*.collected { background-color : rgba(034,034,034,1.0); }
-.collected.checked { background-color : #F00 !important; }
-.collected.checked {            color : #FFF !important; }
- .selected.checked { background-color : #FF0 !important; }
- .selected.checked {            color : #F00 !important; }
-          .checked {       font-weight:  900 !important; }
-          .checked {       transition : background-color 450ms 50ms !important; }
-
+.buttons_pod       >*.visited   { background-color : rgba(136,136,255,0.3) !important; }
+.buttons_pod       >*.clicked   { background-color : rgba(255,255,255,0.5) !important; }
+.buttons_pod       >*.collected { background-color : rgba(034,034,034,1.0) !important; }
+ .selected.checking { background-color : #FF0 !important; color : #F01 !important; }
+.collected.checking { background-color : #F00 !important; color : #FFF !important; }
+ .selected.checking {      font-weight :  900 !important; }
+.collected.checking {      font-weight :  900 !important; }
+ .selected.checking {       transition : background-color 450ms 50ms !important; }
+.collected.checking {       transition : background-color 450ms 50ms !important; }
 /*INLINE}}}*/
 /*# sourceURL=taxo_tools.css */
 `
