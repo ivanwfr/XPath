@@ -19,7 +19,7 @@
 /* eslint-disable      no-warning-comments */
 
 const TAXO_CONTENT_SCRIPT_ID   = "taxo_content";
-const TAXO_CONTENT_SCRIPT_TAG  =  TAXO_CONTENT_SCRIPT_ID  +" (220118:19h:54)";
+const TAXO_CONTENT_SCRIPT_TAG  =  TAXO_CONTENT_SCRIPT_ID  +" (220119:19h:15)";
 /*}}}*/
 let   taxo_content = (function() {
 "use strict";
@@ -266,7 +266,7 @@ let show_top_menu = function()
 {
     /* GUI YET NOT BUILT */
     let shadow_root = get_shadow_root();
-    if(!shadow_root        ) return;
+    if(!shadow_root ) return;
 
     /* SHOW TAXO TOP MENU */
     show_taxo_id( taxo_json.id );
@@ -1781,39 +1781,39 @@ let tag_this = options.LOG1_EVENT || log_this;
         , b_to_t
     } = pods_cluster;
 
-    let pod = visible_menu_EL_array[pods_cluster.i_next];
+        let pod = visible_menu_EL_array[pods_cluster.i_next];
 
-if( log_this && (layout_cluster_details_last != pod)) log_console_clear(caller+": "+pod.id);
-//( log_this && (layout_cluster_details_last != pod)) console.trace()
+    if( log_this && (layout_cluster_details_last != pod)) log_console_clear(caller+": "+pod.id);
+    //( log_this && (layout_cluster_details_last != pod)) console.trace()
 
-    if(pods_cluster.i_next >= visible_menu_EL_array.length)
-    {
-if( log_this) lib_log.logBIG("➔ pods_cluster.i_next("+pods_cluster.i_next+")  >= visible_menu_EL_array.length=("+visible_menu_EL_array.length+")", 2);
+        if(pods_cluster.i_next >= visible_menu_EL_array.length)
+        {
+    if( log_this) lib_log.logBIG("➔ pods_cluster.i_next("+pods_cluster.i_next+")  >= visible_menu_EL_array.length=("+visible_menu_EL_array.length+")", 2);
 
-        return;
-    }
-    /*}}}*/
-//logXXX("layout_cluster_handler_next("+(moving_pod ? moving_pod.id:"...")+")"+(e ? " ["+e.type+"]" : ""))
-    /* CALLED BY [transitionend] or [TIMEOUT OR DIRECT CALL] {{{*/
-    if(e)
-    {
-if( log_this && (layout_cluster_details_last != pod))
-        lib_log.logBIG("EVENT ["+e.type+" "+e.propertyName+"] ["+pod.id+"]", 5);
-    }
-    else {
-if( log_this && (layout_cluster_details_last != pod))
-        lib_log.logBIG("TIMEOUT OR DIRECT CALL ["+pod.id+"]", 4);
-    }
-    /*}}}*/
-    /* [ALL DONE] .. f(moving_pod not nullified) {{{*/
-    if(!pods_cluster.moving_pod)
-    {
+            return;
+        }
+        /*}}}*/
+    //logXXX("layout_cluster_handler_next("+(moving_pod ? moving_pod.id:"...")+")"+(e ? " ["+e.type+"]" : ""))
+        /* CALLED BY [transitionend] or [TIMEOUT OR DIRECT CALL] {{{*/
+        if(e)
+        {
+    if( log_this && (layout_cluster_details_last != pod))
+            lib_log.logBIG("EVENT ["+e.type+" "+e.propertyName+"] ["+pod.id+"]", 5);
+        }
+        else {
+    if( log_this && (layout_cluster_details_last != pod))
+            lib_log.logBIG("TIMEOUT OR DIRECT CALL ["+pod.id+"]", 4);
+        }
+        /*}}}*/
+        /* [ALL DONE] .. f(moving_pod not nullified) {{{*/
+        if(!pods_cluster.moving_pod)
+        {
 if( log_this && (layout_cluster_details_last != pod)) lib_log.logBIG("ALL DONE ["+pod.id+"]", 9);
 
-        return; // all done
-    }
-if( log_this) log("%c "+caller+": i_next: "+(pods_cluster.i_next+1)+"/"+visible_menu_EL_array.length+"%c XY "+m_x+" "+m_y+"%c"+((pod.parent_pod ? pod.parent_pod.id+"➔":"NO parent_pod➔")+pod.id)
-                  ,lbL                                                              ,lbC                 ,lbR                                                                  );
+            return; // all done
+        }
+if( log_this) log("%c "+caller+": i_next: "+(pods_cluster.i_next+1)+"/"+visible_menu_EL_array.length+"%c XY "+m_x+" "+m_y+"%c"+((pod.lead_pod ? pod.lead_pod.id+"➔":"NO lead_pod➔")+pod.id)
+                  ,lbL                                                                               ,lbC                 ,lbR                                                             );
 
     layout_cluster_details_last = pod.id+(e ? (e.type+"."+e.propertyName) : "");
     /*}}}*/
@@ -1828,15 +1828,16 @@ if( log_this) log("%c "+caller+": i_next: "+(pods_cluster.i_next+1)+"/"+visible_
     /*}}}*/
     /* TOP min max .. f(lead_pod) {{{*/
     let lead_pod
-        = pod.parent_pod ? pod.parent_pod
-        :     moving_pod ? moving_pod
-        :                  null;
+        = (pod.id == "menu_"+taxo_json.id)
+        ?  moving_pod
+        :  layout_cluster_get_menu_EL_lead_pod( pod )
+        || moving_pod;
 
     if( lead_pod )
     {
         let lead_pod_bcr     = lead_pod.getBoundingClientRect();
 
-        //  pod.title += "\n parent_pod: "+ lead_pod.id+" top=["+ (lead_pod.getBoundingClientRect().top).toFixed(0)+"]";
+        //  pod.title += "\n lead_pod: "+ lead_pod.id+" top=["+ (lead_pod.getBoundingClientRect().top).toFixed(0)+"]";
         //log("...pod["+pod.id+"]: lead_pod_bcr:", lead_pod_bcr)
         //log("......["+pod.id+"]: "+pod.title)
 
@@ -1875,7 +1876,7 @@ if( log_this) log("%c "+caller+": i_next: "+(pods_cluster.i_next+1)+"/"+visible_
 if( tag_this)
     log_key_val_group((pods_cluster.i_next+1)+" - "+lead_pod.id+" ➔ "+pod.id
                , {             i_next : pods_cluster.i_next
-                 ,     pod_parent_pod : pod.parent_pod
+                 ,     pod_parent_pod : pod.lead_pod
                  ,         moving_pod
                  ,           lead_pod
                  ,                pod
@@ -1938,6 +1939,23 @@ if( log_this) log("➔ i_next=["+pods_cluster.i_next+"]");
 if( log_this) log("➔ all done");
     }
     /*}}}*/
+};
+/*}}}*/
+/*_ layout_cluster_get_menu_EL_lead_pod {{{*/
+let layout_cluster_get_menu_EL_lead_pod = function(menu_EL)
+{
+    if(menu_EL.lead_pod              ) return menu_EL.lead_pod;
+//  if(menu_EL.lead_pod == null      ) return null;
+    /*(menu_EL.lead_pod == undefined) */
+
+    let shadow_root = get_shadow_root();
+    let taxo_id     = menu_EL.id.substring(5); /* skip "menu_" */
+
+    let lead_pod    = shadow_root.getElementById( taxo_id);
+    if( lead_pod )    menu_EL.lead_pod = lead_pod;
+
+ //log("%c layout_cluster_get_menu_EL_lead_pod%c"+menu_EL.id+"%c ...return ["+(lead_pod ? lead_pod.id : "")+"]", lbL+lf0, lbR+lf5, lbH+lf6)
+    return lead_pod;
 };
 /*}}}*/
 /*_ layout_cluster_handler_scroll_to_selected_item {{{*/
@@ -2513,8 +2531,6 @@ if( log_this && !movement.has_moved) log("%c...!has_moved .. onDown_EL.id=["+ (m
         lib_util.cancel_event(e);
         return;
     }
-
-    if(!e_target.parentElement) return;
     /*}}}*/
 //    /* [div_magnify] {{{*/ // TOO MESSY !!
 //    if(e_target.parentElement.id == "div_magnify")
@@ -2689,13 +2705,6 @@ if( log_this) log("%c DISPLAY [menu_EL_id_path_array] OF ["+menu_EL.id+"]:", lf5
 
             undisplay_menu_EL_all(caller);
             dodisplay_menu_EL_id_path_array(menu_EL_id_path_array, menu_EL, caller);
-            /* ATTACH [el.parent_pod] as [current_menu_EL.parent_EL] {{{*/
-            sub_menu_EL = shadow_root.getElementById( sub_menu_id );
-            if( sub_menu_EL && !sub_menu_EL.parent_pod) {
-                sub_menu_EL.parent_pod = menu_EL;
-if( log_this) log("%c➔ parent_pod:",7, sub_menu_EL.parent_pod);
-            }
-            /*}}}*/
         }
         else {
             sync_taxo_clear_button( caller );
@@ -3365,14 +3374,6 @@ if(TAXO_MENU_TAG) logBIG("HIDING  ["+el.id+"]", 2);
 if(TAXO_MENU_TAG) logBIG("SHOWING ["+el.id+"]", 5);
 
                 taxo_pods.dodisplay_menu_EL(el, caller);
-
-//              /* ATTACH [el.parent_pod] as [current_menu_EL.parent_EL] {{{*/
-//              if(    current_menu_EL.parent_EL
-//                 && !el.parent_pod                                  // "menu_FURNITURE".includes("FURNITURE") */
-//                 &&  el.id.includes( current_menu_EL.parent_EL.id ) // ➔ sub menu positionning
-//                )    el.parent_pod = current_menu_EL.parent_EL;
-//              /*}}}*/
-
             }
             /*}}}*/
         });
@@ -3403,7 +3404,7 @@ if( log_this) log("%c"+caller+"("+taxo_id+ (clicked_EL ? (" , clicked_EL=["+clic
 /*{{{*/
 const LF  = String.fromCharCode(10);
 
-const MENU_ZINDEX_TOP = 100;
+const MENU_ZINDEX_TOP = 2147483646; // @see: amazon.com
 /*}}}*/
 let add_menu_EL_for_taxo_id = function(taxo_id,clicked_EL)
 {
@@ -3709,9 +3710,7 @@ console.clear();
 
     if( sample_id_array.length == 0)
     {
-        let msg = "Nothing to check";
-        taxo_check_button.innerText
-            = taxo_check_button.innerText_saved+"\n"+ msg;
+        taxo_check_button.innerText = "Nothing\nto\ncheck";
 
         setTimeout(check_taxo_json_cleanup, CHECK_TAXO_JSON_CLEANUP_DELAY);
         return;
@@ -3719,6 +3718,7 @@ console.clear();
 
     /*}}}*/
     /* DISPLAY [sample_id_array] {{{*/
+    add_el_class(taxo_check_button.parentElement, "checking");
 
     let check_idx = 0;
     check_taxo_json_id_interval
@@ -3729,12 +3729,12 @@ console.clear();
             {
                 /* TRACE IN [taxo_check_button.textContent] */
                 let taxo_id = sample_id_array[ check_idx ];
-                let     msg = (check_idx+1)+" / "+sample_id_array.length
-                    +         "\n"+taxo_id.replace(/\./g,"\n");
+                let     msg = "CHECKING "+(check_idx+1)+" / "+sample_id_array.length
+                    +         "\n\n"
+                    +         taxo_id.replace(/\./g,"\n")
+                ;
 //log("%c➔ "+msg, lf6)
-
-                taxo_check_button.innerText
-                    = taxo_check_button.innerText_saved+"\n"+ msg;
+                taxo_check_button.innerText = msg;
 
                 /* [taxo_id] */
                 if( taxo_id.indexOf(".") >= 0) {
@@ -3745,7 +3745,7 @@ console.clear();
 
                 taxo_content.show_taxo_id( taxo_id );
                 let  menu_EL = shadow_root.getElementById( taxo_id  );
-                add_el_class(menu_EL, "checked");
+                add_el_class(menu_EL, "checking");
             }
             /*}}}*/
             /* or stop checking {{{*/
@@ -3776,13 +3776,14 @@ let check_taxo_json_cleanup = function()
     /* RESTORE [taxo_check_button.textContent] */
     let       shadow_root = get_shadow_root();
     let taxo_check_button = shadow_root.getElementById( "taxo_check" );
+    del_el_class(taxo_check_button.parentElement      , "checking"   );
 
     taxo_check_button.textContent = taxo_check_button.innerText_saved;
     delete taxo_check_button.innerText_saved;
 
     /* UNCHECK menu_EL sample */
-    let el_array = shadow_root.querySelectorAll(".checked");
-    /**/el_array.forEach((el) => del_el_class(el, "checked")); // remove invisible menus
+    let el_array = shadow_root.querySelectorAll( ".checking");
+    /**/el_array.forEach((el) => del_el_class(el, "checking")); // remove invisible menus
 
     taxo_pods.display_activated_cluster();
 };
