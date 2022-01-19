@@ -24,7 +24,7 @@
 /* eslint-disable no-warning-comments */
 
 const XPATH_CONTENT_SCRIPT_ID       = "xpath_content";
-const XPATH_CONTENT_SCRIPT_TAG      =  XPATH_CONTENT_SCRIPT_ID  +" (220118:16h:15)";
+const XPATH_CONTENT_SCRIPT_TAG      =  XPATH_CONTENT_SCRIPT_ID  +" (220119:19h:08)";
 /*}}}*/
 let   xpath_content = (function() {
 "use strict";
@@ -581,8 +581,8 @@ let div_tools_onResize = function(e) /* eslint-disable-line no-unused-vars */
 };
 /*}}}*/
 /* ORIENTATION */
-/*_ div_tools_onOrientationchange_CB {{{*/
-let div_tools_onOrientationchange_CB = function(e) /* eslint-disable-line no-unused-vars */
+/*_ div_tools_onOrientationchange {{{*/
+let div_tools_onOrientationchange = function(e) /* eslint-disable-line no-unused-vars */
 {
     div_tools_confine_to_viewport();
 };
@@ -907,6 +907,7 @@ if( log_this && !movement.has_moved) log("%c...!has_moved .. onDown_EL.id=["+ (m
         return;
     }
     /*}}}*/
+
 
     //┌────────────────────────────────────────────────────────────────────────┐
     //│ CLICK TOOL                                                             │
@@ -2500,7 +2501,7 @@ return { SHADOW_HOST_ID
     , div_tools_beforeunload
     , div_tools_onDown
     , div_tools_onKey
-    , div_tools_onOrientationchange_CB
+    , div_tools_onOrientationchange
     , div_tools_onResize
     , div_tools_onUp
 
