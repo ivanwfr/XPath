@@ -16,7 +16,7 @@
 /* eslint-disable no-warning-comments */
 
 const EVENT_LISTENERS_ID       = "event_listeners";
-const EVENT_LISTENERS_TAG      =  EVENT_LISTENERS_ID  +" (220106:21h:46)";
+const EVENT_LISTENERS_TAG      =  EVENT_LISTENERS_ID  +" (220119:18h:22)";
 /*}}}*/
 let   event_listeners = (function() {
 "use strict";
@@ -113,8 +113,8 @@ let on_resize               = function(e)
 /*_ on_orientationchange {{{*/
 let on_orientationchange    = function(e)
 {
-    xpath_content.xpath_tools_onOrientationchange_CB(e);
-     taxo_content.taxo_tools_onOrientationchange_CB (e);
+    xpath_content.div_tools_onOrientationchange(e);
+     taxo_content.div_tools_onOrientationchange(e);
 };
 /*}}}*/
 

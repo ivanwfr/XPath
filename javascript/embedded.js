@@ -14,7 +14,7 @@
 /* eslint-disable      no-warning-comments */
 
 const EMBEDDED_SCRIPT_ID   = "embedded";
-const EMBEDDED_SCRIPT_TAG  =  EMBEDDED_SCRIPT_ID  +" (220118:15h:53)";
+const EMBEDDED_SCRIPT_TAG  =  EMBEDDED_SCRIPT_ID  +" (220119:15h:23)";
 /*}}}*/
 let   embedded = (function() {
 "use strict";
@@ -60,6 +60,7 @@ const TAXO_SELECTED_ARRAY
    , "ALL.HOME.FLORRINGS"
    , "ALL.HOME.HOUSEHOLD_APPLIANCES"
    , "ALL.HOME.ELECTRICITY.HOUSEHOLD_APPLIANCES"
+   , "ALL.PAYMENTS_AND_INSURANCES.PAYMENT_SYSTEMS"
  ];
 
 const TAXO_COLLECTED_ARRAY
