@@ -24,7 +24,7 @@
 /* eslint-disable no-mixed-operators  */
 
 const XPATH_TOOLS_JS_ID     = "xpath_tools";
-const XPATH_TOOLS_JS_TAG    =  XPATH_TOOLS_JS_ID  +" (220119:19h:56)";
+const XPATH_TOOLS_JS_TAG    =  XPATH_TOOLS_JS_ID  +" (220120:16h:03)";
 /*}}}*/
 let       xpath_tools = (function() {
 "use strict";
@@ -1113,7 +1113,7 @@ let div_activity_apply = function(e)
     }
     /*}}}*/
     /* REVALIDATE TOOLS GUI */
-    event_listeners.on_resize(e);
+//  event_listeners.on_resize(e);
 
 /*{{{
     lib_log.log_key_val("div_activity_apply"
