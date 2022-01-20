@@ -19,7 +19,7 @@
 /* eslint-disable      no-warning-comments */
 
 const TAXO_CONTENT_SCRIPT_ID   = "taxo_content";
-const TAXO_CONTENT_SCRIPT_TAG  =  TAXO_CONTENT_SCRIPT_ID  +" (220119:19h:15)";
+const TAXO_CONTENT_SCRIPT_TAG  =  TAXO_CONTENT_SCRIPT_ID  +" (220120:16h:52)";
 /*}}}*/
 let   taxo_content = (function() {
 "use strict";
@@ -232,7 +232,7 @@ const TAXO_PODS_TAG = false;
 /*}}}*/
 /*➔ buttons_fontSize {{{*/
 const BUTTONS_FONT_SIZE                   = 64;
-const BUTTONS_FONT_SIZE_MIN               =  6;
+const BUTTONS_FONT_SIZE_MIN               =  8;
 let   buttons_fontSize                    = BUTTONS_FONT_SIZE_MIN;
 
 /*}}}*/
@@ -294,14 +294,12 @@ let first_visibility_timer_handler = function()
 /*_ show_taxo_id {{{*/
 let show_taxo_id = function(taxo_id)
 {
-    undisplay_menu_EL_all("show_taxo_id");
-
     let taxo_id_CSV   = taxo_menu.get_node_path_of_taxo_id( taxo_id );
-
     let taxo_id_array = String(taxo_id_CSV).split(",");
 //log( "taxo_id_array:",taxo_id_array)
 
-    dodisplay_menu_EL_id_path_array(taxo_id_array, null, "show_taxo_id");
+    undisplay_menu_EL_all("show_taxo_id", taxo_id_array);
+    dodisplay_menu_EL_id_path_array(      taxo_id_array, null, "show_taxo_id");
 
     click_taxo_id_array( taxo_id_array );
 
@@ -320,7 +318,10 @@ j0"qy$
 /*_ click_taxo_id_array {{{*/
 let click_taxo_id_array = function(taxo_id_array)
 {
-    /* [CSS_CLICKED] ALL [taxo_id] PARENT MENU */
+    /* [CSS_CLICKED] NONE .. (singleton path constraint to current leaf) */
+    unclick_under_parent_EL( get_shadow_root() );
+
+    /* [CSS_CLICKED] ALL [taxo_id] PARENT MENU CHAIN */
     let shadow_root = get_shadow_root();
     for(let i=0; i< taxo_id_array.length; ++i)
     {
@@ -334,7 +335,7 @@ let click_taxo_id_array = function(taxo_id_array)
 
         let             is_a_leaf = has_el_class(leaf_el, "leaf");
         if(!is_a_leaf) add_el_class(leaf_el, CSS_CLICKED);
-//      add_el_class(leaf_el, CSS_CLICKED);
+//                     add_el_class(leaf_el, CSS_CLICKED);
     }
 };
 /*}}}*/
@@ -370,10 +371,9 @@ let show_visible_menu = function(_caller) // eslint-disable-line no-unused-vars
 /*}}}*/
 /*➔ display_activated_cluster {{{*/
 /*{{{*/
-const DISPLAYED_PODS_FONTSIZE_MIN = 8;
-
 let taxo_menu_hidden;
 //t last_fontSizeInt;
+
 /*}}}*/
 let display_activated_cluster = function()
 {
@@ -384,7 +384,7 @@ let display_activated_cluster = function()
     let activated             = taxo_msg.is_activated();
     taxo_menu_hidden
         =  !activated
-        || (fontSizeInt       < DISPLAYED_PODS_FONTSIZE_MIN);
+        || (fontSizeInt       < BUTTONS_FONT_SIZE_MIN);
 
 /*{{{
 if(fontSizeInt != last_fontSizeInt)
@@ -393,7 +393,7 @@ if(fontSizeInt != last_fontSizeInt)
 
     log("display_activated_cluster:%c"
         +" [taxo_menu_hidden "         + taxo_menu_hidden            +"]"
-        +" [MIN "                      + DISPLAYED_PODS_FONTSIZE_MIN +"]"
+        +" [MIN "                      + BUTTONS_FONT_SIZE_MIN +"]"
         +" [buttons_fontSize "            + buttons_fontSize               +"]"
         +" [visible_menu_EL_array.length " + visible_menu_EL_array.length    +"]"
         , l_x);
@@ -442,7 +442,7 @@ if( log_this) log("%c●●●●●●●●●●●●●●●●●●●�
             lead_taxo_id = path_array[m];
 if( log_this) log("%c \u21F6 ["+                            lead_taxo_id+"]", lfX[i+1]);
             let el = shadow_root.querySelector("#"+lead_taxo_id);
-            add_el_class(el, CSS_CLICKED);
+//          add_el_class(el, CSS_CLICKED);
 
             menu_EL = taxo_menu.get_menu_EL_for_taxo_id( lead_taxo_id );
         }
@@ -1063,7 +1063,7 @@ if( log_this) log("%c "+caller+"%c"+(_caller ? _caller:"")+"%c"+menu_EL.id+")"
 /*}}}*/
 
 /*➔ undisplay_menu_EL_all {{{*/
-let undisplay_menu_EL_all = function(_caller)
+let undisplay_menu_EL_all = function(_caller,but_taxo_id_array)
 {
     let menu_EL_array = [];
 
@@ -1078,16 +1078,17 @@ let undisplay_menu_EL_all = function(_caller)
 
         menu_EL_array.push( el );
     }
-    undisplay_menu_EL_array(menu_EL_array,_caller);
+    undisplay_menu_EL_array(menu_EL_array,_caller, but_taxo_id_array);
 };
 /*}}}*/
 /*_ undisplay_menu_EL_array {{{*/
-let undisplay_menu_EL_array = function(menu_EL_array,_caller)
+let undisplay_menu_EL_array = function(menu_EL_array,_caller,but_taxo_id_array=[])
 {
 //  let activated = taxo_msg.is_activated();
 
     for(let i=0; i<menu_EL_array.length; ++i)
-        undisplay_menu_EL(menu_EL_array[i], _caller);
+        if(!but_taxo_id_array.includes( menu_EL_array[i].id.substring(5) )) /* skip "menu_" prefix */
+            undisplay_menu_EL(          menu_EL_array[i], _caller);
 };
 /*}}}*/
 /*_ undisplay_menu_id {{{*/
@@ -1904,7 +1905,8 @@ if( tag_this)
     pod.style.left       = x+"px";
     pod.style.top        = y+"px";
 //  pod.style.visibility = "visible";
-    pod.style.opacity    = (first_visibility_timer) ? "0" : "1";
+//  pod.style.opacity    = (first_visibility_timer) ? "0" : "1";
+    pod.style.opacity    = "1";
 //  setTimeout(() => pod.style.opacity    = "1", 500)
 //  pod.title = (pod.title ? (            pod.title +"\n") : "")
 //            + (        e ? ("e_type=["+ e.type    +"]" ) : "")
@@ -1949,7 +1951,7 @@ let layout_cluster_get_menu_EL_lead_pod = function(menu_EL)
     /*(menu_EL.lead_pod == undefined) */
 
     let shadow_root = get_shadow_root();
-    let taxo_id     = menu_EL.id.substring(5); /* skip "menu_" */
+    let taxo_id     = menu_EL.id.substring(5); /* skip "menu_" prefix */
 
     let lead_pod    = shadow_root.getElementById( taxo_id);
     if( lead_pod )    menu_EL.lead_pod = lead_pod;
