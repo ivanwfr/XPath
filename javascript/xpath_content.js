@@ -163,9 +163,9 @@ let div_tools_init = function(request={})
 
 /*{{{*/
 let   caller = XPATH_CONTENT_SCRIPT_ID+".div_tools_init";
-let log_this = options.LOG1_EVENT || options.LOG5_DIV_TOOLS;
+let log_this = options.LOG1_STEP  || options.LOG5_DIV_TOOLS;
 
-if(options.LOG1_EVENT) logBIG(XPATH_CONTENT_SCRIPT_ID+" ➔ "+caller, 7);
+if(options.LOG1_EVENT) logBIG(XPATH_CONTENT_SCRIPT_ID+" ➔ "+caller, 1);
 //console.trace()
 //log("request:", request)
 /*}}}*/
@@ -206,11 +206,11 @@ if(options.LOG3_SERVER) log_query_step("EXTENSION", caller);
     /*}}}*/
     /* INJECT DIV_TOOLS HTML {{{*/
 
-if(options.LOG1_EVENT) logBIG(XPATH_CONTENT_SCRIPT_ID+" ➔ ADDING DIV_TOOLS HTML", 7);
+if(options.LOG1_EVENT) logBIG(XPATH_CONTENT_SCRIPT_ID+" ➔ ADDING DIV_TOOLS HTML", 1);
 
     xpath_tools.inject_shadow_root(log_this);
     div_tools = get_div_tools();
-if(options.LOG1_EVENT) logBIG("...div_tools=["+lib_util.get_id_or_tag(div_tools)+"]", 7);
+if(options.LOG1_EVENT) logBIG("...div_tools=["+lib_util.get_id_or_tag(div_tools)+"]", 1);
 
 //  /* [log_popup_div] [div_mask] into [shadow_host] {{{*/
 //  let log_popup_div = lib_popup.log_popup_div_get();
@@ -1691,8 +1691,8 @@ let log_this = options.LOG1_STEP || options.LOG2_MESSAGE;
 
 if(log_this)
     log("%c "+caller+" %c FROM "+activated     +" %c TO "+ state
-        ,lbL          ,lbC+lfX[  activated ? 4:2],lbR+lfX[ state ? 4:2]);
-if(log_this) log_key_val_group("request", request, 1, true);
+        ,lbL+lf8      ,lbC+lfX[  activated ? 4:2],lbR+lfX[ state ? 4:2]);
+if(log_this) log_key_val("request", request, 8);
 /*}}}*/
     activated = state;
     /* [div_tools_init] .. [event_listeners] .. [query_domains] {{{*/
