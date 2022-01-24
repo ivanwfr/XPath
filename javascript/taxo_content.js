@@ -19,7 +19,7 @@
 /* eslint-disable      no-warning-comments */
 
 const TAXO_CONTENT_SCRIPT_ID   = "taxo_content";
-const TAXO_CONTENT_SCRIPT_TAG  =  TAXO_CONTENT_SCRIPT_ID  +" (220120:16h:52)";
+const TAXO_CONTENT_SCRIPT_TAG  =  TAXO_CONTENT_SCRIPT_ID  +" (220121:16h:51)";
 /*}}}*/
 let   taxo_content = (function() {
 "use strict";
@@ -473,6 +473,8 @@ let query_taxo_id_path_CSS_array = function(_caller)
 let caller = "query_taxo_id_path_CSS_array";
 let log_this = TAXO_PODS_LOG;
 
+let tag_this = options.LOG1_STEP || log_this;
+if( log_this) log("%c"+caller+"("+_caller+")", lbH);
 /*}}}*/
     let shadow_root = get_shadow_root();
 
@@ -487,11 +489,7 @@ let log_this = TAXO_PODS_LOG;
         ,           selected_DOM_EL_array
         ,            visited_DOM_EL_array
     };
-if( log_this ) log("%c"+caller+"("+_caller+")", lbH);
-if( log_this ) log(  clicked_DOM_EL_array.length +"x %c CLICKED.....:\n", lf4,   clicked_DOM_EL_array);
-if( log_this ) log(collected_DOM_EL_array.length +"x %c COLLECTED...:\n", lf7, collected_DOM_EL_array);
-if( log_this ) log( selected_DOM_EL_array.length +"x %c SELECTED....:\n", lf5,  selected_DOM_EL_array);
-if( log_this ) log(  visited_DOM_EL_array.length +"x %c VISITED.....:\n", lf6,   visited_DOM_EL_array);
+if( tag_this) log_status(_caller);
 
     return result;
 };
@@ -518,7 +516,7 @@ let sync_taxo_clear_button = function(_caller)
 {
 /*{{{*/
 let caller = "sync_taxo_clear_button";
-let log_this = options.LOG1_STEP;
+let log_this = options.LOG1_EVENT;
 
 /*}}}*/
     /* VISIBLE PODS [m_count] .. number of menu showing {{{*/
@@ -530,7 +528,7 @@ let log_this = options.LOG1_STEP;
 
     /*}}}*/
     /* DOM [collected] [selected] [visited] {{{*/
-    query_taxo_id_path_CSS_array(caller);
+    query_taxo_id_path_CSS_array("SYNC [taxo_clear] BUTTON");
     let c_count     = collected_DOM_EL_array.length;
     let s_count     =  selected_DOM_EL_array.length;
     let v_count     =   visited_DOM_EL_array.length;
@@ -561,13 +559,13 @@ let log_this = options.LOG1_STEP;
         + (v_count ? ("\n"+v_count+" visited"  ): "");
 
     let title_action
-        =  (  c_count         && ("click to clear "+c_count+" collected" ))
-        || (  s_count         && ("click to clear "+s_count+" selected"  ))
-        || (  v_count         && ("click to clear "+v_count+" visited"   ))
-        || ( (m_count    > 1) && ("click for TOP MENU ONLY"              ))
-        || ( (m_count    > 0) && ("click to UNLOAD ALL SELECTIONS"       ))
-        || (!is_cache_empty() && ("click to RELOAD SELECTIONS FROM CACHE"))
-        || (                     ("YET NO SELECTIONS FOR THIS PAGE"      ));
+        =  (  c_count         && ("Click to clear "+c_count+" COLLECTED" ))
+        || (  s_count         && ("Click to clear "+s_count+" SELECTED"  ))
+        || (  v_count         && ("Click to clear "+v_count+" VISITED"   ))
+        || ( (m_count    > 1) && ("Click for TOP MENU only"              ))
+        || ( (m_count    > 0) && ("Click to UNLOAD TAXONOMY DATA"        ))
+        || (!is_cache_empty() && ("Click to RELOAD selections from cache"))
+        || (                     ("Yet no selections for this page"      ));
 
     taxo_clear.title
         =       title_count
@@ -588,7 +586,7 @@ if( log_this)
                        ,           caller : lib_log.get_callers()
                       }
                       , lfX[(s_count && 4) || (c_count && 5) || (v_count && 6) || 0]
-                      , false
+                      , true
                      );
 
 /*}}}*/
@@ -706,7 +704,7 @@ if( tag_this) log(         "%c-%c"+caller
                  ,lbb+lbH+lf2,lb0       );
 /*}}}*/
 
-    query_taxo_id_path_CSS_array(caller);
+    query_taxo_id_path_CSS_array("UNSELECT");
 
 if( tag_this) log("%c"+caller+": UNSELECTING (x"+selected_DOM_EL_array.length+")", lbH+lf5);
 
@@ -905,7 +903,7 @@ if( tag_this) log(         "%c-%c"+caller
                  ,lbb+lbH+lf2,lb0       );
 /*}}}*/
 
-    query_taxo_id_path_CSS_array(caller);
+    query_taxo_id_path_CSS_array("UNCOLLECT");
 
 if( tag_this) log("%c"+caller+": UNCOLLECTING (x"+collected_DOM_EL_array.length+")", lbH+lf7);
 
@@ -1175,6 +1173,8 @@ let taxo_pods_init = function(request)
 let   caller = "taxo_pods_init";
 let log_this = options.LOG1_STEP || options.LOG5_DIV_TOOLS;
 
+let tag_this = options.LOG1_EVENT || log_this;
+
 if( log_this) logBIG( TAXO_CONTENT_SCRIPT_ID+" ➔ "+caller, 5);
 //console.trace()
 //log("request:", request)
@@ -1193,16 +1193,17 @@ if( log_this) logBIG( TAXO_CONTENT_SCRIPT_ID+" ➔ "+caller, 5);
         return;
     }
     /*}}}*/
-    /* ACTIVATED {{{*/
+    /* QUERY ACTIVATED {{{*/
     if(!request || !request.activated)
     {
-if( log_this) log("%c GET ACTIVATED STATE FROM BACKGROUND SCRIPT", lbH+lf9);
+if( tag_this) logBIG("QUERY ACTIVATED STATE FROM BACKGROUND SCRIPT", lbH+lf8);
 
 
         taxo_msg.query_active_state();
         return;
     }
     /*}}}*/
+if( log_this) log_sep_top( TAXO_CONTENT_SCRIPT_ID+" ➔ "+caller, 1);
     /* 1/2 INJECT TAXO GUI INTO SINGLE LIB shadow_host {{{*/
     if( get_use_lib_shadow_root() ) {
 if( log_this) logBIG("...INJECT TAXO GUI INTO MAIN LIB shadow_host ["+lib_util.SHADOW_HOST_ID+"]", 5);
@@ -1257,6 +1258,7 @@ if( log_this) logBIG("...div_tools=["+lib_util.get_id_or_tag(div_tools)+"]", 4);
         show_top_menu();
     }
     /*}}}*/
+if( log_this) log_sep_bot( TAXO_CONTENT_SCRIPT_ID+" ➔ "+caller, 1);
 };
 /*}}}*/
 /*➔ load_taxo_id_array {{{*/
@@ -1266,7 +1268,7 @@ let load_taxo_id_array = function(selected_taxo_id_path_CSV,collected_taxo_id_pa
 let caller = TAXO_CONTENT_SCRIPT_ID+".load_taxo_id_array";
 let log_this = options.LOG1_STEP;
 
-if( log_this) log_sep_top("TAXONOMY LOADING", 5);
+if( log_this) log_sep_top("TAXONOMY LOADING", 1);
 /*}}}*/
     /* REMOVE ANY CURRENTLY LOADED COLLECTION */
     unload_taxo_id_array_all();
@@ -1279,11 +1281,31 @@ if( log_this) log_sep_top("TAXONOMY LOADING", 5);
     if(!collected_cache) collected_cache = collected_taxo_id_path_CSV;
     set_taxo_id_path_COLLECTED( collected_taxo_id_path_CSV );
 
-if( log_this) log_sep_bot(caller, 5);
+if( log_this) log_sep_bot(caller, 1);
 
     xpath_tools.div_activity_apply();
 
-    load_taxo_sync_visited( log_this );
+    load_taxo_id_array_sync_visited( log_this );
+};
+/*}}}*/
+/*_ load_taxo_id_array_sync_visited {{{*/
+let load_taxo_id_array_sync_visited = function(_log_this)
+{
+/*{{{*/
+let caller = "load_taxo_id_array_sync_visited";
+
+/*}}}*/
+    let shadow_root = get_shadow_root();
+
+    query_taxo_id_path_CSS_array("SYNC VISITED");
+
+    let el_array = collected_DOM_EL_array.concat( selected_DOM_EL_array );
+
+    el_array.forEach((el) => {
+        let taxo_id = el.getAttribute("data-menu");
+        let menu_EL = shadow_root.getElementById( taxo_id );
+        if( menu_EL ) menu_EL.classList.add("visited");
+    });
 };
 /*}}}*/
 /*_ reload_taxo_id_array {{{*/
@@ -1298,7 +1320,7 @@ let reload_taxo_id_array = function(selected_taxo_id_path_CSV,collected_taxo_id_
 let caller = TAXO_CONTENT_SCRIPT_ID+".reload_taxo_id_array";
 let log_this = options.LOG1_STEP;
 
-if( log_this) log_sep_top("TAXONOMY RELOADING", 5);
+if( log_this) logBIG("TAXONOMY RELOADING", 5);
 /*}}}*/
     if(selected_cache || collected_cache)
         load_taxo_id_array(selected_cache, collected_cache);
@@ -1318,48 +1340,54 @@ let is_cache_empty = function()
 /*_ unload_taxo_id_array_all {{{*/
 let unload_taxo_id_array_all = function()
 {
+/*{{{*/
+let   caller = "unload_taxo_id_array_all";
+let log_this = options.LOG5_DIV_TOOLS;
+
+let tag_this = options.LOG1_EVENT || log_this;
+/*}}}*/
     let shadow_root = get_shadow_root();
     if(!shadow_root) return;
 
     let    el_array = shadow_root.querySelectorAll(".buttons_pod");
+if( log_this) log(caller+": el_array:",el_array);
+
     el_array.forEach((el) => {
-log("%c REMOVING %c "+el.id, lbL+lf2, lbR+lf9);
+if( tag_this) log("%c REMOVING %c "+el.id, lbL+lf2, lbR+lf9);
 
         shadow_root.removeChild( el );
     });
 };
 /*}}}*/
-/*_ load_taxo_sync_visited {{{*/
-let load_taxo_sync_visited = function(_log_this)
-{
-    let caller = "load_taxo_sync_visited";
-
-    let shadow_root = get_shadow_root();
-
-    query_taxo_id_path_CSS_array(caller);
-
-    let el_array = collected_DOM_EL_array.concat( selected_DOM_EL_array );
-
-    el_array.forEach((el) => {
-        let taxo_id = el.getAttribute("data-menu");
-        let menu_EL = shadow_root.getElementById( taxo_id );
-        if( menu_EL ) menu_EL.classList.add("visited");
-    });
-
+/*_ log_status {{{*/
 /*{{{*/
-if( _log_this )
-{
-    log("%c"+                          TAXO_CONTENT_SCRIPT_TAG, lbb+lbH+lf3);
-    log("%c"+  clicked_DOM_EL_array.length +" CLICKED.....:\n", lf4,   clicked_DOM_EL_array);
-    log("%c"+collected_DOM_EL_array.length +" COLLECTED...:\n", lf7, collected_DOM_EL_array);
-    log("path_array:", get_collected_taxo_id_path_array());
+const LOG_STATUS_CALLER_DEFAULT = "status";
 
-    log("%c"+ selected_DOM_EL_array.length +" SELECTED....:\n", lf5,  selected_DOM_EL_array);
-    log("path_array:", get_selected_taxo_id_path_array());
+let log_status_msg;
 
-    log("%c"+  visited_DOM_EL_array.length +" VISITED.....:\n", lf6,   visited_DOM_EL_array);
-}
+let log_status_msg_invalidate = function() { log_status_msg = null; };
+
 /*}}}*/
+let log_status = function(_caller=LOG_STATUS_CALLER_DEFAULT)
+{
+    if(_caller == LOG_STATUS_CALLER_DEFAULT) log_status_msg_invalidate();
+
+    let msg =   TAXO_CONTENT_SCRIPT_TAG+" ➔ ["+_caller+"]"
+        +(  clicked_DOM_EL_array.length ?    " "+   clicked_DOM_EL_array.length +  " Clicked" : "")
+        +(collected_DOM_EL_array.length ? " .. "+ collected_DOM_EL_array.length +" Collected" : "")
+        +( selected_DOM_EL_array.length ? " .. "+  selected_DOM_EL_array.length + " Selected" : "")
+        +(  visited_DOM_EL_array.length ? " .. "+   visited_DOM_EL_array.length +  " Visited" : "");
+
+    if(msg == log_status_msg) return;
+    log_status_msg = msg;
+
+    log_sep_top(log_status_msg, 0);
+    log("%c"+  clicked_DOM_EL_array.length +" CLICKED.....:", lf4,   clicked_DOM_EL_array);
+    log("%c"+collected_DOM_EL_array.length +" COLLECTED...:", lf7, collected_DOM_EL_array);
+    log("%c"+ selected_DOM_EL_array.length +" SELECTED....:", lf5,  selected_DOM_EL_array);
+    log("%c"+  visited_DOM_EL_array.length +" VISITED.....:", lf6,   visited_DOM_EL_array);
+log_caller();//FIXME
+    log_sep_bot(log_status_msg, 0);
 };
 /*}}}*/
 
@@ -2329,6 +2357,7 @@ console.dir(e);
     }
     /*}}}*/
     lib_util.set_onDown_XY(e, caller);
+    log_status_msg_invalidate();
 };
 /*}}}*/
 /*_ div_tools_onDown_moving_target {{{*/
@@ -2563,7 +2592,7 @@ if( tag_this) log("%c CLICK TAXO-TOOL ➔ HIDING CLICKED %c"+e_target.id
         else {
             switch( e_target.id  ) {
             case "taxo_single": { set_multiple_choice_state(false, e_target.id        ); } break;
-            case "taxo_clear" : { taxo_menu.sel_clear_some (       e_target.id, e.type); } break;
+            case "taxo_clear" : { taxo_menu.sel_clear_cycle(       e_target.id, e.type); } break;
             case "taxo_multi" : { set_multiple_choice_state( true, e_target.id        ); } break;
             case "taxo_check" : { taxo_menu.check_taxo_json();                           } break;
             default:
@@ -3173,6 +3202,7 @@ return { name : "taxo_pods"
     ,    unload_taxo_id_array_all
     ,    reload_taxo_id_array
     ,    is_cache_empty
+    ,    log_status
 
     /* DISPLAY */
     ,    dodisplay_menu_EL
@@ -3208,7 +3238,7 @@ return { name : "taxo_pods"
     , get_menu_EL_parent_array
     , get_selected_EL_array
     , load_div_tools_xy
-    , load_taxo_sync_visited
+    , load_taxo_id_array_sync_visited
     , set_taxo_id_path_CSS
     , show_taxo_id
     , undisplay_menu_EL_all
@@ -3593,11 +3623,11 @@ if( tag_this)
     taxo_pods.sync_taxo_clear_button(_caller);
 };
 /*}}}*/
-/*➔ sel_clear_some {{{*/
-let sel_clear_some = function(_caller)
+/*➔ sel_clear_cycle {{{*/
+let sel_clear_cycle = function(_caller)
 {
 /*{{{*/
-let   caller = "sel_clear_some";
+let   caller = "sel_clear_cycle";
 let tag_this = TAXO_MENU_TAG || taxo_pods.TAXO_PODS_TAG || options.LOG1_STEP;
 
 /*}}}*/
@@ -3770,6 +3800,7 @@ console.clear();
     let iterate_level_samples = iterate( taxo_json );
     log(iterate_level_samples);
 }}}*/
+    taxo_pods.log_status("checking");
 };
 /*}}}*/
 /*_ check_taxo_json_cleanup {{{*/
@@ -3862,7 +3893,7 @@ let iterate = function(obj, level=0)
 return { name : "taxo_menu"
     ,    get_menu_EL_for_taxo_id
     ,    sel_clear
-    ,    sel_clear_some
+    ,    sel_clear_cycle
     ,    sel_current_menu_taxo_id
 
     // DEBUG
@@ -4053,8 +4084,8 @@ let log_this = options.LOG1_STEP || options.LOG2_MESSAGE;
 
 if( log_this)
     log("%c "+caller+" %c FROM "+activated     +" %c TO "+ state
-        ,lbL          ,lbC+lfX[  activated ? 4:2],lbR+lfX[ state ? 4:2]);
-if( log_this) log_key_val_group("request", request, 1, true);
+        ,lbL+lf8      ,lbC+lfX[  activated ? 4:2],lbR+lfX[ state ? 4:2]);
+if( log_this) log_key_val("request", request, 8);
 /*}}}*/
     activated = state;
     /* [taxo_pods_init] .. [add_listeners] {{{*/
@@ -4164,12 +4195,10 @@ return { SHADOW_HOST_ID
     ,  get_collected_taxo_id_path_array : taxo_pods.get_collected_taxo_id_path_array
     ,  get_selected_taxo_id_path_array  : taxo_pods.get_selected_taxo_id_path_array
     ,  load_div_tools_xy                : taxo_pods.load_div_tools_xy
-    ,  load_taxo_sync_visited   : (  ) => taxo_pods.load_taxo_sync_visited(true)
     ,  set_multiple_choice_state        : taxo_pods.set_multiple_choice_state
     ,  set_taxo_id_path_CSS             : taxo_pods.set_taxo_id_path_CSS
     ,  show_sub_menu_for_taxo_id        : taxo_pods.show_sub_menu_for_taxo_id
     ,  show_taxo_id                     : taxo_pods.show_taxo_id
-    ,  status                     : () => taxo_pods.load_taxo_sync_visited(true)
     ,  sync_taxo_clear_button           : taxo_pods.sync_taxo_clear_button
     ,  unclick_under_parent_EL          : taxo_pods.unclick_under_parent_EL
     ,  uncollect_menu_EL_all            : taxo_pods.uncollect_menu_EL_all
@@ -4177,6 +4206,7 @@ return { SHADOW_HOST_ID
     ,  unselect_menu_EL_all             : taxo_pods.unselect_menu_EL_all
     ,  unselect_menu_id                 : taxo_pods.unselect_menu_id
     ,  unselect_under_menu_EL           : taxo_pods.unselect_under_menu_EL
+    ,  status                     : () => taxo_pods.log_status()
 
     // taxo_menu
     ,  activate                         : taxo_msg.set_activated
@@ -4190,7 +4220,7 @@ return { SHADOW_HOST_ID
     ,  iterate                  : (  ) => taxo_menu.iterate(taxo_json,0)
     ,  log_taxo_id                      : taxo_menu.log_taxo_id
     ,  sel_clear                        : taxo_menu.sel_clear
-    ,  sel_clear_some                   : taxo_menu.sel_clear_some
+    ,  sel_clear_cycle                  : taxo_menu.sel_clear_cycle
 
     //}}}
 };
