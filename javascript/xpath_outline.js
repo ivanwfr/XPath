@@ -722,7 +722,7 @@ let  caller = "data_num_xpath_load_array";
 let log_this = xpath_content.options.LOG1_STEP;
 
 if( log_this && _data_num_xpath_array) {
-    lib_log.log_sep_top("XPATH LOADING", 6);
+    lib_log.log_sep_top("XPATH LOADING", 1);
     log("%c"+  _data_num_xpath_array.length+ " XPATH ITEMS\n", lbb+lbH+lf3,  _data_num_xpath_array);
 }
 /*}}}*/
@@ -745,7 +745,7 @@ if( log_this && _data_num_xpath_array) {
     div_xpaths_rebuild("XPATH ONLOAD");
 
 if(!_data_num_xpath_array) page_refresh();
-if(log_this) lib_log.log_sep_bot(caller, 6);
+if(log_this) lib_log.log_sep_bot(caller, 1);
 };
 /*}}}*/
 /*_ data_num_xpath_keep_from_server_only {{{*/
