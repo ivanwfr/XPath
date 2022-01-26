@@ -19,7 +19,7 @@
 /* eslint-disable      no-warning-comments */
 
 const TAXO_CONTENT_SCRIPT_ID   = "taxo_content";
-const TAXO_CONTENT_SCRIPT_TAG  =  TAXO_CONTENT_SCRIPT_ID  +" (220121:16h:51)";
+const TAXO_CONTENT_SCRIPT_TAG  =  TAXO_CONTENT_SCRIPT_ID  +" (220126:14h:41)";
 /*}}}*/
 let   taxo_content = (function() {
 "use strict";
@@ -162,61 +162,61 @@ let set_use_lib_shadow_root = (state) => lib_tools.set_use_lib_shadow_root(state
 /*{{{*/
 let options = {};
 /*}}}*/
-    /*_ on_activated_load_options {{{*/
-    let on_activated_load_options = function(request)
+/*_ on_activated_load_options {{{*/
+let on_activated_load_options = function(request)
+{
+/*{{{*/
+let   caller = "on_activated_load_options";
+let log_this = options.LOG2_MESSAGE || options.LOG5_DIV_TOOLS;
+
+let tag_this = log_this || options.LOG5_DIV_TOOLS || options.LOG6_MOVE_TOOL;
+if( tag_this) log_sep_top("LOADING OPTIONS FROM "+Object.keys(request||{}).length+" REQUEST KEYS", 5);
+//console.trace()
+/*}}}*/
+    /* [options] FROM BACKGROUND SCRIPT MESSAGE (activated) {{{*/
+    if(request && typeof request.activated != "undefined")
     {
-    /*{{{*/
-    let   caller = "on_activated_load_options";
-    let log_this = options.LOG2_MESSAGE || options.LOG5_DIV_TOOLS;
+if(tag_this) log_key_val("➔ FROM BACKGROUND SCRIPT MESSAGE (activated) request", request, 4);
 
-    let tag_this = log_this || options.LOG5_DIV_TOOLS || options.LOG6_MOVE_TOOL;
-    if( tag_this) log_sep_top("LOADING OPTIONS FROM "+Object.keys(request||{}).length+" REQUEST KEYS", 5);
-    //console.trace()
+        /* client controls all options, except [activated] .. (which is controled by browser_action_click) */
+        Object.keys(request).forEach( function(k) { options[k] = request[k]; });
+    }
     /*}}}*/
-        /* [options] FROM BACKGROUND SCRIPT MESSAGE (activated) {{{*/
-        if(request && typeof request.activated != "undefined")
-        {
-    if(tag_this) log_key_val("➔ FROM BACKGROUND SCRIPT MESSAGE (activated) request", request, 4);
-
-            /* client controls all options, except [activated] .. (which is controled by browser_action_click) */
-            Object.keys(request).forEach( function(k) { options[k] = request[k]; });
-        }
-        /*}}}*/
-        /* [options] FROM EMBEDDED PAGE DOMAIN [localStorage] {{{*/
-        else {
+    /* [options] FROM EMBEDDED PAGE DOMAIN [localStorage] {{{*/
+    else {
 if( log_this) log("➔ FROM EMBEDDED PAGE DOMAIN [localStorage]:");
 
-            // ┌───────────────────────────────────────────────────────────────────┐
-            // │ [use_lib_shadow_root] FROM [OPTION_KEYS]                          │
-            // └───────────────────────────────────────────────────────────────────┘
-            for(let i=0;i< config_js.OPTION_KEYS.length; ++i)
-            {
-                let key  = config_js.OPTION_KEYS[i];
-                let val  = lib_util.localStorage_getItem( key );
-                if( val  ) options[key] =     JSON.parse( val );
-            }
-
-            // ┌───────────────────────────────────────────────────────────────────┐
-            // │ [use_lib_shadow_root] FROM [localStorage]                         │
-            // └───────────────────────────────────────────────────────────────────┘
-            if(typeof options.use_lib_shadow_root == "undefined")
-            {
-                /**/  options.use_lib_shadow_root  = lib_util.localStorage_getItem("use_lib_shadow_root");
-                if(   options.use_lib_shadow_root == null) delete options.use_lib_shadow_root;
-            }
+        // ┌───────────────────────────────────────────────────────────────────┐
+        // │ [use_lib_shadow_root] FROM [OPTION_KEYS]                          │
+        // └───────────────────────────────────────────────────────────────────┘
+        for(let i=0;i< config_js.OPTION_KEYS.length; ++i)
+        {
+            let key  = config_js.OPTION_KEYS[i];
+            let val  = lib_util.localStorage_getItem( key );
+            if( val  ) options[key] =     JSON.parse( val );
         }
-        /*}}}*/
-        /* [options] FROM DEFAULT [lib_util] {{{*/
+
+        // ┌───────────────────────────────────────────────────────────────────┐
+        // │ [use_lib_shadow_root] FROM [localStorage]                         │
+        // └───────────────────────────────────────────────────────────────────┘
         if(typeof options.use_lib_shadow_root == "undefined")
-            options.use_lib_shadow_root = lib_util.USE_LIB_SHADOW_ROOT;
+        {
+            /**/  options.use_lib_shadow_root  = lib_util.localStorage_getItem("use_lib_shadow_root");
+            if(   options.use_lib_shadow_root == null) delete options.use_lib_shadow_root;
+        }
+    }
+    /*}}}*/
+    /* [options] FROM DEFAULT [lib_util] {{{*/
+    if(typeof options.use_lib_shadow_root == "undefined")
+        options.use_lib_shadow_root = lib_util.USE_LIB_SHADOW_ROOT;
 
 //log("use_lib_shadow_root=["+ options.use_lib_shadow_root+"]")
-        /*}}}*/
+    /*}}}*/
 
 if( log_this) log_key_val("options", options, 6);
 if( tag_this) log_sep_bot(caller, 5);
-    };
-    /*}}}*/
+};
+/*}}}*/
 
 // ┌──────────────┐ ┌──────────────────────────────────────────────────────────┐
 // │ taxo_pods    │-│ [STATE-TRANSITION [selected] [collected] [EVENTS LAYOUT] │
@@ -262,6 +262,11 @@ const SELECTOR_VISITED      =                      "."+CSS_VISITED;
     // │ SHOW MENU ............................................... [taxo_pods] │
     // └───────────────────────────────────────────────────────────────────────┘
 /*➔ show_top_menu {{{*/
+/*{{{*/
+const FIRST_VISIBILITY_DELAY = 1000;
+
+let   show_top_menu_timer;
+/*}}}*/
 let show_top_menu = function()
 {
     /* GUI YET NOT BUILT */
@@ -271,19 +276,14 @@ let show_top_menu = function()
     /* SHOW TAXO TOP MENU */
     show_taxo_id( taxo_json.id );
 
-    if(!first_visibility_timer )
-    /**/first_visibility_timer =   setTimeout(first_visibility_timer_handler, FIRST_VISIBILITY_DELAY);
+    if(!show_top_menu_timer )
+    /**/show_top_menu_timer =   setTimeout(show_top_menu_handler, FIRST_VISIBILITY_DELAY);
 };
 /*}}}*/
-/*_ first_visibility_timer_handler {{{*/
-/*{{{*/
-const FIRST_VISIBILITY_DELAY = 1000;
-
-let   first_visibility_timer;
-/*}}}*/
-let first_visibility_timer_handler = function()
+/*_ show_top_menu_handler {{{*/
+let show_top_menu_handler = function()
 {
-    first_visibility_timer = null;
+    show_top_menu_timer = null;
 
     let shadow_root = get_shadow_root();
     let el_array    = shadow_root.querySelectorAll(taxo_pods.SELECTOR_BUTTONS_POD+":not("+taxo_pods.SELECTOR_HIDDEN+")");
@@ -301,7 +301,7 @@ let show_taxo_id = function(taxo_id)
     undisplay_menu_EL_all("show_taxo_id", taxo_id_array);
     dodisplay_menu_EL_id_path_array(      taxo_id_array, null, "show_taxo_id");
 
-    click_taxo_id_array( taxo_id_array );
+    show_taxo_id_array( taxo_id_array );
 
 /*{{{
 j0"qy$
@@ -315,8 +315,8 @@ j0"qy$
 }}}*/
 };
 /*}}}*/
-/*_ click_taxo_id_array {{{*/
-let click_taxo_id_array = function(taxo_id_array)
+/*_ show_taxo_id_array {{{*/
+let show_taxo_id_array = function(taxo_id_array)
 {
     /* [CSS_CLICKED] NONE .. (singleton path constraint to current leaf) */
     unclick_under_parent_EL( get_shadow_root() );
@@ -339,15 +339,15 @@ let click_taxo_id_array = function(taxo_id_array)
     }
 };
 /*}}}*/
-/*_ show_menu_taxo_id {{{*/
-let show_menu_taxo_id = function(taxo_id,clicked_EL)
+/*_ show_taxo_id_menu {{{*/
+let show_taxo_id_menu = function(taxo_id,clicked_EL)
 {
 /*{{{*/
-    let caller = "show_menu_taxo_id";
+    let caller = "show_taxo_id_menu";
 let log_this = options.LOG1_STEP;
 
 /*}}}*/
-if( log_this) log("%c show_menu_taxo_id("+taxo_id+")", lbR+lf7);
+if( log_this) log("%c show_taxo_id_menu("+taxo_id+")", lbR+lf7);
 
     let menu_EL = taxo_menu.get_menu_EL_for_taxo_id(taxo_id, clicked_EL);
 
@@ -361,6 +361,7 @@ if( log_this) log("menu_EL=["+lib_util.get_id_or_tag_and_className(menu_EL)+"]")
 let show_visible_menu = function(_caller) // eslint-disable-line no-unused-vars
 {
     let unhiding_fontSize = BUTTONS_FONT_SIZE_MIN * 2;
+
     if(parseInt(buttons_fontSize) < unhiding_fontSize)
         buttons_fontSize          = unhiding_fontSize+"px";
 
@@ -377,7 +378,7 @@ let taxo_menu_hidden;
 /*}}}*/
 let display_activated_cluster = function()
 {
-    let visible_menu_EL_array = get_visible_taxo_menu_EL_array();
+    let visible_menu_EL_array = get_visible_menu_EL_array();
     if(!visible_menu_EL_array.length  ) return "!visible_menu_EL_array";
 
     let fontSizeInt           = parseInt( buttons_fontSize );
@@ -415,11 +416,11 @@ last_fontSizeInt = fontSizeInt;
     // ┌──────────────────────┐
     // │ MENU QUERY CSS ARRAY │
     // └──────────────────────┘
-/*_ set_taxo_id_path_CSS {{{*/
-let set_taxo_id_path_CSS = function(taxo_id_CSV,className)
+/*_ class_taxo_id_path_CSS {{{*/
+let class_taxo_id_path_CSS = function(taxo_id_CSV,className)
 {
 /*{{{*/
-let caller = "set_taxo_id_path_CSS";
+let caller = "class_taxo_id_path_CSS";
 let log_this = options.LOG1_STEP;
 
 /*}}}*/
@@ -436,15 +437,14 @@ if( log_this) log("%c●●●●●●●●●●●●●●●●●●●�
         let path_array  = path_string.split(".");
         let m_leaf_idx  = path_array.length-1;
         let menu_EL;
-        let lead_taxo_id;
         for(let m=0; m < m_leaf_idx; ++m)
         {
-            lead_taxo_id = path_array[m];
-if( log_this) log("%c \u21F6 ["+                            lead_taxo_id+"]", lfX[i+1]);
-            let el = shadow_root.querySelector("#"+lead_taxo_id);
+            let lead_taxo_id = path_array[m];
+            let           el = shadow_root.querySelector        ("#"+lead_taxo_id);
+if( log_this) log("%c \u21F6 ["+                                     lead_taxo_id+"]", lfX[i+1]);
 //          add_el_class(el, CSS_CLICKED);
 
-            menu_EL = taxo_menu.get_menu_EL_for_taxo_id( lead_taxo_id );
+            menu_EL          = taxo_menu.get_menu_EL_for_taxo_id(    lead_taxo_id );
         }
 
         /* SET ITEM [className] */
@@ -601,7 +601,7 @@ let   selected_menu_EL_array  = [];
 /*_ set_taxo_id_path_SELECTED {{{*/
 let set_taxo_id_path_SELECTED = function(taxo_id_path_CSV)
 {
-    set_taxo_id_path_CSS(taxo_id_path_CSV, CSS_SELECTED);
+    class_taxo_id_path_CSS(taxo_id_path_CSV, CSS_SELECTED);
 };
 /*}}}*/
 /*➔ get_selected_taxo_id_path_array {{{*/
@@ -792,7 +792,7 @@ let   collected_menu_EL_array  = [];
 /*_ set_taxo_id_path_COLLECTED {{{*/
 let set_taxo_id_path_COLLECTED = function(taxo_id_path_CSV)
 {
-    set_taxo_id_path_CSS(taxo_id_path_CSV, CSS_COLLECTED);
+    class_taxo_id_path_CSS(taxo_id_path_CSV, CSS_COLLECTED);
 };
 /*}}}*/
 /*➔ get_collected_taxo_id_path_array {{{*/
@@ -954,8 +954,8 @@ if( log_this) log("collected_menu_EL_array.length:",collected_menu_EL_array.leng
     // │ CSS_HIDDEN (DISPLAY) │
     // └──────────────────────┘
 /*{{{*/
-/*_ get_visible_taxo_menu_EL_array {{{*/
-let get_visible_taxo_menu_EL_array = function()
+/*_ get_visible_menu_EL_array {{{*/
+let get_visible_menu_EL_array = function()
 {
     return get_taxo_menu_EL_array(true);// NOT HIDDEN ONLY
 };
@@ -1722,7 +1722,7 @@ if( log_this) log("%c"+caller+"("+lib_util.get_id_or_tag_and_className(args.movi
     layout_cluster_timeout = null;
 /*}}}*/
     /* PODS SELECTED {{{*/
-    let visible_menu_EL_array = get_visible_taxo_menu_EL_array();
+    let visible_menu_EL_array = get_visible_menu_EL_array();
 if( log_this) log("...visible_menu_EL_array:");
 if( log_this) console.dir(    visible_menu_EL_array  );
 
@@ -1933,7 +1933,7 @@ if( tag_this)
     pod.style.left       = x+"px";
     pod.style.top        = y+"px";
 //  pod.style.visibility = "visible";
-//  pod.style.opacity    = (first_visibility_timer) ? "0" : "1";
+//  pod.style.opacity    = (show_top_menu_timer) ? "0" : "1";
     pod.style.opacity    = "1";
 //  setTimeout(() => pod.style.opacity    = "1", 500)
 //  pod.title = (pod.title ? (            pod.title +"\n") : "")
@@ -2663,7 +2663,7 @@ if( tag_this) log("%c CLICK_2: MENU-COLLECTED   %c ➔ UNCOLLECT %c SET [CLICKED
 
                 uncollect_menu_EL( menu_EL    );
 
-                show_menu_taxo_id( menu_EL.id );
+                show_taxo_id_menu( menu_EL.id );
             }
             /*}}}*/
             /* 2/3 - menu_EL CSS_CLICKED   ➔ [ADD collected] {{{*/
@@ -2692,7 +2692,7 @@ if( tag_this) log("%c CLICK_3: MENU-CLICKED     %c ➔ COLLECT ["+ menu_EL.id +"
                     /*}}}*/
                     /* SHOW [sub_menu_EL] {{{*/
                     else {
-                        show_menu_taxo_id(menu_EL.id, menu_EL);
+                        show_taxo_id_menu(menu_EL.id, menu_EL);
 
                     }
                     /*}}}*/
@@ -3230,7 +3230,7 @@ return { name : "taxo_pods"
 
     //DEBUG {{{
     , adjust_pods_maxHeight
-    , click_taxo_id_array
+    , show_taxo_id_array
     , display_activated_cluster
     , div_tools_move_RESCALE
     , dodisplay_menu_EL_id_path_array
@@ -3239,7 +3239,7 @@ return { name : "taxo_pods"
     , get_selected_EL_array
     , load_div_tools_xy
     , load_taxo_id_array_sync_visited
-    , set_taxo_id_path_CSS
+    , class_taxo_id_path_CSS
     , show_taxo_id
     , undisplay_menu_EL_all
 
@@ -4155,6 +4155,7 @@ return { name : "taxo_msg"
 // └───────────────────────────────────────────────────────────────────────────┘
 /*{{{*/
 return { SHADOW_HOST_ID
+    ,    tag                     : () => TAXO_CONTENT_SCRIPT_TAG
 
     ,    get_div_tools
     ,    get_used_shadow_host_id : () => lib_tools.get_used_shadow_host_id(SHADOW_HOST_ID)
@@ -4187,7 +4188,7 @@ return { SHADOW_HOST_ID
 
     // taxo_pods
     ,  adjust_pods_maxHeight            : taxo_pods.adjust_pods_maxHeight
-    ,  click_taxo_id_array              : taxo_pods.click_taxo_id_array
+    ,  show_taxo_id_array               : taxo_pods.show_taxo_id_array
     ,  display_activated_cluster        : taxo_pods.display_activated_cluster
     ,  div_tools_move_RESCALE           : taxo_pods.div_tools_move_RESCALE
     ,  dodisplay_menu_EL_id_path_array  : taxo_pods.dodisplay_menu_EL_id_path_array
@@ -4196,7 +4197,7 @@ return { SHADOW_HOST_ID
     ,  get_selected_taxo_id_path_array  : taxo_pods.get_selected_taxo_id_path_array
     ,  load_div_tools_xy                : taxo_pods.load_div_tools_xy
     ,  set_multiple_choice_state        : taxo_pods.set_multiple_choice_state
-    ,  set_taxo_id_path_CSS             : taxo_pods.set_taxo_id_path_CSS
+    ,  class_taxo_id_path_CSS             : taxo_pods.class_taxo_id_path_CSS
     ,  show_sub_menu_for_taxo_id        : taxo_pods.show_sub_menu_for_taxo_id
     ,  show_taxo_id                     : taxo_pods.show_taxo_id
     ,  sync_taxo_clear_button           : taxo_pods.sync_taxo_clear_button
@@ -4308,6 +4309,6 @@ taxo_content.get_node_path_of_taxo_id( "RETAILER"             );
 taxo_content.dodisplay_menu_EL_id_path_array( "menu_ALL,menu_FASHION".split(",") );
 
 /get_selected_taxo_id_path_array.*function
-/set_taxo_id_path_CSS.*function
+/class_taxo_id_path_CSS.*function
 /check_taxo_json.*function
 */
