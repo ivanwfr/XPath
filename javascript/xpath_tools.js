@@ -13,7 +13,7 @@
 /* globals xpath_outline   */
 /* globals xpath_content   */
 /* globals taxo_content    */
-/* globals event_listeners */
+/* globals event_listeners */ /* eslint-disable-line no-unused-vars */
 
 /* exported xpath_tools, XPATH_TOOLS_JS_TAG */
 
@@ -24,7 +24,7 @@
 /* eslint-disable no-mixed-operators  */
 
 const XPATH_TOOLS_JS_ID     = "xpath_tools";
-const XPATH_TOOLS_JS_TAG    =  XPATH_TOOLS_JS_ID  +" (220120:16h:03)";
+const XPATH_TOOLS_JS_TAG    =  XPATH_TOOLS_JS_ID  +" (220126:14h:43)";
 /*}}}*/
 let       xpath_tools = (function() {
 "use strict";
@@ -157,7 +157,7 @@ if(!tools.loaded)
 let div_tools_css_data ="data:text/css,"+ escape(`
 /*INLINE{{{*/
 
-   #xpath_tools.css        { content: "dom_tools_html_css (220110:15h:40)"; }
+   #xpath_tools.css        { content: "dom_tools_html_css (220124:14h:03)"; }
 .waiting_animation SPAN {
     display                   : inline-block;
     font-size                 : 150%;
@@ -176,7 +176,7 @@ DIV        BUTTON *  { transition : all 500ms; }
 DIV        BUTTON *  { pointer-events: none;                           }
 DIV        BUTTON EM { display:        inline; white-space :   nowrap; }
 DIV.folded BUTTON EM { display: table-caption; white-space : pre-wrap; }
-DIV.folded        OL {   width: 0; height: 0; min-width: 0; min-height: 0; };
+DIV.folded        OL {   width: 0; height: 0; min-width: 0; min-height: 0; }
 #div_domains        button.selected,
 #div_urls           button.selected,
 #div_outline_pick   button.selected,
@@ -215,7 +215,7 @@ DIV.folded        OL {   width: 0; height: 0; min-width: 0; min-height: 0; };
 #div_tools BUTTON    { font-weight      :                               900; }
 #div_tools BUTTON    { color            :                              #000; }
 #div_tools BUTTON    { text-shadow      : 1px 1px 1px rgba(255,255,255,0.7); }
-#div_tools SUMMARY                        { white-space: nowrap; };
+#div_tools SUMMARY                        { white-space: nowrap; }
 ::-webkit-scrollbar                       { width         : 0.7rem; }
 ::-webkit-scrollbar:horizontal            { height        : 0.7rem; }
 ::-webkit-scrollbar                       { width         : 0.7rem; }
@@ -1064,7 +1064,7 @@ let div_activity_handler = function(e_target,e)
 };
 /*}}}*/
 /*_ div_activity_apply {{{*/
-let div_activity_apply = function(e)
+let div_activity_apply = function(e) /* eslint-disable-line no-unused-vars */
 {
     if(!tools.loaded) load_tools();
 //    /* [XPATH ● TAXO] .. CHECK BUTTONS STATE {{{*/
