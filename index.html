@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <!-- ┌─────────────────────────────────────────────────────────────────────┐ -->
-<!-- │ [index.html]                                   _TAG (220119:19h:40) │ -->
+<!-- │ [index.html]                                   _TAG (220225:19h:27) │ -->
 <!-- └─────────────────────────────────────────────────────────────────────┘ -->
 <html>
  <!--{{{-->
@@ -85,7 +85,8 @@
      for(let i=0; i<a_array.length; ++i)
      {
       //let a_innerText    = a_array[i].innerText;
-      a_array[i].href      = a_array[i].href     .replace(/localhost/gm, location.hostname);
+      a_array[i].href      = a_array[i].href     .replace(/\blocalhost\b/gm, location.hostname);
+//    a_array[i].href      = a_array[i].href     .replace(/localhost/gm, location.hostname);
 //    a_array[i].innerText = a_array[i].innerText.replace(/localhost/gm, location.hostname);
 
 //console.log("┌──────────────────────────────────────┐");
