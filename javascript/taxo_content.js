@@ -6,7 +6,6 @@
 /* globals console, window, document, setTimeout, clearTimeout, setInterval, clearInterval */
 /* globals requestAnimationFrame */
 /* globals lib_util */
-/* globals lib_popup */ /* eslint-disable-line no-unused-vars */
 /* globals lib_tools */
 
 /* globals config_js */
@@ -19,7 +18,7 @@
 /* eslint-disable      no-warning-comments */
 
 const TAXO_CONTENT_SCRIPT_ID   = "taxo_content";
-const TAXO_CONTENT_SCRIPT_TAG  =  TAXO_CONTENT_SCRIPT_ID  +" (220126:14h:41)";
+const TAXO_CONTENT_SCRIPT_TAG  =  TAXO_CONTENT_SCRIPT_ID  +" (220218:14h:00)";
 /*}}}*/
 let   taxo_content = (function() {
 "use strict";
