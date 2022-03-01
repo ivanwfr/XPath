@@ -32,7 +32,7 @@
 */
 
 const XPATH_OUTLINE_JS_ID         = "outline";
-const XPATH_OUTLINE_JS_TAG        =  XPATH_OUTLINE_JS_ID +" (220218:14h:17)";
+const XPATH_OUTLINE_JS_TAG        =  XPATH_OUTLINE_JS_ID +" (220226:18h:44)";
 /*}}}*/
 let xpath_outline = (function() {
 /*➔ LOG {{{*/
@@ -1101,7 +1101,10 @@ let div_xpaths_sync_GUI_handler = function(docked)
     }
     /*}}}*/
     /* [open] {{{*/
-    let open        = lib_util.get_tool(         "xpath_expand").classList.contains("selected");
+    let xpath_expand = lib_util.get_tool("xpath_expand");
+    if(!xpath_expand ) return;
+
+    let open        = xpath_expand.classList.contains("selected");
 
     if( open )       div_tools.classList.add   ("xpath_expand");
     else             div_tools.classList.remove("xpath_expand");

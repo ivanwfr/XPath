@@ -18,7 +18,7 @@
 /* eslint-disable      no-warning-comments */
 
 const TAXO_CONTENT_SCRIPT_ID   = "taxo_content";
-const TAXO_CONTENT_SCRIPT_TAG  =  TAXO_CONTENT_SCRIPT_ID  +" (220218:14h:00)";
+const TAXO_CONTENT_SCRIPT_TAG  =  TAXO_CONTENT_SCRIPT_ID  +" (220301:17h:31)";
 /*}}}*/
 let   taxo_content = (function() {
 "use strict";
@@ -285,6 +285,7 @@ let show_top_menu_handler = function()
     show_top_menu_timer = null;
 
     let shadow_root = get_shadow_root();
+    if(!shadow_root ) return
     let el_array    = shadow_root.querySelectorAll(taxo_pods.SELECTOR_BUTTONS_POD+":not("+taxo_pods.SELECTOR_HIDDEN+")");
 //log("el_array:",el_array)
     el_array.forEach((el) => el.style.opacity = 1);
@@ -535,8 +536,8 @@ let log_this = options.LOG1_EVENT;
     /*}}}*/
     /* BUTTON[taxo_clear] [className] {{{*/
 
-    let taxo_clear
-        = shadow_root.querySelector("#taxo_clear");
+    let taxo_clear = shadow_root.querySelector("#taxo_clear");
+    if(!taxo_clear) return;
 
     let className
         = "cleared "
