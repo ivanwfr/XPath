@@ -1,0 +1,15 @@
+{   "name"         :             "XPH"
+  , "version"      :             "1.0.0"
+  , "description"  :             "XHP on Docker"
+  , "author"       :             "Ivan Wellesz <ivanw@orange.fr>"
+  , "main"         :             "SERVER/server.js"
+  , "scripts"      : { "start" : "node SERVER/server.js" }
+  , "dependencies" : {
+      "node"  : "latest",
+      "fs"    : "latest",
+      "http"  : "latest",
+      "https" : "latest",
+      "os"    : "latest",
+      "pg"    : "latest"
+  }
+}
