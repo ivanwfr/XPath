@@ -3,6 +3,8 @@
 
 ### ✔ [ZIP archive on GitHub](../../archive/master.zip)
 
+### `README.md` _TAG (220901:01h:28)
+
 ## `USAGE`
 <!--{{{-->
 ```bash
@@ -34,6 +36,11 @@ $ explorer http://localhost:83/index.html   # visit index page
         ├── Makefile
         ├── manifest.json
         └── config.json
+
+    DOCKER:
+        ├── Dockerfile
+        ├── package-lock.json
+        └── package.json
 
     RUN:
         ├── server.sh

@@ -3,11 +3,16 @@
 <!-- │ [index.html]                                   _TAG (220225:19h:27) │ -->
 <!-- └─────────────────────────────────────────────────────────────────────┘ -->
 <html>
- <!--{{{-->
+ <!-- head {{{-->
  <head>
   <meta charset="utf-8"/>
   <title>index</title>
   <base href="file:///C:/LOCAL/DATA/ANDROID/PROJECTS/">
+ </head>
+ <!--}}}-->
+
+ <body onload='set_body_style_f_location(); replace_localhost_with_location_hostname();'>
+
   <!-- style {{{-->
   <style>
    /* LAYOUT {{{*/
@@ -99,10 +104,6 @@
    /*}}}*/
   </script>
   <!--}}}-->
- </head>
- <!--}}}-->
-
- <body onload='set_body_style_f_location(); replace_localhost_with_location_hostname();'>
 
   <h1>index</h1>
 
@@ -111,9 +112,9 @@
    <div>
     <b>&#x25B6; Select an <em class="scheme https">HTTPS URL</em> to this file :</b>
     <ul>
-    <li><a href="https://localhost:443/index.html">http://localhost:<em class="scheme https">443</em>/index.html …</a></li>
     <li><a href="https://localhost:444/index.html">http://localhost:<em class="scheme https">444</em>/index.html …</a></li>
     <li><a href="https://localhost:446/index.html">http://localhost:<em class="scheme https">446</em>/index.html …</a></li>
+    <li><a href="https://localhost:447/index.html">http://localhost:<em class="scheme https">447</em>/index.html …</a></li>
     </ul>
   </div>
 <!--}}}-->
@@ -121,9 +122,9 @@
    <div>
     <b>&#x25B6; Select an <em class="scheme http" >HTTP URL</em> to this file :</b>
     <ul>
-    <li><a href="http://localhost:80/index.html">http://localhost:<em class="scheme http" >80</em>/index.html …</a></li>
     <li><a href="http://localhost:81/index.html">http://localhost:<em class="scheme http" >81</em>/index.html …</a></li>
     <li><a href="http://localhost:83/index.html">http://localhost:<em class="scheme http" >83</em>/index.html …</a></li>
+    <li><a href="http://localhost:84/index.html">http://localhost:<em class="scheme http" >84</em>/index.html …</a></li>
     </ul>
    </div>
    <!--}}}-->
@@ -134,9 +135,9 @@
    <div class="div_https">
     <b><em class="scheme https">HTTPS</em> SERVER DASHBOARD</b>
     <ul>
-    <li><a href="https://localhost:443/server_index.html">https://localhost<em class="scheme https">:443</em>/server_index.html &#x25B6;</a></li>
     <li><a href="https://localhost:444/server_index.html">https://localhost<em class="scheme https">:444</em>/server_index.html &#x25B6;</a></li>
     <li><a href="https://localhost:446/server_index.html">https://localhost<em class="scheme https">:446</em>/server_index.html &#x25B6;</a></li>
+    <li><a href="https://localhost:447/server_index.html">https://localhost<em class="scheme https">:447</em>/server_index.html &#x25B6;</a></li>
     </ul>
    </div>
    <!--}}}-->
@@ -144,9 +145,9 @@
    <div class="div_http">
     <b><em class="scheme http" >HTTP</em>  SERVER DASHBOARD</b>
     <ul>
-    <li><a href= "http://localhost:80/server_index.html" > http://localhost<em class="scheme http" >:80</em>/server_index.html &#x25B6;</a></li>
     <li><a href= "http://localhost:81/server_index.html" > http://localhost<em class="scheme http" >:81</em>/server_index.html &#x25B6;</a></li>
     <li><a href= "http://localhost:83/server_index.html" > http://localhost<em class="scheme http" >:83</em>/server_index.html &#x25B6;</a></li>
+    <li><a href= "http://localhost:84/server_index.html" > http://localhost<em class="scheme http" >:84</em>/server_index.html &#x25B6;</a></li>
     </ul>
    </div>
    <!--}}}-->

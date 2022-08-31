@@ -1,11 +1,11 @@
-{ "SERVER_URL"         : "https://192.168.1.14:446"
+{ "SERVER_URL"         : "http://192.168.1.14:83"
 , "TEXT_LEN_MAX"       :  96
 , "PORT_HTTP"          :  83
 , "PORT_HTTPS"         : 446
-,  "KEY_PEM"           :    "../KEYSTORE/server/privkey.pem"
-, "CERT_PEM"           :    "../KEYSTORE/server/fullchain.pem"
+,  "KEY_PEM"           :    "serverkey.pem"
+, "CERT_PEM"           :    "servercert.pem"
 
-, "HOST"               : "localhost"
+, "HOST"               : "192.168.1.14"
 , "PORT"               : 5432
 , "USER"               : "postgres"
 , "PASSWORD"           : "postgres"
