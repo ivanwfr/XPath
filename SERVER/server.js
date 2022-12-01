@@ -3,11 +3,11 @@
 //└──▲▲▲▲▲▲────────────────────────────────────────────────────────────────────┘
 /* jshint esversion: 9, laxbreak:true, laxcomma:true, boss:true */ /*{{{*/
 /* globals  require, process */
-/* globals  console */
+// globals  console */
 /* eslint-disable no-warning-comments */
 
 const SERVER_JS_ID  = "server";
-const SERVER_JS_TAG = SERVER_JS_ID  +" (211231:09h:03)";
+const SERVER_JS_TAG = SERVER_JS_ID  +" (221123:19h:28)";
 /*}}}*/
 let server = (function() {
 "use strict";
@@ -53,6 +53,7 @@ let   fs                        = require("fs"   );
 let   http                      = require("http" );
 let   https                     = require("https");
 let { networkInterfaces }       = require("os"   );
+//t lib_log                     = require("../lib/lib_log.js");
 //}}}
 //➔ [config defaults] {{{
 let   config =
@@ -300,6 +301,9 @@ let log_net_info = function(response)
                     results[name] = [];
 
                 results[name].push(net.address);
+
+                if(config.HOST && (config.HOST != "localhost"))
+                    net_address = config.HOST;
 
                 if(!net_address)
                     net_address = net.address;
@@ -832,6 +836,7 @@ if(config.LOG_MORE)
     log_B(    "  │        lang=["+ lang        +"]\n"
              +"  │     user_id=["+ user_id     +"]\n"
              +"  │ consumed_by=["+ consumed_by +"]");
+//lib_log.log_caller()
     log_B(    "  └────────────────────────────────────────────────────────────────────────────┘");
 
     return consumed_by;

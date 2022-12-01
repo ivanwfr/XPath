@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <!-- ┌─────────────────────────────────────────────────────────────────────┐ -->
-<!-- │ XPH [SERVER_INDEX]                             _TAG (211027:15h:22) │ -->
+<!-- │ XPH [SERVER_INDEX]                             _TAG (220902:18h:31) │ -->
 <!-- └─────────────────────────────────────────────────────────────────────┘ -->
 <html lang="FR">
  <head>
@@ -9,10 +9,28 @@
  </head>
  <body>
 
-   <a href="https://github.com/ivanwfr/XPath" target="GitHub" style="float:right; margin:0 1em;">GitHub XPath</a>
+
+
+
+
+
+   <a href="https://github.com/ivanwfr/XPath"   target="GitHub" style="margin:0 1em;">GitHub XPath</a>
+<!-- script get_index_url {{{-->
+<script>
+let get_index_url = function()
+{
+ return location.protocol
+  +               "//"
+  +               location.host
+  +               "/index.html";
+};
+</script>
+<!--}}}-->
+   <a href="index.html" onclick='location = get_index_url()'><em>index.html</em></a>
+   <hr>
 
    <iframe id = "iframe_CONTROL"
-    src       = "./CONTROL/index_CONTROL.html"
+    src       = "./CONTROL/index_control.html"
     style     = "
         background-color : #448;
         width            : 99%;

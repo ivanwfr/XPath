@@ -1,5 +1,5 @@
 # image to build from
-FROM    node:16
+FROM    node:latest
 
 # Create app directory
 WORKDIR /usr/src/app

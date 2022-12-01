@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <!-- ┌─────────────────────────────────────────────────────────────────────┐ -->
-<!-- │ [index.html]                                   _TAG (220225:19h:27) │ -->
+<!-- │ [index.html]                                   _TAG (221123:18h:43) │ -->
 <!-- └─────────────────────────────────────────────────────────────────────┘ -->
 <html>
  <!-- head {{{-->
@@ -19,8 +19,9 @@
    html        { height        : 100%; }
    body        { background    : linear-gradient(to bottom right, rgba(255,255,255,1), rgba(0,0,0,0.5)); }
 
-   h1          { text-align    :  right; }
+   h1          { text-align    :  left; }
    h1          { align-self    : center; }
+   h2          { margin        : auto;   }
 
    div, pre    { box-shadow    : 2px 2px 2px #888; }
    div, pre    { border        : 1px solid   #DDD; }
@@ -28,15 +29,12 @@
    div, pre    { padding       : 1em;              }
    div, pre    { margin        : 1em;              }
 
-            #div_online  { display: grid; grid-template-columns: 1fr 1fr; }
-            #div_offline { display: grid; grid-template-columns: 1fr 1fr; }
+   .offline #div_offline { display: grid; grid-template-columns: 4fr 1fr 4fr; }
+   .offline #div_online  { display: none;                                 }
 
-   .offline #div_offline { visibility            : visible !important;         }
-            #div_offline { visibility            : hidden            ;         }
-            #div_offline { position              : fixed; top: 1em; left: 1em; }
+            #div_offline { display: none;                                 }
+            #div_online  { display: grid; grid-template-columns: 4fr 1fr 4fr; }
 
-   .offline #div_online  { visibility            : hidden;  }
-   .offline #div_online  { pointer-events        : none;    }
             #div_online  { box-shadow            : none;    }
             #div_online  { border                : none;    }
 
@@ -79,23 +77,24 @@
    let replace_localhost_with_location_hostname = function()
    {
 //console.log("%c replace_localhost_with_location_hostname ["+location.hostname+"]", "background:#00B;");
-    if(!location.hostname || (location.hostname == "localhost"))
-    {
-        console.log("...have no substitute for [localhost] yet...");
-        return;
-    }
+//  if(!location.hostname || (location.hostname == "localhost"))
+//  {
+//      console.log("...have no substitute for [localhost] yet...");
+//      return;
+//  }
+//  let hostname     = (!location.hostname || (location.hostname == "localhost")) ? "192.168.1.14" : location.host;
+    let hostname     = "192.168.1.14";
 
     let a_array = document.querySelectorAll("A");
 
      for(let i=0; i<a_array.length; ++i)
      {
       //let a_innerText    = a_array[i].innerText;
-      a_array[i].href      = a_array[i].href     .replace(/\blocalhost\b/gm, location.hostname);
-//    a_array[i].href      = a_array[i].href     .replace(/localhost/gm, location.hostname);
-//    a_array[i].innerText = a_array[i].innerText.replace(/localhost/gm, location.hostname);
+      a_array[i].href      = a_array[i].href     .replace(/\blocalhost\b/gm, hostname);
+      a_array[i].innerHTML = a_array[i].innerHTML.replace(/\blocalhost\b/gm, hostname);
 
 //console.log("┌──────────────────────────────────────┐");
-//console.log(  a_array[i].innerText                    );
+//console.log(  a_array[i].innerHTML                    );
 //console.log(  a_array[i] );
 //console.log("└──────────────────────────────────────┘");
 
@@ -118,6 +117,7 @@
     </ul>
   </div>
 <!--}}}-->
+  <h2>OFFLINE</h2>
   <!-- HTTP  URL {{{-->
    <div>
     <b>&#x25B6; Select an <em class="scheme http" >HTTP URL</em> to this file :</b>
@@ -141,6 +141,7 @@
     </ul>
    </div>
    <!--}}}-->
+  <h2>ONLINE</h2>
     <!-- HTTP  SERVER DASHBOARD {{{-->
    <div class="div_http">
     <b><em class="scheme http" >HTTP</em>  SERVER DASHBOARD</b>
